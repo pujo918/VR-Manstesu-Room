@@ -1,0 +1,99 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    background-color: #0b0f19;
+    user-select: none;
+}
+
+/* Panel Panduan Kiri Atas */
+#ui-overlay {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #f8fafc;
+    padding: 16px 22px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    max-width: 330px;
+    pointer-events: none;
+}
+
+#ui-overlay h1 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #38bdf8;
+}
+
+#ui-overlay p {
+    margin: 4px 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #cbd5e1;
+}
+
+.status-box {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: rgba(56, 189, 248, 0.08);
+    border-left: 3px solid #38bdf8;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #e2e8f0;
+}
+
+/* Tombol Interaksi Game Style [ TEKAN F ] (Tengah Layar Bawah) */
+#interact-prompt {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 2px solid #38bdf8;
+    color: #ffffff;
+    padding: 10px 24px;
+    border-radius: 30px;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.45);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    animation: pulse 1.4s infinite;
+}
+
+.key-badge {
+    background: #38bdf8;
+    color: #0f172a;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes pulse {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.05); }
+    100% { transform: translateX(-50%) scale(1); }
+}
+
+.reticle-dot {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9998;
+}
