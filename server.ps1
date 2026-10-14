@@ -23,13 +23,21 @@ try {
     Start-Process "http://localhost:$port/"
 
     $mimeMap = @{
-        ".html" = "text/html; charset=utf-8"
-        ".css"  = "text/css; charset=utf-8"
-        ".js"   = "application/javascript; charset=utf-8"
-        ".json" = "application/json; charset=utf-8"
-        ".png"  = "image/png"
-        ".jpg"  = "image/jpeg"
-        ".svg"  = "image/svg+xml"
+        ".html"  = "text/html; charset=utf-8"
+        ".css"   = "text/css; charset=utf-8"
+        ".js"    = "application/javascript; charset=utf-8"
+        ".json"  = "application/json; charset=utf-8"
+        ".png"   = "image/png"
+        ".jpg"   = "image/jpeg"
+        ".jpeg"  = "image/jpeg"
+        ".webp"  = "image/webp"
+        ".svg"   = "image/svg+xml"
+        ".glb"   = "model/gltf-binary"
+        ".gltf"  = "model/gltf+json"
+        ".bin"   = "application/octet-stream"
+        ".mp3"   = "audio/mpeg"
+        ".wav"   = "audio/wav"
+        ".woff2" = "font/woff2"
     }
 
     while ($true) {
@@ -49,9 +57,10 @@ try {
                 if (Test-Path $filePath -PathType Leaf) {
                     $ext = [System.IO.Path]::GetExtension($filePath).ToLower()
                     $mime = if ($mimeMap.ContainsKey($ext)) { $mimeMap[$ext] } else { "application/octet-stream" }
+                    $cache = if ($ext -in @('.glb', '.png', '.jpg', '.jpeg', '.webp', '.woff2')) { "public, max-age=86400" } else { "no-cache" }
                     $bytes = [System.IO.File]::ReadAllBytes($filePath)
 
-                    $header = "HTTP/1.1 200 OK`r`nContent-Type: $mime`r`nContent-Length: $($bytes.Length)`r`nAccess-Control-Allow-Origin: *`r`nConnection: close`r`n`r`n"
+                    $header = "HTTP/1.1 200 OK`r`nContent-Type: $mime`r`nContent-Length: $($bytes.Length)`r`nCache-Control: $cache`r`nAccess-Control-Allow-Origin: *`r`nConnection: close`r`n`r`n"
                     $headerBytes = [System.Text.Encoding]::ASCII.GetBytes($header)
                     $stream.Write($headerBytes, 0, $headerBytes.Length)
                     $stream.Write($bytes, 0, $bytes.Length)

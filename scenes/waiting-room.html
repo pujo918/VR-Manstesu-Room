@@ -1,4 +1,4 @@
-﻿        <!-- 10. RUANG TUNGGU MENSETSU & RESEPSIONIS KANTOR JEPANG (待合室・受付ロビー)   -->
+        <!-- 10. RUANG TUNGGU MENSETSU & RESEPSIONIS KANTOR JEPANG (待合室・受付ロビー)   -->
         <!-- Area 10m x 10m (X: -5 s/d +5, Z: 6.0 s/d 16.0, Plafon: 3.4m)              -->
         <!-- ========================================================================= -->
         <a-entity id="waiting-and-reception-hall">
@@ -39,6 +39,8 @@
             <a-light type="point" color="#ffffff" intensity="0.45" distance="9" position="0 3.1 11"></a-light>
             <a-light type="point" color="#fffbeb" intensity="0.42" distance="7" position="2.8 3.0 10.5"></a-light>
             <a-light type="point" color="#fffbeb" intensity="0.40" distance="7" position="-2.8 3.0 10.2"></a-light>
+            <a-light type="point" color="#ffffff" intensity="0.45" distance="8" position="-2.5 3.1 14.5"></a-light>
+            <a-light type="point" color="#ffffff" intensity="0.45" distance="8" position="2.5 3.1 14.5"></a-light>
 
             <!-- --------------------------------------------------------------------- -->
             <!-- B. TEMBOK KELILING RUANG TUNGGU                                       -->
@@ -67,7 +69,7 @@
                 <a-cylinder position="0.15 1.25 15.9" radius="0.015" height="0.6" mixin="metal-chrome"></a-cylinder>
                 <!-- Plakat Selamat Datang di Atas Pintu Masuk -->
                 <a-box position="0 2.95 15.92" width="2.6" height="0.35" depth="0.02" material="color: #0f172a; roughness: 0.4;"></a-box>
-                <a-text value="GLOBAL TECH JAPAN CORP.\nエントランス・受付待合ロビー" align="center" position="0 2.95 15.94" color="#f8fafc" width="2.3"></a-text>
+                <a-entity position="0 2.95 15.94" jp-text="value: GLOBAL TECH JAPAN CORP.\nエントランス・受付待合ロビー; color: #f8fafc; fontSize: 28; width: 2.5; height: 0.32;"></a-entity>
             </a-entity>
 
             <!-- 2. Tembok Kiri Ruang Tunggu (X = -5.0m) -->
@@ -83,23 +85,65 @@
             <a-box position="4.94 0.09 7.48" width="0.04" height="0.18" depth="2.82" mixin="wood-dark"></a-box>
             <a-box position="4.94 2.2 7.48" width="0.03" height="0.06" depth="2.82" mixin="wood-trim"></a-box>
 
-            <!-- Jendela Kaca Panorama Ruang Tunggu dengan Tirai Blinds (Z = 12.2 s/d 15.8) -->
-            <a-entity position="4.95 0 14">
-                <!-- Kusen Kayu Jendela -->
-                <a-box position="0 0.5 0" width="0.1" height="1.0" depth="3.8" mixin="wall-mat"></a-box>
-                <a-box position="0 2.95 0" width="0.1" height="0.9" depth="3.8" mixin="wall-mat"></a-box>
-                <a-box position="0 1.95 -1.85" width="0.1" height="2.0" depth="0.1" mixin="wood-trim"></a-box>
-                <a-box position="0 1.95 1.85" width="0.1" height="2.0" depth="0.1" mixin="wood-trim"></a-box>
-                <a-box position="0 1.0 0" width="0.12" height="0.06" depth="3.8" mixin="wood-dark"></a-box>
-                <!-- Kaca Luar Biru Langit Lembut -->
-                <a-box position="0.03 1.95 0" width="0.02" height="1.85" depth="3.6" 
-                       material="color: #bae6fd; opacity: 0.4; transparent: true; roughness: 0.1;"></a-box>
-                <!-- Box Kaset Tirai Venetian Blinds -->
-                <a-box position="-0.02 2.87 0" width="0.06" height="0.06" depth="3.6" material="color: #f1f5f9; roughness: 0.3;"></a-box>
-                <!-- Tirai Bilah Putih Horisontal -->
-                <a-box position="0.01 2.25 0" width="0.01" height="1.2" depth="3.55" material="color: #ffffff; opacity: 0.88; roughness: 0.9;"></a-box>
-                <!-- Tali Pengatur Tirai -->
-                <a-cylinder position="-0.03 2.2 1.7" radius="0.003" height="1.2" material="color: #ffffff;"></a-cylinder>
+            <!-- Dinding Solid Samping Kanan Resepsionis (Z = 12.2 s/d 16.0) -->
+            <a-box position="5 1.7 14.1" width="0.1" height="3.4" depth="3.8" mixin="wall-mat"></a-box>
+            <a-box position="4.94 0.09 14.1" width="0.04" height="0.18" depth="3.8" mixin="wood-dark"></a-box>
+            <a-box position="4.94 2.2 14.1" width="0.03" height="0.06" depth="3.8" mixin="wood-trim"></a-box>
+            <a-box position="4.94 3.37 14.1" width="0.03" height="0.06" depth="3.8" mixin="wood-trim"></a-box>
+
+            <!-- ========================================================================= -->
+            <!-- INSTALASI PETA JEPANG DI TEMBOK (JAPAN CORPORATE WALL MAP DISPLAY)        -->
+            <!-- Ditempatkan di tembok sebelah kanan resepsionis menghadap ke dalam lobby   -->
+            <!-- ========================================================================= -->
+            <a-entity id="japan-wall-map" position="4.93 1.75 14.1" rotation="0 -90 0">
+                <!-- 1. BACKBOARD KAYU WALNUT ELEGAN DENGAN CHAMFERED EDGES -->
+                <a-box position="0 0 -0.015" width="2.4" height="2.2" depth="0.03" mixin="wood-dark"></a-box>
+                <a-box position="0 0 -0.005" width="2.32" height="2.12" depth="0.015" material="color: #1a100a; roughness: 0.6;"></a-box>
+                
+                <!-- 2. BINGKAI LIST LOGAM EMAS / CHAMPAGNE GOLD INNER BEZEL -->
+                <a-box position="0 0 0.001" width="2.14" height="1.94" depth="0.008" 
+                       material="color: #fbbf24; metalness: 0.85; roughness: 0.2;"></a-box>
+                
+                <!-- 3. MATTING PASSE-PARTOUT PUTIH MUSEUM ARCHIVAL -->
+                <a-box position="0 0 0.005" width="2.08" height="1.88" depth="0.004" 
+                       material="color: #f8fafc; roughness: 0.4;"></a-box>
+
+                <!-- 4. KANVAS PETA JEPANG REALISTIS (ASSETS/JAPAN-MAP.PNG) -->
+                <!-- Menampilkan peta kepulauan Jepang lengkap & kota-kota utama -->
+                <a-plane position="0 -0.01 0.008" width="1.6" height="1.72" 
+                         material="src: #tex-japan-map; roughness: 0.2; metalness: 0.05;">
+                </a-plane>
+
+                <!-- 5. PANEL KACA AKRILIK MENGKILAP (GLOSS PROTECTIVE ACRYLIC OVERLAY) -->
+                <a-box position="0 -0.01 0.012" width="1.62" height="1.74" depth="0.002" 
+                       material="color: #ffffff; opacity: 0.12; transparent: true; roughness: 0.05; metalness: 0.15;">
+                </a-box>
+
+                <!-- 6. BAUT PENYANGGA SUDUT CHROME STANDOFFS (4 CORNER MOUNTING BOLTS) -->
+                <a-cylinder position="-0.78 0.83 0.015" radius="0.012" height="0.014" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="0.78 0.83 0.015" radius="0.012" height="0.014" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="-0.78 -0.85 0.015" radius="0.012" height="0.014" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="0.78 -0.85 0.015" radius="0.012" height="0.014" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+
+                <!-- 7. SATU-SATUNYA TULISAN DI BAWAH PETA: "地図" (CHIZU SIGN) -->
+                <a-entity position="0 -0.92 0.024" chizu-sign></a-entity>
+
+                <!-- 8. LAMPU SOROT GALERI PETA (2 OVERHEAD PICTURE LIGHTS) -->
+                <!-- Lampu Kiri -->
+                <a-entity position="-0.45 1.15 0.16">
+                    <a-box position="0 0 -0.10" width="0.025" height="0.025" depth="0.20" mixin="metal-chrome"></a-box>
+                    <a-cylinder position="0 0 0" radius="0.025" height="0.28" rotation="0 0 90" mixin="metal-chrome"></a-cylinder>
+                    <a-sphere position="0 -0.015 0" radius="0.015" material="color: #fef08a; emissive: #fef08a; emissiveIntensity: 0.9;"></a-sphere>
+                </a-entity>
+                <!-- Lampu Kanan -->
+                <a-entity position="0.45 1.15 0.16">
+                    <a-box position="0 0 -0.10" width="0.025" height="0.025" depth="0.20" mixin="metal-chrome"></a-box>
+                    <a-cylinder position="0 0 0" radius="0.025" height="0.28" rotation="0 0 90" mixin="metal-chrome"></a-cylinder>
+                    <a-sphere position="0 -0.015 0" radius="0.015" material="color: #fef08a; emissive: #fef08a; emissiveIntensity: 0.9;"></a-sphere>
+                </a-entity>
+
+                <!-- Cahaya Sorot Lembut ke Permukaan Peta (Dedicated Picture Spotlights) -->
+                <a-light type="point" color="#fffbeb" intensity="0.45" distance="3.0" position="0 0.8 0.55"></a-light>
             </a-entity>
 
             <!-- ========================================================================= -->
@@ -139,12 +183,10 @@
                     <a-cylinder position="0.5 0 -0.03" radius="0.025" height="0.01" rotation="90 0 0" material="color: #94a3b8; metalness: 0.9;"></a-cylinder>
 
                     <!-- Plakat Akrilik Nama Ruangan di Pintu (Sisi Ruang Tunggu) -->
-                    <a-box position="0 0.6 0.032" width="0.45" height="0.16" depth="0.01" material="color: #ffffff; roughness: 0.3;"></a-box>
-                    <a-text value="第1面接室\n(Ruang Wawancara 1)" align="center" position="0 0.6 0.042" color="#0f172a" width="1.3"></a-text>
+                    <a-entity position="0 0.6 0.038" jp-door-sign></a-entity>
 
                     <!-- Plakat Nama Ruangan di Pintu (Sisi Ruang Wawancara) -->
-                    <a-box position="0 0.6 -0.032" width="0.45" height="0.16" depth="0.01" material="color: #ffffff; roughness: 0.3;"></a-box>
-                    <a-text value="第1面接室" align="center" position="0 0.6 -0.042" rotation="0 180 0" color="#0f172a" width="1.4"></a-text>
+                    <a-entity position="0 0.6 -0.038" rotation="0 180 0" jp-door-sign></a-entity>
                 </a-entity>
             </a-entity>
 
@@ -162,38 +204,22 @@
             <!-- Ditempelkan di dinding kiri pintu pada posisi pandangan mata sempurna (X = -2.2m, Y = 1.95m, Z = 6.08m) -->
             <a-entity position="-2.2 1.95 6.08">
                 <!-- Papan Dasar Akrilik Biru Dongker Gelap dengan Bezel Chrome Halus -->
-                <a-box position="0 0 0" width="1.9" height="1.05" depth="0.025" material="color: #0f172a; roughness: 0.25;"></a-box>
-                <a-box position="0 0 0.013" width="1.84" height="0.99" depth="0.003" material="color: #1e293b; roughness: 0.35;"></a-box>
+                <a-box position="0 0 0" width="1.92" height="1.22" depth="0.025" material="color: #0f172a; roughness: 0.25;"></a-box>
+                <a-box position="0 0 0.008" width="1.88" height="1.18" depth="0.003" material="color: #1e293b; roughness: 0.35;"></a-box>
                 
                 <!-- 4 Baut Penahan Stainless Steel Kaca Akrilik di Sudut (Standoff Mounts) -->
-                <a-cylinder position="-0.9 0.47 0.02" radius="0.014" height="0.015" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
-                <a-cylinder position="0.9 0.47 0.02" radius="0.014" height="0.015" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
-                <a-cylinder position="-0.9 -0.47 0.02" radius="0.014" height="0.015" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
-                <a-cylinder position="0.9 -0.47 0.02" radius="0.014" height="0.015" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="-0.91 0.56 0.022" radius="0.014" height="0.018" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="0.91 0.56 0.022" radius="0.014" height="0.018" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="-0.91 -0.56 0.022" radius="0.014" height="0.018" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="0.91 -0.56 0.022" radius="0.014" height="0.018" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
 
-                <!-- Header Banner Papan Pengumuman -->
-                <a-box position="0 0.38 0.018" width="1.8" height="0.16" depth="0.005" material="color: #1e40af; roughness: 0.3;"></a-box>
-                <a-text value="GLOBAL TECH JAPAN  |  第1面接室 入室案内" align="center" position="0 0.38 0.025" color="#ffffff" width="1.75"></a-text>
-
-                <!-- Isi Pengumuman & Tata Krama Wawancara Resmi (Bahasa Jepang & Terjemahan Jelas) -->
-                <a-text value="【 面接マナー & 入室手順 / Panduan Masuk 】\n1. 入室前は、ドアをゆっくり「3回」ノックしてください。\n   (Ketuk pintu 3 kali sebelum masuk, bukan 2 kali)\n2.「どうぞ」の声を確認後、「失礼いたします」と一礼して入室。\n   (Tunggu konfirmasi 'Silakan', lalu ucapkan salam & masuk)\n3. 携帯電話・スマートフォンは必ず電源OFFまたはマナーモードに設定。\n   (Wajib aktifkan Mode Hening / Manner Mode pada ponsel)\n4. お名前が呼ばれるまで、こちらの待合ロビーでお待ちください。" 
-                        align="left" position="-0.85 -0.08 0.022" color="#f8fafc" width="1.7" line-height="54"></a-text>
+                <!-- KANVAS PAPAN PENGUMUMAN FORMAL FULL BAHASA JEPANG (PROSEDURAL RESOLUSI TINGGI 1024x640) -->
+                <a-entity position="0 0 0.008" interview-notice-board></a-entity>
             </a-entity>
 
             <!-- LAMPU INDIKATOR STATUS WAWANCARA DI ATAS PINTU (OCCUPIED LIGHT) -->
             <!-- Dipasang rapi menempel pada permukaan dinding (Z = 6.06m) tanpa tembus atau Z-fighting -->
-            <a-entity position="0 2.65 6.07">
-                <!-- Plat Dudukan Belakang (Backplate) -->
-                <a-box position="0 0 0.008" width="0.66" height="0.28" depth="0.016" mixin="wood-dark"></a-box>
-                <!-- Kotak Akrilik Merah Luminous Halus (Emissive Stabil) -->
-                <a-box position="0 0 0.026" width="0.60" height="0.22" depth="0.02" 
-                       material="color: #dc2626; emissive: #b91c1c; emissiveIntensity: 0.45; roughness: 0.35;"></a-box>
-                <!-- Bezel Lis Bingkai Atas & Bawah Chrome -->
-                <a-box position="0 0.115 0.03" width="0.62" height="0.015" depth="0.015" mixin="metal-chrome"></a-box>
-                <a-box position="0 -0.115 0.03" width="0.62" height="0.015" depth="0.015" mixin="metal-chrome"></a-box>
-                <!-- Teks Status Jelas & Bebas Flickering -->
-                <a-text value="第1面接室\n【 面接中 / OCCUPIED 】" align="center" position="0 0 0.04" color="#ffffff" width="1.35"></a-text>
-            </a-entity>
+            <a-entity position="0 2.65 6.08" jp-door-indicator></a-entity>
 
             <!-- ----------------------------------------------------------------- -->
             <!-- FITUR DINDING SISI RUANG WAWANCARA (Menghadap Sisi Dalam di Z = 5.93) -->
@@ -234,17 +260,24 @@
                 <a-box position="1.3 0 0.03" width="0.04" height="3.36" depth="0.04" mixin="wood-desk"></a-box>
                 <a-box position="1.5 0 0.03" width="0.04" height="3.36" depth="0.04" mixin="wood-desk"></a-box>
 
-                <!-- Papan Plakat Akrilik Hitam Elegan untuk Logo -->
-                <a-box position="0 0.55 0.07" width="2.4" height="0.85" depth="0.03" material="color: #0f172a; roughness: 0.2;"></a-box>
+                <!-- Papan Plakat Akrilik Hitam Elegan untuk Logo dengan Trim Aluminium Biru -->
+                <a-box position="0 0.55 0.068" width="2.44" height="0.89" depth="0.02" 
+                       material="color: #0284c7; metalness: 0.8; roughness: 0.25; emissive: #0369a1; emissiveIntensity: 0.25;"></a-box>
+                <a-box position="0 0.55 0.075" width="2.4" height="0.85" depth="0.02" 
+                       material="color: #0b1329; roughness: 0.3;"></a-box>
                 
-                <!-- Logo Perusahaan 3D Geometris (Cincin Glowing Cyan & Diamond Core) -->
-                <a-torus position="0 0.72 0.095" radius="0.13" radius-tubular="0.016" 
-                         material="color: #38bdf8; metalness: 0.9; roughness: 0.1; emissive: #0284c7; emissiveIntensity: 0.5;"></a-torus>
-                <a-octahedron position="0 0.72 0.095" radius="0.07" material="color: #ffffff; emissive: #e0f2fe; emissiveIntensity: 0.8;"></a-octahedron>
+                <!-- Logo Perusahaan 3D Geometris (Cincin Logam Biru Presisi & Inti Kristal Cyan Menyala) -->
+                <a-torus position="0 0.72 0.10" radius="0.13" radius-tubular="0.016" 
+                         material="color: #0284c7; metalness: 0.85; roughness: 0.2; emissive: #0284c7; emissiveIntensity: 0.6;"></a-torus>
+                <a-octahedron position="0 0.72 0.10" radius="0.07" 
+                              material="color: #38bdf8; roughness: 0.15; metalness: 0.2; emissive: #38bdf8; emissiveIntensity: 0.85;"></a-octahedron>
                 
-                <!-- Huruf 3D Nama Perusahaan & Slogan Korporat -->
-                <a-text value="GLOBAL TECH JAPAN" align="center" position="0 0.5 0.095" color="#38bdf8" width="2.7"></a-text>
-                <a-text value="グローバル株式会社\n「未来を拓く技術と信頼」" align="center" position="0 0.32 0.095" color="#e2e8f0" width="1.9"></a-text>
+                <!-- Cahaya Aksen Biru Mewah (Soft Corporate Blue Signage Glow) -->
+                <a-light type="point" color="#0ea5e9" intensity="0.5" distance="1.8" position="0 0.72 0.22"></a-light>
+
+                <!-- Huruf 3D Nama Perusahaan (Teks Putih Bersih dengan Aksen Biru Muda & Kanji Resmi) -->
+                <a-text value="GLOBAL TECH JAPAN" align="center" position="0 0.50 0.10" color="#f0f9ff" width="2.7"></a-text>
+                <a-entity position="0 0.35 0.10" jp-text="value: グローバルテック・ジャパン株式会社; color: #7dd3fc; fontSize: 22; width: 1.8; height: 0.25;"></a-entity>
             </a-entity>
 
             <!-- 2. MEJA RESEPSIONIS MODERN L-SHAPE (RECEPTION DESK) -->
@@ -264,18 +297,11 @@
                 <!-- Permukaan Meja Kerja Staf di Dalam (Lebar 65cm, Tinggi 0.74m) -->
                 <a-box position="0.38 0.72 0" width="0.66" height="0.04" depth="2.2" mixin="wood-desk"></a-box>
 
-                <!-- PLAKAT MEJA AKRILIK: "受付 (RECEPTION)" -->
-                <a-entity position="-0.04 1.15 0" rotation="0 -90 0">
-                    <a-box position="0 0 0" width="0.38" height="0.12" depth="0.03" material="color: #0f172a; roughness: 0.3;"></a-box>
-                    <a-text value="受  付\nRECEPTION" align="center" position="0 0 0.02" color="#f8fafc" width="0.95"></a-text>
-                </a-entity>
+                <!-- PLAKAT MEJA AKRILIK: "受付 / RECEPTION" -->
+                <a-entity position="-0.04 1.15 0" rotation="0 -90 0" jp-reception-sign></a-entity>
 
                 <!-- FORMULIR BUKU TAMU AKRILIK & PULPEN RESEPSIONIS (来社受付票) -->
-                <a-entity position="-0.04 1.08 -0.65" rotation="0 -90 0">
-                    <a-box position="0 0 0" width="0.28" height="0.01" depth="0.38" material="color: #ffffff; roughness: 0.7;"></a-box>
-                    <a-box position="0 0.008 -0.17" width="0.1" height="0.012" depth="0.025" mixin="metal-chrome"></a-box>
-                    <a-text value="ご来社受付票\n(Visitor Sign-In Form)\n氏名: ___________\n訪問先: 人事部" align="center" 
-                            position="0 0.01 0" rotation="-90 0 0" color="#0f172a" width="0.55"></a-text>
+                <a-entity position="-0.04 1.08 -0.65" rotation="0 -90 0" jp-visitor-sheet>
                     <!-- Dudukan Pulpen Kuningan Formal -->
                     <a-cylinder position="0.18 0.02 0" radius="0.015" height="0.03" material="color: #fbbf24; metalness: 0.9;"></a-cylinder>
                     <a-cylinder position="0.18 0.08 0.02" radius="0.005" height="0.14" rotation="20 0 0" material="color: #1e293b; metalness: 0.8;"></a-cylinder>
@@ -298,11 +324,11 @@
                     
                     <!-- Jam Digital Layar Utama & Tanggal -->
                     <a-text value="09:48" align="center" position="0 0.01 -0.032" rotation="-90 0 0" color="#ffffff" width="0.32"></a-text>
-                    <a-text value="9月20日 (土)" align="center" position="0 0.01 -0.012" rotation="-90 0 0" color="#93c5fd" width="0.18"></a-text>
+                    <a-entity position="0 0.01 -0.012" rotation="-90 0 0" jp-text="value: 9月20日 (土); color: #93c5fd; fontSize: 24; width: 0.07; height: 0.018;"></a-entity>
                     
                     <!-- Kartu Notifikasi Masuk dari Tim HR / Pewawancara -->
                     <a-box position="0 0.0095 0.026" width="0.068" height="0.001" depth="0.05" material="color: #1e293b; roughness: 0.3;"></a-box>
-                    <a-text value="[人事部 面接官]\n面接室1 準備完了\n10:00〜 佐藤様" align="center" position="0 0.011 0.026" rotation="-90 0 0" color="#f8fafc" width="0.18"></a-text>
+                    <a-entity position="0 0.011 0.026" rotation="-90 0 0" jp-text="value: [人事部 面接官]\n面接室1 準備完了\n10:00〜 佐藤様; color: #f8fafc; fontSize: 20; width: 0.065; height: 0.045;"></a-entity>
 
                     <!-- Modul 3 Kamera Belakang & Lampu Flash (Sisi Bawah/Samping) -->
                     <a-box position="-0.025 0.001 -0.05" width="0.024" height="0.003" depth="0.03" material="color: #1e293b;"></a-box>
@@ -366,7 +392,109 @@
                     <a-torus position="-0.12 0.015 -0.01" radius="0.015" radius-tubular="0.004" rotation="45 30 0" material="color: #0f172a;"></a-torus>
                 </a-entity>
 
-                <!-- 3. KURSI KERJA ERGONOMIS RESEPSIONIS (DIBERI JARAK LEGA DARI MEJA) -->
+                <!-- 3. WORKSTATION KOMPUTER & MONITOR WIDESCREEN RESEPSIONIS -->
+                <!-- Menampilkan Homepage Resmi Global Tech Japan di Meja Resepsionis -->
+                <a-entity id="receptionist-pc-setup">
+                    <!-- A. MONITOR WIDESCREEN 27 INCH (TEGAK LURUS SEJAJAR MEJA, TIDAK MIRING) -->
+                    <!-- Posisi lurus menghadap ke arah kursi resepsionis (arah +X) -->
+                    <a-entity id="reception-monitor" position="0.26 0.74 0.20" rotation="0 90 0">
+                        <!-- Alas Stand Logam Hitam Anodized -->
+                        <a-box position="0 0.005 0" width="0.22" height="0.01" depth="0.18" 
+                               material="color: #1e293b; roughness: 0.3; metalness: 0.8;"></a-box>
+                        
+                        <!-- Tiang Penyangga Vertikal Tegak Lurus (Stand Column) -->
+                        <a-box position="0 0.18 -0.02" width="0.045" height="0.35" depth="0.025" 
+                               material="color: #334155; roughness: 0.3; metalness: 0.85;"></a-box>
+                        
+                        <!-- Engsel Penyesuaian Sudut (Tilt Pivot Hinge) -->
+                        <a-cylinder position="0 0.35 -0.01" radius="0.016" height="0.05" rotation="0 0 90" 
+                                    material="color: #64748b; metalness: 0.9;"></a-cylinder>
+                        
+                        <!-- Bodi Belakang Monitor Tipis Modern (Frameless Chassis) -->
+                        <a-box position="0 0.36 0.005" width="0.60" height="0.37" depth="0.024" 
+                               material="color: #0f172a; roughness: 0.4; metalness: 0.7;"></a-box>
+                        
+                        <!-- Logo Punggung Monitor Menghadap ke Sisi Tamu/Pengunjung -->
+                        <a-text value="GLOBAL TECH" align="center" position="0 0.35 -0.015" rotation="0 180 0" 
+                                color="#7dd3fc" width="0.45"></a-text>
+                        <a-torus position="0 0.42 -0.015" radius="0.025" radius-tubular="0.004" rotation="0 180 0" 
+                                 material="color: #0284c7; roughness: 0.25; metalness: 0.8; emissive: #0369a1; emissiveIntensity: 0.5;"></a-torus>
+                        <a-octahedron position="0 0.42 -0.015" radius="0.012" rotation="0 180 0" 
+                                      material="color: #38bdf8; roughness: 0.2; emissive: #38bdf8; emissiveIntensity: 0.8;"></a-octahedron>
+                        
+                        <!-- Bingkai Bezel Depan Hitam Ramping -->
+                        <a-box position="0 0.36 0.018" width="0.592" height="0.362" depth="0.002" 
+                               material="color: #1e293b; roughness: 0.5; metalness: 0.8;"></a-box>
+                        
+                        <!-- LAYAR UTAMA: HOMEPAGE RESMI PERUSAHAAN (GLOBAL TECH JAPAN) -->
+                        <a-plane position="0 0.365 0.020" width="0.58" height="0.35" 
+                                 material="src: #tex-reception-screen; roughness: 0.15; metalness: 0.05; emissive: #ffffff; emissiveIntensity: 0.25; emissiveMap: #tex-reception-screen;"></a-plane>
+                        
+                        <!-- Logo & Brand Monitor di Bezel Bawah Depan -->
+                        <a-text value="GLOBAL TECH IPS 27\"" align="center" position="0 0.19 0.021" color="#94a3b8" width="0.32"></a-text>
+                        
+                        <!-- Lampu Indikator Power LED Hijau Menyala -->
+                        <a-sphere position="0.265 0.19 0.021" radius="0.003" 
+                                  material="color: #22c55e; emissive: #16a34a; emissiveIntensity: 1.0;"></a-sphere>
+                        
+                        <!-- Cahaya Lembut Layar (Screen Ambient Glow) -->
+                        <a-light type="point" color="#e2e8f0" intensity="0.25" distance="1.8" position="0 0.36 0.25"></a-light>
+                    </a-entity>
+
+                    <!-- B. KEYBOARD REALISTIS BILINGUAL JEPANG/INGGRIS & MOUSEPAD LOGITECH MX MASTER -->
+                    <!-- Posisi tegak lurus sejajar meja di depan monitor (+X = 0.52m), menghadap kursi resepsionis -->
+                    <a-entity id="reception-peripherals" position="0.52 0.74 0.20" rotation="0 90 0">
+                        <!-- Rangka Keyboard Aluminium Space Grey Ergonomis Miring 3.5 Derajat -->
+                        <a-box position="0 0.007 0" rotation="3.5 0 0" width="0.434" height="0.012" depth="0.142" 
+                               material="color: #1e293b; roughness: 0.3; metalness: 0.7;"></a-box>
+                        
+                        <!-- Permukaan Tombol Lengkap Laser-Engraved (Esc, F1-F12, QWERTY, Hiragana, Space, Enter, Numpad) -->
+                        <a-plane position="0 0.014 0" rotation="-86.5 0 0" width="0.43" height="0.138" 
+                                 material="src: #tex-reception-keyboard; roughness: 0.25; metalness: 0.08;"></a-plane>
+                        
+                        <!-- Mousepad Kulit Hitam Berjahit Benang Emas Asli (Elevasi Khusus Anti Z-Fighting) -->
+                        <a-box position="0.32 0.001 0" width="0.21" height="0.002" depth="0.21" 
+                               material="color: #0b0f19; roughness: 0.9;"></a-box>
+                        <a-plane position="0.32 0.003 0" rotation="-90 0 0" width="0.205" height="0.205" 
+                                 material="src: #tex-reception-mousepad; roughness: 0.4; metalness: 0.05;"></a-plane>
+
+                        <!-- MOUSE 3D ERGONOMIS MODERN DENGAN SCROLL WHEEL & THUMB REST (100% BEBAS GLITCH) -->
+                        <a-entity id="reception-3d-mouse" position="0.32 0.004 0">
+                            <!-- Bodi Utama Mouse (Ergonomic Contoured Palm Shell) -->
+                            <a-sphere position="0 0.012 0.008" radius="0.032" 
+                                      scale="0.94 0.46 1.55" 
+                                      material="color: #1e293b; roughness: 0.35; metalness: 0.25;"></a-sphere>
+                            
+                            <!-- Sasis Dasar Bawah Mouse -->
+                            <a-box position="0 0.004 0.005" width="0.060" height="0.006" depth="0.10" 
+                                   material="color: #0f172a; roughness: 0.5; metalness: 0.4;"></a-box>
+                            
+                            <!-- Tombol Klik Kiri (Left Click) -->
+                            <a-box position="-0.015 0.012 -0.034" width="0.027" height="0.007" depth="0.042" rotation="-7 0 0" 
+                                   material="color: #0f172a; roughness: 0.3;"></a-box>
+                            
+                            <!-- Tombol Klik Kanan (Right Click) -->
+                            <a-box position="0.015 0.012 -0.034" width="0.027" height="0.007" depth="0.042" rotation="-7 0 0" 
+                                   material="color: #0f172a; roughness: 0.3;"></a-box>
+                            
+                            <!-- Roda Gulir Logam Berulir (Tactile Chrome Scroll Wheel) -->
+                            <a-cylinder position="0 0.016 -0.032" radius="0.0065" height="0.005" rotation="0 0 90" 
+                                        material="color: #e2e8f0; metalness: 0.9; roughness: 0.15;"></a-cylinder>
+                            <a-torus position="0 0.016 -0.032" radius="0.0065" radius-tubular="0.0012" rotation="0 90 0" 
+                                     material="color: #020617; roughness: 0.8;"></a-torus>
+                            
+                            <!-- Tombol DPI di Belakang Scroll Wheel -->
+                            <a-box position="0 0.017 -0.010" width="0.008" height="0.004" depth="0.012" 
+                                   material="color: #334155; metalness: 0.6;"></a-box>
+                            
+                            <!-- Sayap Penyangga Ibu Jari (Thumb Rest Wing) Sisi Kiri -->
+                            <a-box position="-0.036 0.006 0.008" width="0.015" height="0.005" depth="0.065" rotation="0 0 10" 
+                                   material="color: #0f172a; roughness: 0.6;"></a-box>
+                        </a-entity>
+                    </a-entity>
+                </a-entity>
+
+                <!-- 4. KURSI KERJA ERGONOMIS RESEPSIONIS (DIBERI JARAK LEGA DARI MEJA) -->
                 <!-- Berjarak 55cm di belakang meja staf sehingga tidak menempel/menembus meja -->
                 <a-entity position="1.18 0 0" rotation="0 -90 0">
                     <a-cylinder position="0 0.24 0" radius="0.025" height="0.45" mixin="metal-chrome"></a-cylinder>
@@ -417,7 +545,7 @@
             </a-entity>
 
             <!-- 2. MEJA KOPI RENDAH TAMU (LOW COFFEE TABLE) -->
-            <a-entity id="coffee-table" position="-2.0 0 10.0">
+            <a-entity id="coffee-table" position="-1.85 0 10.0">
                 <!-- Rangka Kaki Meja Kayu Walnut -->
                 <a-box position="0 0.18 0" width="0.68" height="0.36" depth="1.3" mixin="wood-desk"></a-box>
                 <!-- Daun Meja Kaca Tempered Bening -->
@@ -427,38 +555,7 @@
                 <!-- ============================================================= -->
                 <!-- MAJALAH BISNIS JEPANG MULTI-LAYER & REALISTIS DI ATAS MEJA     -->
                 <!-- ============================================================= -->
-                <!-- MAJALAH 1: PRESIDENT (プレジデント) - Berlapis Blok Kertas & Cover -->
-                <a-entity position="-0.15 0.395 -0.36" rotation="0 12 0">
-                    <!-- Blok Halaman Kertas Putih Tebal 1.2cm -->
-                    <a-box position="0 0.006 0" width="0.22" height="0.012" depth="0.3" material="color: #f8fafc; roughness: 0.8;"></a-box>
-                    <!-- Punggung Buku Majalah Biru Gelap (Spine) -->
-                    <a-box position="-0.108 0.006 0" width="0.006" height="0.012" depth="0.3" material="color: #1e3a8a;"></a-box>
-                    <!-- Cover Depan Mengkilap -->
-                    <a-box position="0 0.0125 0" width="0.22" height="0.001" depth="0.3" material="color: #1e3a8a; roughness: 0.3;"></a-box>
-                    <a-box position="0.01 0.013 0" width="0.19" height="0.001" depth="0.27" material="color: #ffffff;"></a-box>
-                    <a-text value="PRESIDENT\nプレジデント\n[ 特集: 2026年 企業革新 ]" align="center" position="0.01 0.014 0" 
-                            rotation="-90 0 0" color="#1e3a8a" width="0.45"></a-text>
-                </a-entity>
-
-                <!-- MAJALAH 2: NIKKEI BUSINESS (日経ビジネス) - Sedikit Menindih Ujung -->
-                <a-entity position="0.12 0.395 -0.22" rotation="0 -7 0">
-                    <a-box position="0 0.006 0" width="0.22" height="0.012" depth="0.3" material="color: #f8fafc; roughness: 0.8;"></a-box>
-                    <a-box position="-0.108 0.006 0" width="0.006" height="0.012" depth="0.3" material="color: #991b1b;"></a-box>
-                    <a-box position="0 0.0125 0" width="0.22" height="0.001" depth="0.3" material="color: #991b1b; roughness: 0.3;"></a-box>
-                    <a-box position="0.01 0.013 0" width="0.19" height="0.001" depth="0.27" material="color: #ffffff;"></a-box>
-                    <a-text value="日経ビジネス\nNikkei Business\n[ 日本企業のグローバル挑戦 ]" align="center" position="0.01 0.014 0" 
-                            rotation="-90 0 0" color="#991b1b" width="0.45"></a-text>
-                </a-entity>
-
-                <!-- MAJALAH 3: WEEKLY TOYO KEIZAI (週刊東洋経済) -->
-                <a-entity position="-0.06 0.395 0.3" rotation="0 6 0">
-                    <a-box position="0 0.006 0" width="0.22" height="0.012" depth="0.3" material="color: #f8fafc; roughness: 0.8;"></a-box>
-                    <a-box position="-0.108 0.006 0" width="0.006" height="0.012" depth="0.3" material="color: #15803d;"></a-box>
-                    <a-box position="0 0.0125 0" width="0.22" height="0.001" depth="0.3" material="color: #15803d; roughness: 0.3;"></a-box>
-                    <a-box position="0.01 0.013 0" width="0.19" height="0.001" depth="0.27" material="color: #ffffff;"></a-box>
-                    <a-text value="週刊東洋経済\nTOYO KEIZAI\n[ 業界地図 & 採用最前線 ]" align="center" position="0.01 0.014 0" 
-                            rotation="-90 0 0" color="#15803d" width="0.45"></a-text>
-                </a-entity>
+                <a-entity table-magazines></a-entity>
 
                 <!-- KOTAK TISU MEJA MODERN MINIMALIS -->
                 <a-entity position="0.18 0.395 0.36">
@@ -481,15 +578,15 @@
 
                     <!-- Indikator Ikon Manner Mode Aktif (Getar / Mute) -->
                     <a-box position="0 0.0095 -0.058" width="0.055" height="0.001" depth="0.016" material="color: #b45309;"></a-box>
-                    <a-text value="[ マナーモード中 / SILENT ]" align="center" position="0 0.011 -0.058" rotation="-90 0 0" color="#fef3c7" width="0.15"></a-text>
+                    <a-entity position="0 0.011 -0.058" rotation="-90 0 0" jp-text="value: [ マナーモード中 / SILENT ]; color: #fef3c7; fontSize: 22; width: 0.06; height: 0.015;"></a-entity>
 
                     <!-- Jam Lockscreen 09:48 -->
                     <a-text value="09:48" align="center" position="0 0.011 -0.03" rotation="-90 0 0" color="#f8fafc" width="0.3"></a-text>
-                    <a-text value="9月20日 土曜日" align="center" position="0 0.011 -0.01" rotation="-90 0 0" color="#94a3b8" width="0.17"></a-text>
+                    <a-entity position="0 0.011 -0.01" rotation="-90 0 0" jp-text="value: 9月20日 土曜日; color: #94a3b8; fontSize: 22; width: 0.065; height: 0.015;"></a-entity>
 
                     <!-- Pesan Semangat Masuk dari Keluarga/Teman di Layar -->
                     <a-box position="0 0.0095 0.03" width="0.065" height="0.001" depth="0.048" material="color: #1e293b; roughness: 0.4;"></a-box>
-                    <a-text value="LINE (母)\n「面接リラックスしてね!\n応援してるよ!」" align="center" position="0 0.011 0.03" rotation="-90 0 0" color="#38bdf8" width="0.17"></a-text>
+                    <a-entity position="0 0.011 0.03" rotation="-90 0 0" jp-text="value: LINE (母)\n「面接リラックスしてね!\n応援してるよ!」; color: #38bdf8; fontSize: 20; width: 0.065; height: 0.045;"></a-entity>
 
                     <!-- Modul Kamera Belakang & Tombol Samping -->
                     <a-box position="-0.024 0.001 -0.05" width="0.024" height="0.003" depth="0.028" material="color: #1e293b;"></a-box>
@@ -497,70 +594,111 @@
                 </a-entity>
             </a-entity>
 
-            <!-- 3. RAK BUKU & MAJALAH RESMI DI SAMPING SOFA (OFFICE BOOKSHELF & MAGAZINE RACK) -->
-            <!-- Diletakkan rapi di samping kanan sofa tamu (X = -3.6m, Z = 11.6m) menghadap ke arah area duduk -->
-            <a-entity id="brochure-rack" position="-3.6 0 11.6" rotation="0 20 0">
-                <!-- Kaki Penyangga Dasar Logam Baja Solid -->
-                <a-box position="0 0.02 0" width="0.56" height="0.04" depth="0.38" material="color: #0f172a; roughness: 0.4;"></a-box>
-                <!-- Tiang Penyangga Kiri & Kanan Berkemiringan 15 Derajat -->
-                <a-cylinder position="-0.24 0.68 -0.06" radius="0.014" height="1.38" rotation="-15 0 0" mixin="metal-chrome"></a-cylinder>
-                <a-cylinder position="0.24 0.68 -0.06" radius="0.014" height="1.38" rotation="-15 0 0" mixin="metal-chrome"></a-cylinder>
+            <!-- ========================================================================= -->
+            <!-- 3. TV MONITOR 65 INCH PEMBELAJARAN ETIKA WAWANCARA JEPANG (面接マナー学習) -->
+            <!-- Ditempatkan elegan di depan area Sofa Ruang Tunggu (X = -0.75m, Z = 10.0m)  -->
+            <!-- Menghadap langsung ke arah Sofa (-X = rotation 0 -90 0)                   -->
+            <!-- ========================================================================= -->
+            <a-entity id="learning-tv-setup" position="-0.75 0 10.0" rotation="0 -90 0">
+                <!-- A. KREDENSA MEJA KONSOL TV KAYU WALNUT MINIMALIS -->
+                <a-box position="0 0.22 0" width="1.6" height="0.44" depth="0.42" mixin="wood-dark"></a-box>
+                <a-box position="0 0.45 0" width="1.64" height="0.04" depth="0.44" mixin="wood-desk"></a-box>
+                <!-- Aksen Profil Pintu Geser Kabinet Bawah -->
+                <a-box position="-0.4 0.22 0.215" width="0.74" height="0.36" depth="0.01" mixin="wood-trim"></a-box>
+                <a-box position="0.4 0.22 0.215" width="0.74" height="0.36" depth="0.01" mixin="wood-trim"></a-box>
+                
+                <!-- Soundbar TV Korporat Hitam Elegan di Atas Konsol -->
+                <a-box position="0 0.49 0.12" width="0.9" height="0.04" depth="0.08" material="color: #0f172a; roughness: 0.3;"></a-box>
 
-                <!-- SAKU AMBALAN TINGKAT 1 (ATAS) - BUKU BISNIS & MAJALAH UTAMA - Y = 1.05m -->
-                <a-entity position="0 1.05 -0.15" rotation="-15 0 0">
-                    <!-- Papan Belakang Penahan Buku -->
-                    <a-box position="0 0.12 -0.02" width="0.48" height="0.28" depth="0.01" material="color: #1e293b; roughness: 0.5;"></a-box>
-                    <!-- Dasar Saku (Tempat Duduk Buku) -->
-                    <a-box position="0 0 0.025" width="0.48" height="0.015" depth="0.08" material="color: #0f172a;"></a-box>
-                    <!-- Bibir Akrilik Bening Penahan Buku di Depan -->
-                    <a-box position="0 0.04 0.065" width="0.48" height="0.08" depth="0.005" 
-                           material="color: #ffffff; opacity: 0.45; transparent: true; roughness: 0.1;"></a-box>
+                <!-- B. KAKI STAND TV METAL HEAVY-DUTY -->
+                <a-box position="0 0.485 0" width="0.45" height="0.012" depth="0.25" material="color: #1e293b; metalness: 0.8;"></a-box>
+                <a-box position="0 0.74 -0.02" width="0.1" height="0.5" depth="0.05" material="color: #0f172a; metalness: 0.7;"></a-box>
 
-                    <!-- Buku Majalah 1 (Kiri): PRESIDENT (プレジデント) -->
-                    <a-box position="-0.12 0.12 0.02" width="0.2" height="0.25" depth="0.02" material="color: #f8fafc; roughness: 0.8;"></a-box>
-                    <a-box position="-0.12 0.12 0.031" width="0.198" height="0.248" depth="0.002" material="color: #1e3a8a; roughness: 0.3;"></a-box>
-                    <a-text value="PRESIDENT\nプレジデント\n[ 2026年 企業革新 ]" align="center" position="-0.12 0.13 0.033" color="#ffffff" width="0.48"></a-text>
+                <!-- C. BODI UTAMA TV 65-INCH (ASPECT RATIO 16:9, BEZEL ULTRA-THIN) -->
+                <a-box position="0 1.25 0" width="1.48" height="0.86" depth="0.04" material="color: #020617; roughness: 0.2; metalness: 0.5;"></a-box>
 
-                    <!-- Buku Majalah 2 (Kanan): NIKKEI BUSINESS (日経ビジネス) -->
-                    <a-box position="0.12 0.12 0.02" width="0.2" height="0.25" depth="0.02" material="color: #f8fafc; roughness: 0.8;"></a-box>
-                    <a-box position="0.12 0.12 0.031" width="0.198" height="0.248" depth="0.002" material="color: #991b1b; roughness: 0.3;"></a-box>
-                    <a-text value="日経ビジネス\nNikkei Business\n[ グローバル挑戦 ]" align="center" position="0.12 0.13 0.033" color="#ffffff" width="0.48"></a-text>
+                <!-- LAYAR TAMPILAN INTERAKTIF VIDEO PEMBELAJARAN (KLIK UNTUK MEMUTAR) -->
+                <a-plane id="learning-tv-screen" position="0 1.25 0.023" width="1.44" height="0.82" 
+                         material="roughness: 0.15; emissive: #ffffff; emissiveIntensity: 0.6;" 
+                         learning-video-screen>
+                </a-plane>
+
+                <!-- Ambient Glow Lembut dari Layar TV ke Arah Sofa -->
+                <a-light type="point" color="#cbd5e1" intensity="0.25" distance="3.0" position="0 1.25 0.35"></a-light>
+            </a-entity>
+
+            <!-- 4. RAK BUKU EKSEKUTIF KANTOR JEPANG DENGAN BANYAK BUKU & DOKUMEN REALISTIS (EXECUTIVE BOOKCASE) -->
+            <!-- Diletakkan rapi menempel pada dinding di samping kiri resepsionis (X = 4.68m, Z = 8.0m, Menghadap ke -X) -->
+            <a-entity id="office-bookshelf" position="4.68 0 8.0" rotation="0 -90 0">
+
+                <!-- A. RANGKA LEMARI KAYU WALNUT SOLID MEWAH (BOOKCASE STRUCTURE) -->
+                <!-- Papan Alas Dasar / Plinth Bawah -->
+                <a-box position="0 0.04 0" width="1.34" height="0.08" depth="0.42" mixin="wood-dark"></a-box>
+                <!-- Dinding Samping Kiri Lemari -->
+                <a-box position="-0.65 1.0 0" width="0.04" height="1.84" depth="0.4" mixin="wood-desk"></a-box>
+                <!-- Dinding Samping Kanan Lemari -->
+                <a-box position="0.65 1.0 0" width="0.04" height="1.84" depth="0.4" mixin="wood-desk"></a-box>
+                <!-- Papan Penutup Atas / Crown Molding Elegan -->
+                <a-box position="0 1.94 0" width="1.38" height="0.05" depth="0.44" mixin="wood-dark"></a-box>
+                <a-box position="0 1.915 0.01" width="1.35" height="0.02" depth="0.43" mixin="wood-trim"></a-box>
+                <!-- Panel Dinding Belakang Kayu Bertekstur -->
+                <a-box position="0 0.98 -0.19" width="1.26" height="1.84" depth="0.02" material="color: #241711; roughness: 0.7;"></a-box>
+
+                <!-- AMBALAN RAK HORIZONTAL (SHELVES TEBAL 2.5cm) -->
+                <!-- Ambalan 1 (Pemisah Lemari Bawah & Rak Buku): Y = 0.52m -->
+                <a-box position="0 0.52 0" width="1.26" height="0.026" depth="0.39" mixin="wood-dark"></a-box>
+                <!-- Ambalan 2 (Tingkat Bawah): Y = 0.92m -->
+                <a-box position="0 0.92 0" width="1.26" height="0.024" depth="0.38" mixin="wood-desk"></a-box>
+                <!-- Ambalan 3 (Tingkat Tengah): Y = 1.30m -->
+                <a-box position="0 1.30 0" width="1.26" height="0.024" depth="0.38" mixin="wood-desk"></a-box>
+                <!-- Ambalan 4 (Tingkat Atas): Y = 1.66m -->
+                <a-box position="0 1.66 0" width="1.26" height="0.024" depth="0.38" mixin="wood-desk"></a-box>
+                <!-- Tiang Pembatas Vertikal Tengah -->
+                <a-box position="0 1.22 0" width="0.025" height="1.38" depth="0.37" mixin="wood-desk"></a-box>
+
+                <!-- B. KOMPARTEMEN KABINET BAWAH TERTUTUP (Y = 0.08 s/d 0.52m) -->
+                <!-- Pintu Kiri Lemari Bawah -->
+                <a-box position="-0.315 0.28 0.185" width="0.61" height="0.45" depth="0.018" mixin="wood-desk"></a-box>
+                <a-box position="-0.315 0.28 0.196" width="0.55" height="0.39" depth="0.005" mixin="wood-dark"></a-box>
+                <a-box position="-0.04 0.28 0.205" width="0.012" height="0.12" depth="0.012" mixin="metal-chrome"></a-box>
+                <!-- Pintu Kanan Lemari Bawah -->
+                <a-box position="0.315 0.28 0.185" width="0.61" height="0.45" depth="0.018" mixin="wood-desk"></a-box>
+                <a-box position="0.315 0.28 0.196" width="0.55" height="0.39" depth="0.005" mixin="wood-dark"></a-box>
+                <a-box position="0.04 0.28 0.205" width="0.012" height="0.12" depth="0.012" mixin="metal-chrome"></a-box>
+
+                <!-- ========================================================================= -->
+                <!-- C. TINGKAT 1 (Y = 0.54 s/d 0.92m): BINDER ARSIP A4 KORPORAT JEPANG        -->
+                <!-- ========================================================================= -->
+                <a-entity position="0 0.533 0" shelf-books-tier1></a-entity>
+
+                <!-- ========================================================================= -->
+                <!-- D. TINGKAT 2 (Y = 0.94 s/d 1.30m): KOLEKSI BUKU MANAJEMEN & ETIKA KERJA   -->
+                <!-- ========================================================================= -->
+                <a-entity position="0 0.932 0" shelf-books-tier2></a-entity>
+
+                <!-- ========================================================================= -->
+                <!-- E. TINGKAT 3 (Y = 1.32 s/d 1.66m): ENSIKLOPEDIA PERUSAHAAN & SUKULEN      -->
+                <!-- ========================================================================= -->
+                <a-entity position="0 1.312 0" shelf-books-tier3></a-entity>
+                
+                <!-- Sukulen & Jam Meja di Ambalan Tingkat 3 -->
+                <a-entity position="0.08 1.312 0">
+                    <a-entity position="0.32 0 0.03" shelf-succulent></a-entity>
+                    <a-entity position="0.45 0 0.02">
+                        <a-box position="0 0.04 0" width="0.09" height="0.07" depth="0.04" material="color: #0f172a; roughness: 0.3;"></a-box>
+                        <a-box position="0 0.04 0.021" width="0.078" height="0.055" depth="0.002" material="color: #020617;"></a-box>
+                        <a-text value="09:48" align="center" position="0 0.04 0.023" color="#38bdf8" width="0.32"></a-text>
+                    </a-entity>
                 </a-entity>
 
-                <!-- SAKU AMBALAN TINGKAT 2 (TENGAH) - BUKU PANDUAN KERJA & BROSUR REKRUTMEN - Y = 0.72m -->
-                <a-entity position="0 0.72 -0.06" rotation="-15 0 0">
-                    <a-box position="0 0.12 -0.02" width="0.48" height="0.28" depth="0.01" material="color: #1e293b; roughness: 0.5;"></a-box>
-                    <a-box position="0 0 0.025" width="0.48" height="0.015" depth="0.08" material="color: #0f172a;"></a-box>
-                    <a-box position="0 0.04 0.065" width="0.48" height="0.08" depth="0.005" 
-                           material="color: #ffffff; opacity: 0.45; transparent: true; roughness: 0.1;"></a-box>
+                <!-- ========================================================================= -->
+                <!-- F. TINGKAT 4 (Y = 1.68 s/d 1.91m): SERTIFIKAT ISO & BUKU SEJARAH RESMI   -->
+                <!-- ========================================================================= -->
+                <!-- 1. TANAMAN HIAS RAK ATAS REALISTIS BERLAPIS DAUN RIMBUN (LUSH SHELF POTHOS 68 LEAVES) -->
+                <a-entity position="-0.36 1.672 0.03" shelf-pothos></a-entity>
 
-                    <!-- Buku 3 (Kiri): 会社四季報 (Japan Company Handbook / Kaisha Shikiho) -->
-                    <a-box position="-0.12 0.12 0.02" width="0.2" height="0.25" depth="0.025" material="color: #f8fafc; roughness: 0.8;"></a-box>
-                    <a-box position="-0.12 0.12 0.033" width="0.198" height="0.248" depth="0.002" material="color: #15803d; roughness: 0.3;"></a-box>
-                    <a-text value="会社四季報\nJAPAN COMPANY\n[ 業界研究 & 企業年鑑 ]" align="center" position="-0.12 0.13 0.035" color="#ffffff" width="0.46"></a-text>
-
-                    <!-- Buku 4 (Kanan): Panduan Karier & Budaya Kerja Rekrutmen -->
-                    <a-box position="0.12 0.12 0.02" width="0.2" height="0.25" depth="0.02" material="color: #f8fafc; roughness: 0.8;"></a-box>
-                    <a-box position="0.12 0.12 0.031" width="0.198" height="0.248" depth="0.002" material="color: #047857; roughness: 0.3;"></a-box>
-                    <a-text value="採用情報\nRECRUITMENT\n新卒・中途採用案内" align="center" position="0.12 0.13 0.033" color="#ffffff" width="0.48"></a-text>
-                </a-entity>
-
-                <!-- SAKU AMBALAN TINGKAT 3 (BAWAH) - PROFIL KORPORAT & LAPORAN CSR - Y = 0.39m -->
-                <a-entity position="0 0.39 0.03" rotation="-15 0 0">
-                    <a-box position="0 0.12 -0.02" width="0.48" height="0.28" depth="0.01" material="color: #1e293b; roughness: 0.5;"></a-box>
-                    <a-box position="0 0 0.025" width="0.48" height="0.015" depth="0.08" material="color: #0f172a;"></a-box>
-                    <a-box position="0 0.04 0.065" width="0.48" height="0.08" depth="0.005" 
-                           material="color: #ffffff; opacity: 0.45; transparent: true; roughness: 0.1;"></a-box>
-
-                    <!-- Brosur Profil Perusahaan & CSR Laporan SDGs -->
-                    <a-box position="-0.12 0.12 0.02" width="0.2" height="0.25" depth="0.02" material="color: #f8fafc; roughness: 0.8;"></a-box>
-                    <a-box position="-0.12 0.12 0.031" width="0.198" height="0.248" depth="0.002" material="color: #1e40af; roughness: 0.3;"></a-box>
-                    <a-text value="会社案内\nCOMPANY\nPROFILE" align="center" position="-0.12 0.13 0.033" color="#ffffff" width="0.48"></a-text>
-
-                    <a-box position="0.12 0.12 0.02" width="0.2" height="0.25" depth="0.02" material="color: #f8fafc; roughness: 0.8;"></a-box>
-                    <a-box position="0.12 0.12 0.031" width="0.198" height="0.248" depth="0.002" material="color: #b45309; roughness: 0.3;"></a-box>
-                    <a-text value="サステナビリティ\nCSR・SDGs\nREPORT" align="center" position="0.12 0.13 0.033" color="#ffffff" width="0.48"></a-text>
-                </a-entity>
+                <!-- 2 & 3. BUKU SEJARAH SLIPCASE & KOLEKSI BUKU PROFIL PASAR MODAL TSE -->
+                <a-entity position="0 1.672 0" shelf-books-tier4></a-entity>
             </a-entity>
 
             <!-- --------------------------------------------------------------------- -->
@@ -570,130 +708,236 @@
             <a-entity id="refreshment-station" position="-4.7 0 13.8" rotation="0 90 0">
                 <!-- 1. WATER DISPENSER KANTOR JEPANG REALISTIS (PREMIUM WATER SERVER) -->
                 <a-entity position="0 0 0">
-                    <!-- Bodi Menara Utama Dispenser (Satin Pearl White & Graphite Grey) -->
-                    <a-box position="0 0.49 0" width="0.36" height="0.98" depth="0.36" material="color: #f8fafc; roughness: 0.25;"></a-box>
-                    <!-- Panel Samping Graphite Grey Beraksen Tekstur -->
-                    <a-box position="-0.181 0.49 0" width="0.004" height="0.96" depth="0.34" material="color: #334155; roughness: 0.4;"></a-box>
-                    <a-box position="0.181 0.49 0" width="0.004" height="0.96" depth="0.34" material="color: #334155; roughness: 0.4;"></a-box>
+                    <!-- Bodi Menara Utama Dispenser (Satin Pearl White dengan Chamfered Pillars) -->
+                    <a-box position="0 0.49 0" width="0.36" height="0.98" depth="0.36" material="color: #f8fafc; roughness: 0.22;"></a-box>
+                    <!-- Panel Samping Graphite Grey Beraksen Tekstur Pinstripe -->
+                    <a-box position="-0.181 0.49 0" width="0.004" height="0.96" depth="0.34" material="color: #1e293b; roughness: 0.4;"></a-box>
+                    <a-box position="0.181 0.49 0" width="0.004" height="0.96" depth="0.34" material="color: #1e293b; roughness: 0.4;"></a-box>
+                    <!-- Garis Shadow Line Minimalis Pemisah Pintu Bawah -->
+                    <a-box position="0 0.485 0.181" width="0.356" height="0.006" depth="0.002" material="color: #0f172a;"></a-box>
                     
-                    <!-- Kaki Penyangga Karet Hitam di Bawah (4 Kaki) -->
-                    <a-cylinder position="-0.15 0.01 -0.15" radius="0.018" height="0.02" material="color: #0f172a;"></a-cylinder>
-                    <a-cylinder position="0.15 0.01 -0.15" radius="0.018" height="0.02" material="color: #0f172a;"></a-cylinder>
-                    <a-cylinder position="-0.15 0.01 0.15" radius="0.018" height="0.02" material="color: #0f172a;"></a-cylinder>
-                    <a-cylinder position="0.15 0.01 0.15" radius="0.018" height="0.02" material="color: #0f172a;"></a-cylinder>
+                    <!-- Kaki Penyangga Karet Hitam di Bawah dengan Ring Chrome -->
+                    <a-cylinder position="-0.15 0.012 -0.15" radius="0.02" height="0.024" material="color: #020617;"></a-cylinder>
+                    <a-cylinder position="0.15 0.012 -0.15" radius="0.02" height="0.024" material="color: #020617;"></a-cylinder>
+                    <a-cylinder position="-0.15 0.012 0.15" radius="0.02" height="0.024" material="color: #020617;"></a-cylinder>
+                    <a-cylinder position="0.15 0.012 0.15" radius="0.02" height="0.024" material="color: #020617;"></a-cylinder>
+                    <a-torus position="-0.15 0.02 -0.15" radius="0.02" radius-tubular="0.003" rotation="90 0 0" mixin="metal-chrome"></a-torus>
+                    <a-torus position="0.15 0.02 -0.15" radius="0.02" radius-tubular="0.003" rotation="90 0 0" mixin="metal-chrome"></a-torus>
+                    <a-torus position="-0.15 0.02 0.15" radius="0.02" radius-tubular="0.003" rotation="90 0 0" mixin="metal-chrome"></a-torus>
+                    <a-torus position="0.15 0.02 0.15" radius="0.02" radius-tubular="0.003" rotation="90 0 0" mixin="metal-chrome"></a-torus>
 
-                    <!-- Kerah Dudukan Galon Atas (Funnel Collar Anti-Tumpah) -->
-                    <a-cylinder position="0 0.985 0" radius="0.165" height="0.02" material="color: #e2e8f0; roughness: 0.3;"></a-cylinder>
-                    <a-torus position="0 0.995 0" radius="0.165" radius-tubular="0.008" rotation="90 0 0" material="color: #cbd5e1;"></a-torus>
+                    <!-- Kerah Dudukan Galon Atas (Funnel Collar Anti-Tumpah Berlapis) -->
+                    <a-cylinder position="0 0.985 0" radius="0.168" height="0.02" material="color: #e2e8f0; roughness: 0.3;"></a-cylinder>
+                    <a-torus position="0 0.995 0" radius="0.168" radius-tubular="0.008" rotation="90 0 0" material="color: #cbd5e1;"></a-torus>
+                    <a-cylinder position="0 0.996 0" radius="0.09" height="0.015" material="color: #1e293b; roughness: 0.5;"></a-cylinder>
+                    <!-- Tusukan Pemecah Segel Galon (Intake Puncture Probe Chrome) -->
+                    <a-cone position="0 1.04 0" radius-bottom="0.014" radius-top="0.004" height="0.08" mixin="metal-chrome"></a-cone>
 
-                    <!-- Plakat Merk Server Depan Atas: PREMIUM WATER JAPAN -->
-                    <a-box position="0 0.93 0.182" width="0.28" height="0.04" depth="0.005" material="color: #0f172a; roughness: 0.2;"></a-box>
-                    <a-text value="PREMIUM WATER  TOKYO" align="center" position="0 0.93 0.186" color="#38bdf8" width="0.48"></a-text>
+                    <!-- HEADER KONSOL ATAS AKRILIK HITAM MENGKILAP -->
+                    <a-box position="0 0.925 0.182" width="0.32" height="0.07" depth="0.006" material="color: #090d16; roughness: 0.15;"></a-box>
+                    <!-- Lis Chrome Tipis Pembatas Header -->
+                    <a-box position="0 0.96 0.185" width="0.32" height="0.003" depth="0.002" mixin="metal-chrome"></a-box>
+                    <a-box position="0 0.89 0.185" width="0.32" height="0.003" depth="0.002" mixin="metal-chrome"></a-box>
+                    
+                    <!-- Logo Merk Resmi: PREMIUM WATER TOKYO -->
+                    <a-text value="PREMIUM WATER TOKYO" align="center" position="0 0.938 0.187" color="#e2e8f0" width="0.48"></a-text>
 
-                    <!-- Panel 4 Lampu Indikator LED Operasi -->
-                    <a-box position="0 0.875 0.182" width="0.28" height="0.03" depth="0.004" material="color: #1e293b;"></a-box>
-                    <!-- LED 1: Power (Hijau) -->
-                    <a-sphere position="-0.09 0.875 0.186" radius="0.005" material="color: #22c55e; emissive: #16a34a; emissiveIntensity: 0.8;"></a-sphere>
-                    <!-- LED 2: Hot 85°C (Merah) -->
-                    <a-sphere position="-0.03 0.875 0.186" radius="0.005" material="color: #ef4444; emissive: #dc2626; emissiveIntensity: 0.8;"></a-sphere>
-                    <!-- LED 3: Cold 6°C (Biru) -->
-                    <a-sphere position="0.03 0.875 0.186" radius="0.005" material="color: #38bdf8; emissive: #0284c7; emissiveIntensity: 0.8;"></a-sphere>
-                    <!-- LED 4: Eco Mode (Kuning) -->
-                    <a-sphere position="0.09 0.875 0.186" radius="0.005" material="color: #fbbf24; emissive: #d97706; emissiveIntensity: 0.8;"></a-sphere>
+                    <!-- DISPLAY SUHU DIGITAL LED & STATUS SERVER -->
+                    <!-- Indikator Suhu Air Panas (88°C) -->
+                    <a-text value="HOT 88°C" align="center" position="-0.075 0.91 0.187" color="#ef4444" width="0.32"></a-text>
+                    <!-- Indikator Suhu Air Dingin (5°C) -->
+                    <a-text value="COLD 5°C" align="center" position="0.075 0.91 0.187" color="#60a5fa" width="0.32"></a-text>
 
-                    <!-- CERUK DISPENSER PENGAMBILAN AIR (RECESSED ALCOVE) -->
+                    <!-- 4 Lampu Indikator Bulat Operasi Normal -->
+                    <a-sphere position="-0.09 0.865 0.185" radius="0.004" material="color: #16a34a; emissive: #15803d; emissiveIntensity: 0.9;"></a-sphere>
+                    <a-sphere position="-0.03 0.865 0.185" radius="0.004" material="color: #ef4444; emissive: #dc2626; emissiveIntensity: 0.9;"></a-sphere>
+                    <a-sphere position="0.03 0.865 0.185" radius="0.004" material="color: #2563eb; emissive: #1d4ed8; emissiveIntensity: 0.9;"></a-sphere>
+                    <a-sphere position="0.09 0.865 0.185" radius="0.004" material="color: #f59e0b; emissive: #d97706; emissiveIntensity: 0.9;"></a-sphere>
+
+                    <!-- CERUK DISPENSER PENGAMBILAN AIR (RECESSED ALCOVE BERLAPIS) -->
                     <a-box position="0 0.67 0.11" width="0.28" height="0.32" depth="0.14" material="color: #0f172a; roughness: 0.6;"></a-box>
-                    <!-- Lampu LED Lembut Penerang Ceruk Air (Downlight) -->
-                    <a-circle position="0 0.825 0.13" radius="0.02" rotation="90 0 0" 
-                              material="color: #e0f2fe; emissive: #ffffff; emissiveIntensity: 0.7;"></a-circle>
-                    <a-light type="point" color="#bae6fd" intensity="0.25" distance="0.6" position="0 0.78 0.14"></a-light>
+                    <!-- Pelat Belakang Stainless Steel Sikat (Brushed Metallic Backplate) -->
+                    <a-box position="0 0.67 0.041" width="0.276" height="0.316" depth="0.002" material="color: #94a3b8; metalness: 0.7; roughness: 0.3;"></a-box>
 
-                    <!-- KRAN AIR PANAS KIRI (DENGAN KUNCI PENGAMAN ANAK / CHILD SAFETY LOCK) -->
-                    <a-entity position="-0.06 0.73 0.12">
-                        <!-- Pipa Cerat Air Chrome -->
-                        <a-cylinder position="0 0.04 0" radius="0.005" height="0.035" mixin="metal-chrome"></a-cylinder>
-                        <!-- Tuas Dorong Merah Air Panas -->
-                        <a-box position="0 0.01 0.015" width="0.026" height="0.045" depth="0.03" material="color: #dc2626; roughness: 0.3;"></a-box>
-                        <!-- Tombol Penggeser Safety Lock Putih -->
-                        <a-box position="0 0.035 0.022" width="0.014" height="0.01" depth="0.012" material="color: #ffffff;"></a-box>
+                    <!-- Lampu Ambient Downlight Halus di Plafon Ceruk -->
+                    <a-circle position="0 0.825 0.11" radius="0.025" rotation="90 0 0" 
+                              material="color: #e2e8f0; emissive: #f1f5f9; emissiveIntensity: 0.5;"></a-circle>
+                    <a-light type="point" color="#f1f5f9" intensity="0.25" distance="0.75" position="0 0.78 0.12"></a-light>
+
+                    <!-- KRAN AIR PANAS KIRI (DENGAN KUNCI PENGAMAN ANAK / SAFETY LOCK LEVER) -->
+                    <a-entity position="-0.06 0.73 0.115">
+                        <a-cylinder position="0 0.045 0" radius="0.006" height="0.035" mixin="metal-chrome"></a-cylinder>
+                        <a-cylinder position="0 0.02 0.008" radius="0.004" height="0.016" rotation="-30 0 0" mixin="metal-chrome"></a-cylinder>
+                        <!-- Tuas Dorong Merah Solid -->
+                        <a-box position="0 0.008 0.016" width="0.026" height="0.046" depth="0.028" material="color: #dc2626; roughness: 0.25;"></a-box>
+                        <!-- Tombol Safety Lock Putih Timbul -->
+                        <a-box position="0 0.036 0.025" width="0.015" height="0.01" depth="0.012" material="color: #ffffff; roughness: 0.2;"></a-box>
                     </a-entity>
 
-                    <!-- KRAN AIR DINGIN KANAN (COLD WATER TAP) -->
-                    <a-entity position="0.06 0.73 0.12">
-                        <a-cylinder position="0 0.04 0" radius="0.005" height="0.035" mixin="metal-chrome"></a-cylinder>
-                        <!-- Tuas Dorong Biru Air Dingin -->
-                        <a-box position="0 0.01 0.015" width="0.026" height="0.045" depth="0.03" material="color: #0284c7; roughness: 0.3;"></a-box>
+                    <!-- KRAN AIR DINGIN KANAN (COLD WATER DISPENSE TAP) -->
+                    <a-entity position="0.06 0.73 0.115">
+                        <a-cylinder position="0 0.045 0" radius="0.006" height="0.035" mixin="metal-chrome"></a-cylinder>
+                        <a-cylinder position="0 0.02 0.008" radius="0.004" height="0.016" rotation="-30 0 0" mixin="metal-chrome"></a-cylinder>
+                        <!-- Tuas Dorong Biru Dingin -->
+                        <a-box position="0 0.008 0.016" width="0.026" height="0.046" depth="0.028" material="color: #0284c7; roughness: 0.25;"></a-box>
                     </a-entity>
 
-                    <!-- NAMPAN PENAMPUNG TETESAN AIR (DRIP TRAY & KISI DRAINASE CHROME) -->
+                    <!-- NAMPAN DRIP TRAY & KISI DRAINASE STAINLESS STEEL -->
                     <a-box position="0 0.525 0.145" width="0.26" height="0.025" depth="0.12" mixin="metal-chrome"></a-box>
-                    <!-- Plat Kisi Berlubang Drainase Hitam/Chrome -->
-                    <a-box position="0 0.538 0.145" width="0.245" height="0.002" depth="0.105" material="color: #1e293b; roughness: 0.4;"></a-box>
-                    <a-box position="-0.07 0.539 0.145" width="0.008" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
-                    <a-box position="-0.035 0.539 0.145" width="0.008" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
-                    <a-box position="0 0.539 0.145" width="0.008" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
-                    <a-box position="0.035 0.539 0.145" width="0.008" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
-                    <a-box position="0.07 0.539 0.145" width="0.008" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
+                    <!-- Plat Kisi Drainase Hitam Bergaris Chrome -->
+                    <a-box position="0 0.538 0.145" width="0.245" height="0.002" depth="0.105" material="color: #0f172a; roughness: 0.3;"></a-box>
+                    <a-box position="-0.08 0.539 0.145" width="0.006" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
+                    <a-box position="-0.04 0.539 0.145" width="0.006" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
+                    <a-box position="0 0.539 0.145" width="0.006" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
+                    <a-box position="0.04 0.539 0.145" width="0.006" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
+                    <a-box position="0.08 0.539 0.145" width="0.006" height="0.002" depth="0.08" mixin="metal-chrome"></a-box>
 
                     <!-- 1 CANGKIR KERTAS DI ATAS NAMPAN BERISI AIR SEGAR -->
                     <a-entity position="0.06 0.54 0.145">
-                        <!-- Bodi Cangkir Kertas Putih Kerucut Terpancung -->
                         <a-cone position="0 0.04 0" radius-bottom="0.025" radius-top="0.033" height="0.075" material="color: #ffffff; roughness: 0.9;"></a-cone>
-                        <!-- Bibir Gulungan Cangkir Kertas Halus di Atas -->
                         <a-torus position="0 0.078 0" radius="0.033" radius-tubular="0.003" rotation="90 0 0" material="color: #ffffff;"></a-torus>
-                        <!-- Permukaan Air Bening di Dalam Cangkir -->
-                        <a-circle position="0 0.06 0" radius="0.028" rotation="-90 0 0" 
+                        <!-- Permukaan Air di Dalam Cangkir dengan Efek Refraksi Transparan -->
+                        <a-circle position="0 0.062 0" radius="0.029" rotation="-90 0 0" 
                                   material="color: #38bdf8; opacity: 0.75; transparent: true; roughness: 0.1;"></a-circle>
                     </a-entity>
 
-                    <!-- PINTU KABINET BAWAH DISPENSER DENGAN HANDLE RECESSED -->
-                    <a-box position="0 0.25 0.181" width="0.34" height="0.47" depth="0.006" material="color: #f1f5f9; roughness: 0.3;"></a-box>
-                    <a-box position="0 0.46 0.185" width="0.09" height="0.014" depth="0.006" material="color: #0f172a;"></a-box>
+                    <!-- PINTU KABINET BAWAH DISPENSER DENGAN HANDLE RECESSED HORISONTAL -->
+                    <a-box position="0 0.25 0.181" width="0.34" height="0.45" depth="0.006" material="color: #f8fafc; roughness: 0.25;"></a-box>
+                    <!-- Handle Ceruk Tarik Chrome -->
+                    <a-box position="0 0.45 0.185" width="0.1" height="0.016" depth="0.008" mixin="metal-chrome"></a-box>
+                    <a-box position="0 0.45 0.187" width="0.088" height="0.008" depth="0.006" material="color: #0f172a;"></a-box>
 
-                    <!-- ============================================================= -->
-                    <!-- GALON AIR MINERAL 12L BERKONTUR REALISTIS (POLYCARBONATE JUG)  -->
-                    <!-- ============================================================= -->
-                    <a-entity position="0 1.0 0">
-                        <!-- Leher Galon Masuk ke Mesin dengan Segel Biru (Tear-Off Cap) -->
-                        <a-cylinder position="0 0.025 0" radius="0.05" height="0.05" material="color: #0284c7; roughness: 0.3;"></a-cylinder>
-                        <a-torus position="0 0.04 0" radius="0.052" radius-tubular="0.004" rotation="90 0 0" material="color: #0369a1;"></a-torus>
+                    <!-- ========================================================================= -->
+                    <!-- GALON AIR MINERAL 12L ULTRA-REALISTIS MULTI-LAYER & ANIMASI AIR          -->
+                    <!-- Menggunakan multi-lapisan polikarbonat, pantulan cahaya, kontur rusuk 3D, -->
+                    <!-- dan gelembung udara beranimasi loop mengapung ke atas secara berkelanjutan -->
+                    <!-- ========================================================================= -->
+                    <a-entity id="water-gallon" position="0 1.0 0">
 
-                        <!-- Bahu Kerucut Galon Biru Transparan Mengkilap -->
-                        <a-cone position="0 0.09 0" radius-bottom="0.14" radius-top="0.06" height="0.08" 
-                                material="color: #38bdf8; opacity: 0.58; transparent: true; roughness: 0.12; metalness: 0.08;"></a-cone>
+                        <!-- 1. LEHER GALON DENGAN SEGEL ANTI-TUMPAH (PULL-RING TEAR CAP) -->
+                        <a-cylinder position="0 0.025 0" radius="0.052" height="0.05" material="color: #0284c7; roughness: 0.3;"></a-cylinder>
+                        <!-- Cincin Pengaman Segel Botol (Tamper Evident Band) -->
+                        <a-torus position="0 0.042 0" radius="0.053" radius-tubular="0.004" rotation="90 0 0" material="color: #0369a1;"></a-torus>
+                        <!-- Pita Tarik Segel Putih (Tear-Off Pull Strip) -->
+                        <a-box position="0.051 0.025 0" width="0.004" height="0.02" depth="0.015" material="color: #ffffff;"></a-box>
+                        <a-box position="0.053 0.016 0" width="0.008" height="0.006" depth="0.012" material="color: #ffffff;"></a-box>
 
-                        <!-- Bodi Silinder Galon Utama (Tinggi 38cm, Diameter 28cm) -->
-                        <a-cylinder position="0 0.32 0" radius="0.14" height="0.38" 
-                                    material="color: #38bdf8; opacity: 0.52; transparent: true; roughness: 0.1; metalness: 0.1;"></a-cylinder>
+                        <!-- Tabung Siphon Intake Stainless Steel yang Menembus Galon (Terlihat dari Luar) -->
+                        <a-cylinder position="0 0.14 0" radius="0.012" height="0.22" mixin="metal-chrome" 
+                                    material="opacity: 0.85; transparent: true;"></a-cylinder>
 
-                        <!-- 4 CINCIN RUSUK PENGUAT HORIZONTAL KHAS GALON AIR (REINFORCING RIBS) -->
-                        <a-torus position="0 0.18 0" radius="0.141" radius-tubular="0.007" rotation="90 0 0" 
-                                 material="color: #0284c7; opacity: 0.65; transparent: true;"></a-torus>
-                        <a-torus position="0 0.26 0" radius="0.141" radius-tubular="0.007" rotation="90 0 0" 
-                                 material="color: #0284c7; opacity: 0.65; transparent: true;"></a-torus>
-                        <a-torus position="0 0.34 0" radius="0.141" radius-tubular="0.007" rotation="90 0 0" 
-                                 material="color: #0284c7; opacity: 0.65; transparent: true;"></a-torus>
-                        <a-torus position="0 0.42 0" radius="0.141" radius-tubular="0.007" rotation="90 0 0" 
-                                 material="color: #0284c7; opacity: 0.65; transparent: true;"></a-torus>
+                        <!-- 2. BAHU KERUCUT GALON BERLAPIS (CONICAL TAPERED SHOULDER) -->
+                        <!-- Lapisan Luar Polikarbonat Bahu Galon -->
+                        <a-cone position="0 0.09 0" radius-bottom="0.142" radius-top="0.062" height="0.08" 
+                                material="color: #38bdf8; opacity: 0.52; transparent: true; roughness: 0.08; metalness: 0.12;"></a-cone>
+                        <!-- Lapisan Dalam Massa Air di Bahu Galon -->
+                        <a-cone position="0 0.09 0" radius-bottom="0.136" radius-top="0.056" height="0.076" 
+                                material="color: #0284c7; opacity: 0.72; transparent: true; roughness: 0.1;"></a-cone>
 
-                        <!-- ISI AIR SEGAR DI DALAM GALON (85% TERISI AIR) -->
-                        <a-cylinder position="0 0.28 0" radius="0.133" height="0.32" 
-                                    material="color: #0284c7; opacity: 0.7; transparent: true; roughness: 0.1;"></a-cylinder>
-                        <!-- Permukaan Air Dalam Galon (Meniscus Air & Gelembung Udara di Puncak) -->
-                        <a-circle position="0 0.44 0" radius="0.132" rotation="-90 0 0" 
-                                  material="color: #7dd3fc; opacity: 0.85; transparent: true;"></a-circle>
+                        <!-- 3. BODI SILINDER GALON UTAMA MULTI-LAYER (TINGGI 38cm, DIAMETER 28.5cm) -->
+                        <!-- A. Lapisan Polikarbonat Terluar (High-Gloss Clear Shell) -->
+                        <a-cylinder position="0 0.32 0" radius="0.143" height="0.38" 
+                                    material="color: #38bdf8; opacity: 0.42; transparent: true; roughness: 0.06; metalness: 0.15;"></a-cylinder>
+
+                        <!-- B. Lapisan Dinding Dalam Botol (Inner Wall Refraction) -->
+                        <a-cylinder position="0 0.32 0" radius="0.140" height="0.378" 
+                                    material="color: #0284c7; opacity: 0.48; transparent: true; roughness: 0.08;"></a-cylinder>
+
+                        <!-- C. Kolom Air Mineral Alami Segar (Deep Aquamarine Fluid Core) -->
+                        <a-cylinder position="0 0.28 0" radius="0.135" height="0.32" 
+                                    material="color: #0284c7; opacity: 0.72; transparent: true; roughness: 0.1;"></a-cylinder>
                         
-                        <!-- Kubah Lengkung Puncak Galon (Top Dome Galon Terbalik) -->
-                        <a-cone position="0 0.53 0" radius-bottom="0.14" radius-top="0.06" height="0.06" 
-                                material="color: #38bdf8; opacity: 0.58; transparent: true; roughness: 0.15;"></a-cone>
-                        <a-cylinder position="0 0.56 0" radius="0.06" height="0.02" 
-                                    material="color: #38bdf8; opacity: 0.65; transparent: true;"></a-cylinder>
+                        <!-- D. Inti Kedalaman Densitas Air (Dense Core Gradient) -->
+                        <a-cylinder position="0 0.28 0" radius="0.105" height="0.318" 
+                                    material="color: #0369a1; opacity: 0.42; transparent: true; roughness: 0.15;"></a-cylinder>
 
-                        <!-- LABEL EMBLEM AIR MINERAL ALAMI GUNUNG FUJI DI MUKA GALON -->
-                        <a-box position="0 0.31 0.142" width="0.16" height="0.09" depth="0.002" 
-                               material="color: #ffffff; opacity: 0.92; roughness: 0.2;"></a-box>
-                        <a-text value="富士山の天然水\nMt. Fuji Pure 12L\n[ 天然ミネラル水 ]" align="center" 
-                                position="0 0.31 0.145" color="#0369a1" width="0.34"></a-text>
+                        <!-- 4. PANTULAN CAHAYA KILAU VERTIKAL (SPECULAR GLASS HIGHLIGHT STREAKS) -->
+                        <!-- Memberikan ilusi lekukan 3D yang sangat kuat dari berbagai sudut pandang -->
+                        <a-entity rotation="0 32 0">
+                            <a-plane position="0 0.32 0.144" width="0.024" height="0.36" 
+                                     material="color: #ffffff; opacity: 0.32; transparent: true; roughness: 0.2;"></a-plane>
+                            <a-plane position="0 0.32 0.144" width="0.008" height="0.36" 
+                                     material="color: #ffffff; opacity: 0.65; transparent: true; roughness: 0.1;"></a-plane>
+                        </a-entity>
+                        <a-entity rotation="0 -48 0">
+                            <a-plane position="0 0.32 0.144" width="0.016" height="0.36" 
+                                     material="color: #bae6fd; opacity: 0.25; transparent: true; roughness: 0.2;"></a-plane>
+                        </a-entity>
+
+                        <!-- 5. LIMA CINCIN RUSUK PENGUAT HORISONTAL 3D (STRUCTURAL REINFORCING RIBS) -->
+                        <!-- Cincin 1 (Bawah) -->
+                        <a-torus position="0 0.16 0" radius="0.144" radius-tubular="0.008" rotation="90 0 0" 
+                                 material="color: #0284c7; opacity: 0.75; transparent: true; roughness: 0.1;"></a-torus>
+                        <!-- Cincin 2 (Bawah-Tengah) -->
+                        <a-torus position="0 0.23 0" radius="0.144" radius-tubular="0.008" rotation="90 0 0" 
+                                 material="color: #0284c7; opacity: 0.75; transparent: true; roughness: 0.1;"></a-torus>
+                        <!-- Cincin 3 (Lekukan Pinggang Tengah / Ergonomic Grip Waist) -->
+                        <a-torus position="0 0.30 0" radius="0.141" radius-tubular="0.009" rotation="90 0 0" 
+                                 material="color: #0369a1; opacity: 0.85; transparent: true; roughness: 0.1;"></a-torus>
+                        <!-- Cincin 4 (Atas-Tengah) -->
+                        <a-torus position="0 0.37 0" radius="0.144" radius-tubular="0.008" rotation="90 0 0" 
+                                 material="color: #0284c7; opacity: 0.75; transparent: true; roughness: 0.1;"></a-torus>
+                        <!-- Cincin 5 (Atas) -->
+                        <a-torus position="0 0.44 0" radius="0.144" radius-tubular="0.008" rotation="90 0 0" 
+                                 material="color: #0284c7; opacity: 0.75; transparent: true; roughness: 0.1;"></a-torus>
+
+                        <!-- 6. PERMUKAAN AIR DENGAN ANIMASI GELOMBANG & MENISCUS DINAMIS -->
+                        <a-circle id="water-surface" position="0 0.44 0" radius="0.134" rotation="-90 0 0" 
+                                  material="color: #67e8f9; opacity: 0.82; transparent: true; roughness: 0.08; metalness: 0.25;"
+                                  animation="property: position; from: 0 0.438 0; to: 0 0.443 0; dur: 1800; dir: alternate; loop: true; easing: easeInOutSine"
+                                  animation__scale="property: scale; from: 0.985 0.985 1; to: 1.015 1.015 1; dur: 2400; dir: alternate; loop: true; easing: easeInOutSine">
+                        </a-circle>
+                        <!-- Cincin Kilau Meniscus Air di Tepi Dinding Kaca -->
+                        <a-ring position="0 0.441 0" radius-inner="0.128" radius-outer="0.136" rotation="-90 0 0" 
+                                material="color: #e0f2fe; opacity: 0.7; transparent: true; roughness: 0.1;"
+                                animation="property: scale; from: 0.99 0.99 1; to: 1.01 1.01 1; dur: 1800; dir: alternate; loop: true; easing: easeInOutSine">
+                        </a-ring>
+
+                        <!-- 7. ANIMASI GELEMBUNG AIR MENGAPUNG KE ATAS (CONTINUOUS RISING AIR BUBBLES) -->
+                        <!-- Gelembung 1: Gelembung Utama Kanan Depan -->
+                        <a-sphere position="0.035 0.08 0.025" radius="0.011" 
+                                  material="color: #ffffff; opacity: 0.85; transparent: true; roughness: 0.05; metalness: 0.3;"
+                                  animation="property: position; from: 0.035 0.08 0.025; to: 0.028 0.438 0.02; dur: 2200; loop: true; easing: easeInQuad"
+                                  animation__scale="property: scale; from: 0.75 0.75 0.75; to: 1.3 1.3 1.3; dur: 2200; loop: true; easing: easeInQuad">
+                        </a-sphere>
+
+                        <!-- Gelembung 2: Gelembung Sedang Kiri Belakang -->
+                        <a-sphere position="-0.04 0.12 -0.02" radius="0.014" 
+                                  material="color: #e0f2fe; opacity: 0.8; transparent: true; roughness: 0.05; metalness: 0.3;"
+                                  animation="property: position; from: -0.04 0.10 -0.02; to: -0.032 0.438 -0.015; dur: 2700; loop: true; easing: easeInQuad"
+                                  animation__scale="property: scale; from: 0.8 0.8 0.8; to: 1.35 1.35 1.35; dur: 2700; loop: true; easing: easeInQuad">
+                        </a-sphere>
+
+                        <!-- Gelembung 3: Gelembung Kecil Lincah Tengah -->
+                        <a-sphere position="0.01 0.06 -0.035" radius="0.007" 
+                                  material="color: #ffffff; opacity: 0.9; transparent: true; roughness: 0.05;"
+                                  animation="property: position; from: 0.01 0.06 -0.035; to: 0.018 0.438 -0.028; dur: 1800; loop: true; easing: easeInQuad"
+                                  animation__scale="property: scale; from: 0.7 0.7 0.7; to: 1.2 1.2 1.2; dur: 1800; loop: true; easing: easeInQuad">
+                        </a-sphere>
+
+                        <!-- Gelembung 4: Gelembung Kiri Depan -->
+                        <a-sphere position="-0.025 0.15 0.038" radius="0.009" 
+                                  material="color: #e0f2fe; opacity: 0.82; transparent: true; roughness: 0.05; metalness: 0.25;"
+                                  animation="property: position; from: -0.025 0.11 0.038; to: -0.018 0.438 0.03; dur: 2450; loop: true; easing: easeInQuad"
+                                  animation__scale="property: scale; from: 0.8 0.8 0.8; to: 1.25 1.25 1.25; dur: 2450; loop: true; easing: easeInQuad">
+                        </a-sphere>
+
+                        <!-- Gelembung 5: Gelembung Halus di Leher Siphon -->
+                        <a-sphere position="0 0.05 0" radius="0.006" 
+                                  material="color: #ffffff; opacity: 0.88; transparent: true;"
+                                  animation="property: position; from: 0 0.05 0; to: 0.005 0.438 0.005; dur: 1650; loop: true; easing: easeInQuad"
+                                  animation__scale="property: scale; from: 0.6 0.6 0.6; to: 1.15 1.15 1.15; dur: 1650; loop: true; easing: easeInQuad">
+                        </a-sphere>
+
+                        <!-- 8. KUBAH LENGKUNG PUNCAK GALON (TOP DOMED CAP & HANDLE RECESS) -->
+                        <a-cone position="0 0.53 0" radius-bottom="0.143" radius-top="0.065" height="0.06" 
+                                material="color: #38bdf8; opacity: 0.52; transparent: true; roughness: 0.1;"></a-cone>
+                        <a-cylinder position="0 0.565 0" radius="0.065" height="0.02" 
+                                    material="color: #38bdf8; opacity: 0.62; transparent: true; roughness: 0.1;"></a-cylinder>
+                        <!-- Lekukan Bawah Dasar Galon (Punted Concave Base) -->
+                        <a-torus position="0 0.565 0" radius="0.06" radius-tubular="0.006" rotation="90 0 0" 
+                                 material="color: #0284c7; opacity: 0.8; transparent: true;"></a-torus>
+
                     </a-entity>
                 </a-entity>
 
@@ -739,259 +983,98 @@
             </a-entity>
 
             <!-- --------------------------------------------------------------------- -->
-            <!-- F. AREA GROOMING & PINTU MASUK (CERMIN, STAND PAYUNG, POSTER KANTOR)  -->
+            <!-- F. AREA GROOMING & DINDING KIRI (CERMIN GROOMING & POSTER KANTOR)    -->
             <!-- --------------------------------------------------------------------- -->
             <!-- 1. CERMIN BERDIRI SELURUH BADAN (FULL-LENGTH DRESS MIRROR / 姿見鏡) -->
             <!-- Calon pelamar wajib memeriksa kerapian jas, simpul dasi & rambut sebelum wawancara -->
-            <!-- Material PBR stabil bebas flickering/glitch specular & lampu vanity bar LED elegan -->
+            <!-- Dilengkapi cermin real-time Three.js Reflector & pencahayaan vanity LED -->
             <a-entity id="grooming-mirror" position="-4.92 1.35 15.0" rotation="0 90 0">
-                <!-- Bingkai Logam Elegan -->
+                <!-- Bingkai Kayu & Logam Elegan -->
                 <a-box position="0 0 0" width="0.76" height="2.05" depth="0.04" mixin="wood-dark"></a-box>
                 <a-box position="0 0 0.01" width="0.72" height="2.01" depth="0.02" mixin="metal-chrome"></a-box>
-                <!-- Kaca Cermin Silver Halus (Bebas Specular Aliasing / Firefly Glitch) -->
-                <a-box position="0 0 0.02" width="0.66" height="1.93" depth="0.005" 
-                       material="color: #cbd5e1; metalness: 0.45; roughness: 0.25;"></a-box>
-                <!-- Lampu Vanity LED Bar di Atas Cermin (Cahaya Merata Tanpa Spot Glitch) -->
+                
+                <!-- BIDANG KACA CERMIN REAL-TIME (PLANAR REFLECTION WEBGL DUAL-LAYER) -->
+                <a-entity position="0 0 0.022" realtime-mirror="width: 0.66; height: 1.93"></a-entity>
+
+                <!-- Lampu Vanity LED Bar di Atas Cermin -->
                 <a-box position="0 1.05 0.06" width="0.48" height="0.03" depth="0.05" material="color: #0f172a;"></a-box>
                 <a-box position="0 1.05 0.09" width="0.44" height="0.018" depth="0.015" 
-                       material="color: #ffffff; emissive: #ffffff; emissiveIntensity: 0.6; roughness: 0.3;"></a-box>
-                <!-- Plakat Pengingat Kerapian Diri (Minashinami Check) -->
-                <a-text value="身だしなみチェック\n(Periksa Kerapian Jas, Dasi & Rambut)" align="center" 
-                        position="0 1.15 0.03" color="#38bdf8" width="1.2"></a-text>
-            </a-entity>
-
-            <!-- 2. STAND PAYUNG KANTOR JEPANG MULTI-SLOT ULTRA-REALISTIS (KASATATE / 傘立て) -->
-            <!-- Model Korporat Jepang dengan Panel Logam Berlubang (Punching Metal), Grid 12-Slot Bernomor, dan Kunci Pengaman -->
-            <!-- Diletakkan dekat pintu masuk lobby (X = -4.3m, Z = 15.4m) -->
-            <a-entity id="umbrella-stand" position="-4.3 0 15.4">
-                <!-- 4 Kaki Tiang Baja Kotak Utama dengan Bantalan Karet Dasar -->
-                <a-box position="-0.32 0.28 -0.16" width="0.026" height="0.56" depth="0.026" material="color: #0f172a; roughness: 0.35;"></a-box>
-                <a-box position="0.32 0.28 -0.16" width="0.026" height="0.56" depth="0.026" material="color: #0f172a; roughness: 0.35;"></a-box>
-                <a-box position="-0.32 0.28 0.16" width="0.026" height="0.56" depth="0.026" material="color: #0f172a; roughness: 0.35;"></a-box>
-                <a-box position="0.32 0.28 0.16" width="0.026" height="0.56" depth="0.026" material="color: #0f172a; roughness: 0.35;"></a-box>
-
-                <!-- Karet Kaki Penyangga Lantai (Floor Glides) -->
-                <a-cylinder position="-0.32 0.01 -0.16" radius="0.016" height="0.02" material="color: #020617;"></a-cylinder>
-                <a-cylinder position="0.32 0.01 -0.16" radius="0.016" height="0.02" material="color: #020617;"></a-cylinder>
-                <a-cylinder position="-0.32 0.01 0.16" radius="0.016" height="0.02" material="color: #020617;"></a-cylinder>
-                <a-cylinder position="0.32 0.01 0.16" radius="0.016" height="0.02" material="color: #020617;"></a-cylinder>
-
-                <!-- PANEL LOGAM BERLUBANG SAMPING & BELAKANG (PUNCHING METAL PANELS) -->
-                <!-- Panel Samping Kiri (Lebar 32cm, Tinggi 42cm) -->
-                <a-box position="-0.32 0.28 0" width="0.008" height="0.42" depth="0.31" material="color: #1e293b; roughness: 0.45;"></a-box>
-                <a-box position="-0.323 0.28 0" width="0.002" height="0.4" depth="0.29" material="color: #334155; roughness: 0.6;"></a-box>
-                <!-- Panel Samping Kanan -->
-                <a-box position="0.32 0.28 0" width="0.008" height="0.42" depth="0.31" material="color: #1e293b; roughness: 0.45;"></a-box>
-                <a-box position="0.323 0.28 0" width="0.002" height="0.4" depth="0.29" material="color: #334155; roughness: 0.6;"></a-box>
-                <!-- Panel Dinding Belakang -->
-                <a-box position="0 0.28 -0.16" width="0.63" height="0.42" depth="0.008" material="color: #1e293b; roughness: 0.45;"></a-box>
-
-                <!-- Panel Pelindung Bawah Depan dengan Lis Baja -->
-                <a-box position="0 0.16 0.16" width="0.63" height="0.18" depth="0.008" material="color: #1e293b; roughness: 0.45;"></a-box>
-                <a-box position="0 0.25 0.163" width="0.63" height="0.012" depth="0.006" mixin="metal-chrome"></a-box>
-
-                <!-- NAMPAN PENAMPUNG AIR BAWAH (MIZUKE-ZARA / 水受け皿) -->
-                <!-- Nampan Plastik Baja Hitam Tebal dengan Bibir Penahan Air -->
-                <a-box position="0 0.04 0" width="0.62" height="0.065" depth="0.31" material="color: #020617; roughness: 0.3;"></a-box>
-                <!-- Karpet Karet Bertekstur Penahan Ujung Payung di Dalam Nampan -->
-                <a-box position="0 0.058 0" width="0.59" height="0.02" depth="0.28" material="color: #0f172a; roughness: 0.8;"></a-box>
-                <!-- Pegangan Tarik Nampan Chrome di Sisi Depan -->
-                <a-box position="0 0.05 0.16" width="0.12" height="0.015" depth="0.012" mixin="metal-chrome"></a-box>
-
-                <!-- BINGKAI RANGKA ATAS KASATATE (PENGUNCI STRUKTUR) -->
-                <a-box position="0 0.55 0" width="0.67" height="0.035" depth="0.35" open-ended="true" mixin="metal-chrome"></a-box>
-
-                <!-- GRID PEMBAGI 12 LUBANG PAYUNG (2 BARIS x 6 KOLOM KAWAT BAJA CHROME) -->
-                <!-- Pembagi Tengah Horisontal Panjang (Sumbu X) -->
-                <a-box position="0 0.55 0" width="0.63" height="0.008" depth="0.008" mixin="metal-chrome"></a-box>
-                <!-- 5 Pembagi Vertikal Lebar (Sumbu Z) -->
-                <a-box position="-0.21 0.55 0" width="0.008" height="0.008" depth="0.32" mixin="metal-chrome"></a-box>
-                <a-box position="-0.105 0.55 0" width="0.008" height="0.008" depth="0.32" mixin="metal-chrome"></a-box>
-                <a-box position="0 0.55 0" width="0.008" height="0.008" depth="0.32" mixin="metal-chrome"></a-box>
-                <a-box position="0.105 0.55 0" width="0.008" height="0.008" depth="0.32" mixin="metal-chrome"></a-box>
-                <a-box position="0.21 0.55 0" width="0.008" height="0.008" depth="0.32" mixin="metal-chrome"></a-box>
-
-                <!-- BADGE NOMOR SLOT PAYUNG (01 S/D 06 DI DEPAN) -->
-                <a-entity position="0 0.565 0.165">
-                    <a-box position="-0.26 0 0" width="0.05" height="0.02" depth="0.002" material="color: #ffffff;"></a-box>
-                    <a-text value="01" align="center" position="-0.26 0 0.003" color="#0f172a" width="0.3"></a-text>
-
-                    <a-box position="-0.155 0 0" width="0.05" height="0.02" depth="0.002" material="color: #ffffff;"></a-box>
-                    <a-text value="02" align="center" position="-0.155 0 0.003" color="#0f172a" width="0.3"></a-text>
-
-                    <a-box position="-0.05 0 0" width="0.05" height="0.02" depth="0.002" material="color: #ffffff;"></a-box>
-                    <a-text value="03" align="center" position="-0.05 0 0.003" color="#0f172a" width="0.3"></a-text>
-
-                    <a-box position="0.05 0 0" width="0.05" height="0.02" depth="0.002" material="color: #ffffff;"></a-box>
-                    <a-text value="04" align="center" position="0.05 0 0.003" color="#0f172a" width="0.3"></a-text>
-
-                    <a-box position="0.155 0 0" width="0.05" height="0.02" depth="0.002" material="color: #ffffff;"></a-box>
-                    <a-text value="05" align="center" position="0.155 0 0.003" color="#0f172a" width="0.3"></a-text>
-
-                    <a-box position="0.26 0 0" width="0.05" height="0.02" depth="0.002" material="color: #ffffff;"></a-box>
-                    <a-text value="06" align="center" position="0.26 0 0.003" color="#0f172a" width="0.3"></a-text>
-                </a-entity>
-
-                <!-- KLIP KUNCI PENGAMAN PAYUNG JEPANG (KEY LOCK LATCHES PADA SLOT 02 & 05) -->
-                <!-- Slot 02: Klip Kunci Pengaman Dial -->
-                <a-entity position="-0.155 0.555 0.08">
-                    <a-box position="0 0 0" width="0.035" height="0.015" depth="0.035" material="color: #334155;"></a-box>
-                    <a-cylinder position="0 0.01 0" radius="0.006" height="0.01" mixin="metal-chrome"></a-cylinder>
-                    <!-- Tag Gantungan Kunci Kecil -->
-                    <a-box position="0.015 0.015 0" width="0.01" height="0.002" depth="0.02" rotation="0 25 0" material="color: #ef4444;"></a-box>
-                </a-entity>
-
-                <!-- Slot 05: Klip Kunci Pengaman Dial -->
-                <a-entity position="0.155 0.555 0.08">
-                    <a-box position="0 0 0" width="0.035" height="0.015" depth="0.035" material="color: #334155;"></a-box>
-                    <a-cylinder position="0 0.01 0" radius="0.006" height="0.01" mixin="metal-chrome"></a-cylinder>
-                    <a-box position="0.015 0.015 0" width="0.01" height="0.002" depth="0.02" rotation="0 -15 0" material="color: #2563eb;"></a-box>
-                </a-entity>
-
-                <!-- ============================================================= -->
-                <!-- KOLEKSI PAYUNG MULTI-LAYER & DETAIL BERAGAM DI DALAM STAND     -->
-                <!-- ============================================================= -->
-                <!-- PAYUNG 1 (Slot 02 Depan): Payung Transparan Standar Jepang (Vinyl Kasa 65cm) -->
-                <a-entity position="-0.155 0 0.08" rotation="4 5 -3">
-                    <!-- Ujung Logam Runcing (Ferrule) di Nampan Bawah -->
-                    <a-cylinder position="0 0.06 0" radius="0.004" height="0.09" mixin="metal-chrome"></a-cylinder>
-                    <a-cone position="0 0.02 0" radius-bottom="0.005" radius-top="0.002" height="0.03" material="color: #0f172a;"></a-cone>
-
-                    <!-- Batang Poros Tengah Baja Chrome -->
-                    <a-cylinder position="0 0.46 0" radius="0.007" height="0.84" mixin="metal-chrome"></a-cylinder>
-
-                    <!-- 8 Kawat Rusuk Payung Hitam yang Terlihat di Bawah Plastik Transparan -->
-                    <a-cylinder position="0.016 0.36 0" radius="0.0015" height="0.52" material="color: #0f172a;"></a-cylinder>
-                    <a-cylinder position="-0.016 0.36 0" radius="0.0015" height="0.52" material="color: #0f172a;"></a-cylinder>
-                    <a-cylinder position="0 0.36 0.016" radius="0.0015" height="0.52" material="color: #0f172a;"></a-cylinder>
-                    <a-cylinder position="0 0.36 -0.016" radius="0.0015" height="0.52" material="color: #0f172a;"></a-cylinder>
-
-                    <!-- Kanopi Plastik Transparan Tergulung Rapi (Vinyl Kasa) -->
-                    <a-cone position="0 0.36 0" radius-bottom="0.038" radius-top="0.012" height="0.52" 
-                            material="color: #ffffff; opacity: 0.55; transparent: true; roughness: 0.15;"></a-cone>
-
-                    <!-- Pita Pengikat Payung (Name-Band) dengan Kancing Jepret Silver -->
-                    <a-torus position="0 0.33 0" radius="0.029" radius-tubular="0.005" rotation="90 0 0" material="color: #ffffff;"></a-torus>
-                    <a-sphere position="0.029 0.33 0" radius="0.004" mixin="metal-chrome"></a-sphere>
-
-                    <!-- Gagang Lengkung Huruf J Plastik Putih Khas Jepang dengan Ujung Halus -->
-                    <a-cylinder position="0 0.82 0" radius="0.009" height="0.08" material="color: #f8fafc; roughness: 0.2;"></a-cylinder>
-                    <a-torus position="0.036 0.85 0" radius="0.036" radius-tubular="0.009" arc="180" rotation="0 0 -90" 
-                             material="color: #f8fafc; roughness: 0.2;"></a-torus>
-                    <!-- Pembungkus Plastik Pelindung Gagang Bening (Baru Beli) -->
-                    <a-torus position="0.036 0.85 0" radius="0.037" radius-tubular="0.01" arc="120" rotation="0 0 -90" 
-                             material="color: #bae6fd; opacity: 0.45; transparent: true;"></a-torus>
-                </a-entity>
-
-                <!-- PAYUNG 2 (Slot 04 Depan): Payung Formal Eksekutif Hitam (Gentleman's Umbrella 70cm) -->
-                <a-entity position="0.05 0 0.08" rotation="-5 -4 3">
-                    <!-- Ujung Ferrule Emas Kuningan Elegan -->
-                    <a-cylinder position="0 0.06 0" radius="0.004" height="0.09" material="color: #d97706; metalness: 0.8; roughness: 0.2;"></a-cylinder>
-                    <a-cylinder position="0 0.48 0" radius="0.007" height="0.88" material="color: #0f172a; metalness: 0.7;"></a-cylinder>
-
-                    <!-- Kain Kanopi Hitam Pekat Tegang (High-Density Polyester) -->
-                    <a-cone position="0 0.37 0" radius-bottom="0.04" radius-top="0.014" height="0.56" 
-                            material="color: #0a0a0a; roughness: 0.5;"></a-cone>
-
-                    <!-- Pita Pengikat Hitam dengan Kancing Emas -->
-                    <a-torus position="0 0.34 0" radius="0.031" radius-tubular="0.005" rotation="90 0 0" material="color: #171717;"></a-torus>
-                    <a-sphere position="0.031 0.34 0" radius="0.004" material="color: #d97706; metalness: 0.9;"></a-sphere>
-
-                    <!-- Cincin Kerah Emas di Bawah Gagang -->
-                    <a-torus position="0 0.82 0" radius="0.011" radius-tubular="0.003" rotation="90 0 0" material="color: #d97706; metalness: 0.9;"></a-torus>
-                    <!-- Gagang Lengkung Kulit Hitam Mewah -->
-                    <a-cylinder position="0 0.84 0" radius="0.01" height="0.06" material="color: #171717; roughness: 0.6;"></a-cylinder>
-                    <a-torus position="0.036 0.87 0" radius="0.036" radius-tubular="0.01" arc="180" rotation="0 0 -90" 
-                             material="color: #171717; roughness: 0.6;"></a-torus>
-                </a-entity>
-
-                <!-- PAYUNG 3 (Slot 09 Belakang): Payung Bening Besar (70cm Frosted Vinyl Kasa) -->
-                <a-entity position="-0.05 0 -0.08" rotation="-4 6 -2">
-                    <a-cylinder position="0 0.06 0" radius="0.004" height="0.09" mixin="metal-chrome"></a-cylinder>
-                    <a-cylinder position="0 0.49 0" radius="0.007" height="0.9" mixin="metal-chrome"></a-cylinder>
-
-                    <a-cone position="0 0.38 0" radius-bottom="0.042" radius-top="0.014" height="0.58" 
-                            material="color: #e2e8f0; opacity: 0.6; transparent: true; roughness: 0.2;"></a-cone>
-                    <a-torus position="0 0.35 0" radius="0.032" radius-tubular="0.005" rotation="90 0 0" material="color: #334155;"></a-torus>
-                    <a-sphere position="0.032 0.35 0" radius="0.004" mixin="metal-chrome"></a-sphere>
-
-                    <!-- Gagang J-Handle Abu-abu Charcoal -->
-                    <a-cylinder position="0 0.84 0" radius="0.009" height="0.06" material="color: #334155;"></a-cylinder>
-                    <a-torus position="0.036 0.87 0" radius="0.036" radius-tubular="0.009" arc="180" rotation="0 0 -90" 
-                             material="color: #334155;"></a-torus>
-                </a-entity>
-
-                <!-- PAYUNG 4 (Slot 11 Belakang): Payung Navy Blue Klasik dengan Gagang Kayu Asli -->
-                <a-entity position="0.155 0 -0.08" rotation="3 -5 -4">
-                    <a-cylinder position="0 0.06 0" radius="0.004" height="0.09" mixin="metal-chrome"></a-cylinder>
-                    <a-cylinder position="0 0.47 0" radius="0.007" height="0.86" mixin="metal-chrome"></a-cylinder>
-
-                    <!-- Kanopi Biru Dongker / Navy Solid -->
-                    <a-cone position="0 0.36 0" radius-bottom="0.039" radius-top="0.013" height="0.54" 
-                            material="color: #1e3a8a; roughness: 0.55;"></a-cone>
-                    <a-torus position="0 0.33 0" radius="0.03" radius-tubular="0.005" rotation="90 0 0" material="color: #172554;"></a-torus>
-
-                    <!-- Gagang Kayu Polished Walnut Mengkilap -->
-                    <a-cylinder position="0 0.82 0" radius="0.01" height="0.06" mixin="wood-dark"></a-cylinder>
-                    <a-torus position="0.036 0.85 0" radius="0.036" radius-tubular="0.01" arc="180" rotation="0 0 -90" 
-                             mixin="wood-dark"></a-torus>
-                </a-entity>
-
-                <!-- ACCESSORY BAR SAMPING & 2 PAYUNG LIPAT (FOLDING UMBRELLAS / 折りたたみ傘) -->
-                <!-- Batang Rel Gantungan Samping Kiri Stand Payung -->
-                <a-entity position="-0.33 0.46 0">
-                    <a-cylinder position="0 0 0" radius="0.005" height="0.22" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
-                    <a-sphere position="0 0 -0.11" radius="0.008" mixin="metal-chrome"></a-sphere>
-                    <a-sphere position="0 0 0.11" radius="0.008" mixin="metal-chrome"></a-sphere>
-
-                    <!-- Payung Lipat 1: Sarung Biru Gelap Beresleting dengan Tali Penggantung -->
-                    <a-entity position="0 -0.12 -0.05">
-                        <!-- Tali Pergelangan Tangan Nilon Menggantung di Rel -->
-                        <a-torus position="0 0.12 0" radius="0.015" radius-tubular="0.003" rotation="0 90 0" material="color: #1e293b;"></a-torus>
-                        <!-- Bodi Silinder Payung Lipat dalam Sarung -->
-                        <a-cylinder position="0 0 0" radius="0.024" height="0.22" material="color: #1e3a8a; roughness: 0.6;"></a-cylinder>
-                        <!-- Kepala Gagang Pipih Hitam & Tombol Otomatis -->
-                        <a-cylinder position="0 0.115 0" radius="0.022" height="0.02" material="color: #0f172a;"></a-cylinder>
-                        <a-box position="0.023 0.115 0" width="0.002" height="0.008" depth="0.01" mixin="metal-chrome"></a-box>
-                    </a-entity>
-
-                    <!-- Payung Lipat 2: Sarung Hitam Minimalis -->
-                    <a-entity position="0 -0.11 0.05">
-                        <a-torus position="0 0.11 0" radius="0.015" radius-tubular="0.003" rotation="0 90 0" material="color: #0f172a;"></a-torus>
-                        <a-cylinder position="0 0 0" radius="0.022" height="0.2" material="color: #0f172a; roughness: 0.7;"></a-cylinder>
-                        <a-cylinder position="0 0.105 0" radius="0.02" height="0.018" material="color: #334155;"></a-cylinder>
-                    </a-entity>
-                </a-entity>
-            </a-entity>
-
-            <!-- 3. POSTER & PAPAN INFORMASI PERUSAHAAN (CORPORATE INFORMATION BOARD) -->
-            <!-- Diletakkan di dinding kiri (X = -4.94m, Z = 8.5m) -->
-            <a-entity position="-4.94 1.9 8.5" rotation="0 90 0">
-                <!-- Bingkai Kayu Walnut Elegan -->
-                <a-box position="0 0 0" width="1.65" height="1.15" depth="0.04" mixin="wood-dark"></a-box>
-                <!-- Papan Latar Putih Bersih -->
-                <a-box position="0 0 0.015" width="1.55" height="1.05" depth="0.01" material="color: #ffffff; roughness: 0.8;"></a-box>
-
-                <!-- Judul & Filosofi Perusahaan (企業理念) -->
-                <a-text value="企業理念 / Corporate Philosophy\n「技術革新と誠実をもって、社会の持続的発展に貢献する」\n(Inovasi Teknologi & Integritas Demi Masa Depan)" 
-                        align="center" position="0 0.36 0.022" color="#0f172a" width="1.4"></a-text>
+                       material="color: #ffffff; emissive: #ffffff; emissiveIntensity: 1.0; roughness: 0.2;"></a-box>
                 
-                <!-- 3 Kotak Pilar Utama: 誠実 (Integritas) / 挑戦 (Tantangan) / 共創 (Kolaborasi) -->
-                <a-box position="-0.48 0.05 0.025" width="0.44" height="0.32" depth="0.01" material="color: #eff6ff;"></a-box>
-                <a-text value="【誠 実】\n高い倫理観と\n信頼の構築" align="center" position="-0.48 0.05 0.032" color="#1e40af" width="0.75"></a-text>
+                <!-- Pencahayaan Vanity Terang & Merata Menempel pada Bingkai Cermin (+Z lokal = +X dunia) -->
+                <!-- Cahaya selalu berada di depan pemain bahkan saat mendekat sangat dekat ke kaca (X = -4.65) -->
+                <!-- 1. Lampu Atas: Tepat di fixture LED bar atas cermin, menerangi kepala, rambut, wajah & kerah -->
+                <a-light type="point" color="#ffffff" intensity="1.8" distance="5.0" position="0 1.02 0.08"></a-light>
+                <!-- 2. Lampu Tengah: Setinggi dada, menerangi simpul dasi, kemeja putih & kerah jas formal -->
+                <a-light type="point" color="#ffffff" intensity="1.6" distance="4.5" position="0 0.35 0.08"></a-light>
+                <!-- 3. Lampu Bawah: Setinggi pinggang, menerangi jas bawah, tangan, tas koper & celana bahan -->
+                <a-light type="point" color="#f8fafc" intensity="1.3" distance="4.0" position="0 -0.45 0.08"></a-light>
 
-                <a-box position="0 0.05 0.025" width="0.44" height="0.32" depth="0.01" material="color: #f0fdf4;"></a-box>
-                <a-text value="【挑 戦】\n失敗を恐れず\n新価値を創出" align="center" position="0 0.05 0.032" color="#166534" width="0.75"></a-text>
+                <!-- Plakat Pengingat Kerapian Diri (Minashinami Check) -->
+                <a-entity position="0 1.15 0.03" jp-text="value: 身だしなみチェック\n服装・髪型・ネクタイ確認; color: #38bdf8; fontSize: 32; width: 1.1; height: 0.28;"></a-entity>
+            </a-entity>
 
-                <a-box position="0.48 0.05 0.025" width="0.44" height="0.32" depth="0.01" material="color: #fefce8;"></a-box>
-                <a-text value="【共 創】\n多様性を尊重し\n共に未来を創る" align="center" position="0.48 0.05 0.032" color="#854d0e" width="0.75"></a-text>
+            <!-- 2. AVATAR KANDIDAT WAWANCARA (RECRUIT SUIT AVATAR) - Mengikuti pemain secara real-time -->
+            <a-entity id="candidate-player-avatar" candidate-avatar></a-entity>
 
-                <!-- Badge Logo SDGs 17 Goals & Sertifikasi ISO 9001 / ISO 14001 -->
-                <a-box position="-0.45 -0.32 0.025" width="0.55" height="0.18" depth="0.01" material="color: #f8fafc;"></a-box>
-                <a-text value="SUSTAINABLE\nDEVELOPMENT GOALS\n(SDGs 推進企業)" align="center" position="-0.45 -0.32 0.032" color="#0284c7" width="0.65"></a-text>
 
-                <a-box position="0.45 -0.32 0.025" width="0.55" height="0.18" depth="0.01" material="color: #f8fafc;"></a-box>
-                <a-text value="ISO 9001 / ISO 14001\n品質・環境マネジメント認証\n登録番号: JQA-EM2026" align="center" position="0.45 -0.32 0.032" color="#334155" width="0.62"></a-text>
+
+            <!-- 3. LUKISAN SENI JEPANG MEWAH BERBINGKAI (FINE ART NIHONGA: 霊峰富士 - MT. FUJI SACRED PEAK) -->
+            <!-- Dipasang di dinding ruang tunggu (X = -4.88m, Y = 1.80m, Z = 8.5m) menghadap ke arah ruangan (+X) -->
+            <!-- Bebas glitch / Zero Z-fighting: berada 2.5cm di depan lis kayu dinding dengan pencahayaan galeri hangat -->
+            <a-entity id="fuji-fine-art" position="-4.88 1.80 8.5" rotation="0 90 0">
+                <!-- 1. BINGKAI KAYU WALNUT SOLID MEWAH (OUTER WALNUT FRAME) -->
+                <a-box position="0 0 0" width="2.22" height="1.40" depth="0.04" mixin="wood-dark"></a-box>
+
+                <!-- 2. BEZEL LIST LOGAM EMAS / CHAMPAGNE GOLD INNER ACCENT -->
+                <a-box position="0 0 0.008" width="2.14" height="1.32" depth="0.03" 
+                       material="color: #d97706; metalness: 0.8; roughness: 0.25;"></a-box>
+
+                <!-- 3. MATTING PASSE-PARTOUT SUTRA WASHI ARCHIVAL (CREAM MATTE BACKGROUND) -->
+                <a-box position="0 0 0.015" width="2.08" height="1.26" depth="0.018" 
+                       material="color: #fefce8; roughness: 0.65;"></a-box>
+
+                <!-- 4. KANVAS LUKISAN NIHONGA GUNUNG FUJI 16:9 HIGH RESOLUTION (ASSETS/FUJI-ART.JPG) -->
+                <a-plane position="0 0.04 0.026" width="1.76" height="0.99" 
+                         material="src: #tex-fuji-art; roughness: 0.25; metalness: 0.02;">
+                </a-plane>
+
+                <!-- 5. KACA PELINDUNG AKRILIK ANTI-GLARE (MUSEUM GLAZING OVERLAY) -->
+                <a-box position="0 0.04 0.030" width="1.77" height="1.00" depth="0.002" 
+                       material="color: #ffffff; opacity: 0.08; transparent: true; roughness: 0.05; metalness: 0.2;">
+                </a-box>
+
+                <!-- 6. 4 BAUT PENYANGGA SUDUT LOGAM CHROME (STANDOFF CORNER BOLTS) -->
+                <a-cylinder position="-0.98 0.57 0.032" radius="0.012" height="0.016" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="0.98 0.57 0.032" radius="0.012" height="0.016" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="-0.98 -0.57 0.032" radius="0.012" height="0.016" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+                <a-cylinder position="0.98 -0.57 0.032" radius="0.012" height="0.016" rotation="90 0 0" mixin="metal-chrome"></a-cylinder>
+
+                <!-- 7. PLAKAT KUNINGAN RESMI KARYA SENI: "霊峰富士" (NIHONGA ARTWORK BRASS PLAQUE) -->
+                <a-entity position="0 -0.53 0.028" nihonga-plaque></a-entity>
+
+                <!-- 8. LAMPU GALERI SOROT KUNINGAN ATAS (DUAL PICTURE OVERHEAD BRASS LAMPS) -->
+                <!-- Lampu Kiri -->
+                <a-entity position="-0.50 0.76 0.16">
+                    <a-box position="0 0 -0.09" width="0.02" height="0.02" depth="0.18" 
+                           material="color: #d97706; metalness: 0.8; roughness: 0.2;"></a-box>
+                    <a-cylinder position="0 0 0" radius="0.022" height="0.26" rotation="0 0 90" 
+                                material="color: #d97706; metalness: 0.8; roughness: 0.2;"></a-cylinder>
+                    <a-sphere position="0 -0.012 0" radius="0.014" 
+                              material="color: #fef08a; emissive: #fef08a; emissiveIntensity: 0.9;"></a-sphere>
+                </a-entity>
+                <!-- Lampu Kanan -->
+                <a-entity position="0.50 0.76 0.16">
+                    <a-box position="0 0 -0.09" width="0.02" height="0.02" depth="0.18" 
+                           material="color: #d97706; metalness: 0.8; roughness: 0.2;"></a-box>
+                    <a-cylinder position="0 0 0" radius="0.022" height="0.26" rotation="0 0 90" 
+                                material="color: #d97706; metalness: 0.8; roughness: 0.2;"></a-cylinder>
+                    <a-sphere position="0 -0.012 0" radius="0.014" 
+                              material="color: #fef08a; emissive: #fef08a; emissiveIntensity: 0.9;"></a-sphere>
+                </a-entity>
+
+                <!-- Cahaya Sorot Galeri Lembut Hangat ke Permukaan Lukisan (Dedicated Picture Spotlight) -->
+                <a-light type="point" color="#fffbeb" intensity="0.48" distance="3.2" position="0 0.6 0.45"></a-light>
             </a-entity>
 
             <!-- --------------------------------------------------------------------- -->

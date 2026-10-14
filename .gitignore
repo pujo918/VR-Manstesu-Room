@@ -1,0 +1,9 @@
+# Scratch directory & temporary test outputs
+scratch/
+
+# System & editor files
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

@@ -9,31 +9,28 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
     <!-- Stylesheet UI & HUD -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=4.0">
 
     <!-- Modul JavaScript & Logika Interaksi -->
     <script src="js/audio.js"></script>
-    <script src="js/collision.js"></script>
-    <script src="js/interaction.js"></script>
+    <script src="js/collision.js?v=2.0"></script>
+    <script src="js/interaction.js?v=5.0"></script>
+    <script src="js/components/mobile-controls.js?v=2.0"></script>
+    <script src="js/components/gate-screen.js?v=3.0"></script>
+    <script src="js/components/manner-evaluator.js?v=1.0"></script>
+    <script src="js/components/video-player.js?v=1.0"></script>
+    <script src="js/components/npc-interviewers.js?v=4.7"></script>
+    <script src="js/components/voice-recorder.js?v=1.0"></script>
     <script src="js/components/dracaena.js"></script>
-    <script src="js/components/player.js"></script>
+    <script src="js/components/books.js"></script>
+    <script src="js/components/japanese-signs.js?v=2.1"></script>
+    <script src="js/components/player.js?v=4.0"></script>
+    <script src="js/components/mirror.js?v=8.1"></script>
     <script src="js/scene-loader.js"></script>
 </head>
 <body>
 
-    <!-- Panel Informasi di Kiri Atas -->
-    <div id="ui-overlay">
-        <h1>Simulasi Mensetsu: Ruang Tunggu & Wawancara</h1>
-        <p>🏢 <strong>Alur:</strong> Anda tiba di <strong>Ruang Tunggu (待合室) & Resepsionis</strong>. Cek kerapian di cermin, lalu dekati pintu <strong>Ruang Wawancara (面接室)</strong>.</p>
-        <p>🎮 <strong>Kontrol:</strong> <strong>W, A, S, D</strong> untuk jalan, <strong>Mouse</strong> untuk lihat sekeliling, <strong>F</strong> untuk interaksi objek.</p>
-        
-        <div class="status-box">
-            <div>PINTU WAWANCARA: <span id="status-door"><b style="color:#f87171">Tertutup</b></span></div>
-            <div style="margin-top:3px;">JENDELA: <span id="status-window"><b style="color:#f87171">Tertutup</b></span></div>
-            <div style="margin-top:3px;">POSTUR KANDIDAT: <span id="status-posture"><b style="color:#e2e8f0">Berdiri (立位)</b></span></div>
-            <div style="margin-top:3px; color:#38bdf8;">COLLISION: <b>Aktif di Seluruh Ruangan & Furnitur</b></div>
-        </div>
-    </div>
+
 
     <!-- Tombol Prompt Interaksi Mengambang [ TEKAN F ] -->
     <div id="interact-prompt">
@@ -56,6 +53,15 @@
             <a-mixin id="ceiling-mat" material="color: #ffffff; roughness: 0.95;"></a-mixin>
             <a-mixin id="chair-cushion" material="color: #1e293b; roughness: 0.8;"></a-mixin>
             <a-mixin id="metal-chrome" material="color: #e2e8f0; metalness: 0.85; roughness: 0.2;"></a-mixin>
+            <img id="tex-japan-map" src="assets/japan-map.png">
+            <img id="tex-fuji-art" src="assets/fuji-art.jpg">
+            <img id="tex-candidate-avatar" src="assets/candidate-avatar.png">
+            <img id="tex-candidate-head" src="assets/candidate-head.png">
+            <img id="tex-candidate-head-clean" src="assets/candidate-head-clean.png">
+            <img id="tex-candidate-body" src="assets/candidate-body.png">
+            <img id="tex-reception-screen" src="assets/reception-screen.jpg">
+            <img id="tex-reception-keyboard" src="assets/reception-keyboard.png">
+            <img id="tex-reception-mousepad" src="assets/reception-mousepad.png">
         </a-assets>
 
         <!-- ========================================================= -->
@@ -64,6 +70,7 @@
         <a-camera id="player-camera" 
                   position="0 1.6 14.2" 
                   rotation="0 180 0"
+                  near="0.05"
                   look-controls 
                   wasd-controls="acceleration: 26"
                   player-collision-and-proximity>

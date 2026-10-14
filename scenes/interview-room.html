@@ -1,4 +1,4 @@
-﻿        <!-- PENCAHAYAAN RUANG WAWANCARA (LIGHTING)                    -->
+        <!-- PENCAHAYAAN RUANG WAWANCARA (LIGHTING)                    -->
         <!-- ========================================================= -->
         <a-light type="ambient" color="#f1f5f9" intensity="0.55"></a-light>
         <a-light type="directional" color="#fffbeb" intensity="0.75" position="7 4 0" target="#room-center"></a-light>
@@ -77,8 +77,8 @@
             <a-box position="0.08 -0.07 0" width="0.04" height="0.015" depth="1.05" material="color: #cbd5e1;"></a-box>
             <!-- Indikator Suhu Digital (24°C) & Lampu Power LED Hijau -->
             <a-box position="0.102 0.03 0.35" width="0.002" height="0.045" depth="0.14" material="color: #0f172a;"></a-box>
-            <a-text value="24°C" align="center" position="0.104 0.03 0.35" rotation="0 90 0" color="#38bdf8" width="0.65"></a-text>
-            <a-circle position="0.104 -0.04 0.35" radius="0.008" rotation="0 90 0" material="color: #22c55e; emissive: #22c55e; emissiveIntensity: 0.9;"></a-circle>
+            <a-text value="24°C" align="center" position="0.104 0.03 0.35" rotation="0 90 0" color="#ffffff" width="0.65"></a-text>
+            <a-circle position="0.104 -0.04 0.35" radius="0.008" rotation="0 90 0" material="color: #16a34a; emissive: #16a34a; emissiveIntensity: 0.9;"></a-circle>
         </a-entity>
 
         <!-- ========================================================= -->
@@ -166,63 +166,11 @@
             <a-box position="0 0.42 0.37" width="4.06" height="0.56" depth="0.02" mixin="wood-dark"></a-box>
 
             <!-- ========================================================= -->
-            <!-- DOKUMEN, LEMBAR PENILAIAN, FOLDER & PULPEN DI ATAS MEJA    -->
+            <!-- DOKUMEN & LEMBAR PENILAIAN RESMI MEJA WAWANCARA JEPANG     -->
+            <!-- (Map Berkas, Lembar Evaluasi Kiri & Kanan, Resume Rirekisho, -->
+            <!--  Lembar Penilaian Ketua dengan Cap Kelulusan, Plakat Jabatan) -->
             <!-- ========================================================= -->
-            <!-- 1. MAP / FOLDER ARSIP DOKUMEN (Tumpukan Folder di Ujung Meja Kiri) -->
-            <a-entity position="-1.85 0.75 -0.05">
-                <!-- Folder Map Biru Bawah -->
-                <a-box position="0 0.01 0" width="0.34" height="0.02" depth="0.44" rotation="0 5 0" material="color: #1e3a8a; roughness: 0.5;"></a-box>
-                <!-- Folder Map Merah/Cokelat Atas -->
-                <a-box position="0 0.03 0" width="0.33" height="0.02" depth="0.43" rotation="0 -3 0" material="color: #7f1d1d; roughness: 0.5;"></a-box>
-                <a-box position="0 0.045 0" width="0.3" height="0.005" depth="0.4" material="color: #ffffff;"></a-box>
-                <a-text value="応募書類一式\n(Berkas Lamaran)" align="center" position="0 0.05 0" rotation="-90 0 0" color="#1e293b" width="0.65"></a-text>
-            </a-entity>
-
-            <!-- 2. LEMBAR PENILAIAN WAWANCARA (面接評価表) & PULPEN PEWAWANCARA KIRI -->
-            <a-entity position="-1.1 0.75 -0.05">
-                <!-- Papan Clipboard Hitam -->
-                <a-box position="0 0.006 0" width="0.32" height="0.01" depth="0.42" rotation="0 -5 0" material="color: #1e293b; roughness: 0.4;"></a-box>
-                <a-box position="0 0.012 -0.19" width="0.1" height="0.012" depth="0.03" rotation="0 -5 0" mixin="metal-chrome"></a-box>
-                <!-- Kertas Lembar Penilaian -->
-                <a-box position="0 0.012 0.01" width="0.29" height="0.002" depth="0.37" rotation="0 -5 0" material="color: #ffffff; roughness: 0.9;"></a-box>
-                <a-text value="面接評価表\n(Lembar Penilaian)\n[A] [B] [C] [S]" align="center" position="0 0.015 0" rotation="-90 -5 0" color="#0f172a" width="0.6"></a-text>
-                <!-- Pulpen Ballpoint Biru -->
-                <a-cylinder position="-0.18 0.015 0" radius="0.005" height="0.15" rotation="0 85 90" material="color: #0284c7; metalness: 0.8;"></a-cylinder>
-            </a-entity>
-
-            <!-- 3. LEMBAR PENILAIAN & MAP UTAMA KETUA PEWAWANCARA (TENGAH) -->
-            <a-entity position="0 0.75 -0.05">
-                <!-- Map Dokumen Resmi Rirekisho Terbuka -->
-                <a-box position="-0.2 0.005 0" width="0.32" height="0.008" depth="0.42" material="color: #1e293b; roughness: 0.4;"></a-box>
-                <!-- Kertas Rirekisho (Resume Siswa) -->
-                <a-box position="-0.2 0.01 0" width="0.29" height="0.003" depth="0.38" material="color: #ffffff; roughness: 0.9;"></a-box>
-                <a-text value="履 歴 書\n(Rirekisho / Resume)" align="center" position="-0.2 0.013 -0.1" rotation="-90 0 0" color="#0f172a" width="0.65"></a-text>
-                <!-- Foto Formal Kandidat di Kertas Resume -->
-                <a-box position="-0.1 0.013 -0.12" width="0.05" height="0.002" depth="0.06" material="color: #3b82f6;"></a-box>
-
-                <!-- Papan Clipboard Lembar Penilaian Utama Ketua -->
-                <a-box position="0.22 0.006 0" width="0.32" height="0.01" depth="0.42" rotation="0 4 0" material="color: #1e293b; roughness: 0.4;"></a-box>
-                <a-box position="0.22 0.012 -0.19" width="0.1" height="0.012" depth="0.03" rotation="0 4 0" mixin="metal-chrome"></a-box>
-                <!-- Kertas Penilaian Ketua -->
-                <a-box position="0.22 0.012 0.01" width="0.29" height="0.002" depth="0.37" rotation="0 4 0" material="color: #ffffff; roughness: 0.9;"></a-box>
-                <a-text value="面接官採点表\n(Nilai: Etika, Keigo)\n合格 / 不合格" align="center" position="0.22 0.015 0" rotation="-90 4 0" color="#b91c1c" width="0.58"></a-text>
-                <!-- Pulpen Merah / Tinta Koreksi Ketua Pewawancara -->
-                <a-cylinder position="0.4 0.015 0" radius="0.005" height="0.15" rotation="0 94 90" material="color: #dc2626; metalness: 0.8;"></a-cylinder>
-
-                <!-- Plakat Jabatan di Meja: "主面接官" -->
-                <a-box position="0 0.03 0.33" width="0.28" height="0.04" depth="0.06" rotation="-20 0 0" material="color: #1e293b; roughness: 0.4;"></a-box>
-                <a-text value="主面接官 (Ketua)" align="center" position="0 0.035 0.35" rotation="-20 0 0" color="#f8fafc" width="0.75"></a-text>
-            </a-entity>
-
-            <!-- 4. LEMBAR PENILAIAN & PULPEN PEWAWANCARA KANAN -->
-            <a-entity position="1.2 0.75 -0.05">
-                <a-box position="0 0.006 0" width="0.32" height="0.01" depth="0.42" rotation="0 6 0" material="color: #1e293b; roughness: 0.4;"></a-box>
-                <a-box position="0 0.012 -0.19" width="0.1" height="0.012" depth="0.03" rotation="0 6 0" mixin="metal-chrome"></a-box>
-                <a-box position="0 0.012 0.01" width="0.29" height="0.002" depth="0.37" rotation="0 6 0" material="color: #ffffff; roughness: 0.9;"></a-box>
-                <a-text value="面接評価表\n(Lembar Penilaian)\n[A] [B] [C] [S]" align="center" position="0 0.015 0" rotation="-90 6 0" color="#0f172a" width="0.6"></a-text>
-                <!-- Pulpen Hitam -->
-                <a-cylinder position="0.18 0.015 0" radius="0.005" height="0.15" rotation="0 96 90" material="color: #0f172a; metalness: 0.8;"></a-cylinder>
-            </a-entity>
+            <a-entity position="0 0.75 -0.16" jp-interview-desk></a-entity>
 
             <!-- 5. TEMPAT PULPEN MEJA FORMAL (DUAL DESK PEN STAND GAYA JEPANG) -->
             <a-entity position="0.6 0.75 0.22">
@@ -261,10 +209,10 @@
 
         <!-- ========================================================================= -->
         <!-- 8. TIGA KURSI PEWAWANCARA (3 EXECUTIVE OFFICE CHAIRS)                      -->
-        <!-- Posisi di Z = -4.2m (Di Belakang Meja Menghadap ke Depan)                 -->
+        <!-- Posisi di Z = -4.08m (Sejajar Sempurna di Belakang Meja, Bebas Tabrakan)   -->
         <!-- ========================================================================= -->
-        <!-- KURSI 1: Pewawancara Kiri (X = -1.3) -->
-        <a-entity position="-1.3 0 -4.2">
+        <!-- KURSI 1: Pewawancara Kiri (X = -1.3, Pria - Penanya 1) -->
+        <a-entity position="-1.3 0 -4.08">
             <a-cylinder position="0 0.22 0" radius="0.025" height="0.42" mixin="metal-chrome"></a-cylinder>
             <!-- Roda Kaki Bintang -->
             <a-cylinder position="0 0.04 0" radius="0.3" height="0.03" mixin="wood-dark"></a-cylinder>
@@ -275,10 +223,12 @@
             <!-- Sandaran Tangan (Armrest) Kiri & Kanan -->
             <a-box position="-0.27 0.65 -0.05" width="0.04" height="0.3" depth="0.32" mixin="wood-dark"></a-box>
             <a-box position="0.27 0.65 -0.05" width="0.04" height="0.3" depth="0.32" mixin="wood-dark"></a-box>
+            <!-- MODEL 3D NPC PEWAWANCARA PRIA KIRI -->
+            <a-entity id="npc-left" position="0 0 0" npc-interviewer="role: left; gender: male; name: Tanaka-sensei"></a-entity>
         </a-entity>
 
-        <!-- KURSI 2: Ketua Pewawancara / Tengah (X = 0) -->
-        <a-entity position="0 0 -4.2">
+        <!-- KURSI 2: Ketua Pewawancara / Tengah (X = 0, Pria - Pengamat/Pencatat) -->
+        <a-entity position="0 0 -4.08">
             <a-cylinder position="0 0.22 0" radius="0.025" height="0.42" mixin="metal-chrome"></a-cylinder>
             <a-cylinder position="0 0.04 0" radius="0.3" height="0.03" mixin="wood-dark"></a-cylinder>
             <a-box position="0 0.45 0" width="0.55" height="0.08" depth="0.52" mixin="chair-cushion"></a-box>
@@ -286,23 +236,27 @@
             <a-box position="0 0.88 -0.23" width="0.52" height="0.78" depth="0.06" rotation="-5 0 0" mixin="chair-cushion"></a-box>
             <a-box position="-0.28 0.65 -0.05" width="0.04" height="0.3" depth="0.32" mixin="wood-dark"></a-box>
             <a-box position="0.28 0.65 -0.05" width="0.04" height="0.3" depth="0.32" mixin="wood-dark"></a-box>
+            <!-- MODEL 3D NPC KETUA PEWAWANCARA / PENCATAT -->
+            <a-entity id="npc-center" position="0 0 0" npc-interviewer="role: center; gender: male; name: Sato-sensei"></a-entity>
         </a-entity>
 
-        <!-- KURSI 3: Pewawancara Kanan (X = 1.3) -->
-        <a-entity position="1.3 0 -4.2">
+        <!-- KURSI 3: Pewawancara Kanan (X = 1.3, Wanita - Penanya 2) -->
+        <a-entity position="1.3 0 -4.08">
             <a-cylinder position="0 0.22 0" radius="0.025" height="0.42" mixin="metal-chrome"></a-cylinder>
             <a-cylinder position="0 0.04 0" radius="0.3" height="0.03" mixin="wood-dark"></a-cylinder>
             <a-box position="0 0.45 0" width="0.52" height="0.08" depth="0.5" mixin="chair-cushion"></a-box>
             <a-box position="0 0.82 -0.22" width="0.5" height="0.68" depth="0.06" rotation="-5 0 0" mixin="chair-cushion"></a-box>
             <a-box position="-0.27 0.65 -0.05" width="0.04" height="0.3" depth="0.32" mixin="wood-dark"></a-box>
             <a-box position="0.27 0.65 -0.05" width="0.04" height="0.3" depth="0.32" mixin="wood-dark"></a-box>
+            <!-- MODEL 3D NPC PEWAWANCARA WANITA KANAN -->
+            <a-entity id="npc-right" position="0 0 0" npc-interviewer="role: right; gender: female; name: Suzuki-sensei"></a-entity>
         </a-entity>
 
         <!-- ========================================================================= -->
         <!-- 9. AREA KANDIDAT: KURSI KANDIDAT INTERAKTIF (CANDIDATE CHAIR)             -->
-        <!-- Posisi di Z = -1.0m (Jarak ideal 2.2m dari meja pewawancara)              -->
+        <!-- Posisi di Z = -1.6m (Jarak ideal 1.9m dari meja pewawancara)              -->
         <!-- ========================================================================= -->
-        <a-entity id="candidate-station" position="0 0 -1.0">
+        <a-entity id="candidate-station" position="0 0 -1.6">
             <!-- 1. KURSI KANDIDAT FORMAL (Bisa Duduk / Berdiri dengan Tekan F) -->
             <a-entity id="candidate-chair" position="0 0 0">
                 <!-- 4 Kaki Kursi Logam Kokoh -->
@@ -321,12 +275,7 @@
 
             <!-- 2. PENANDA POSISI BERDIRI DI SISI KIRI KURSI (ETIKA MENSETSU JEPANG) -->
             <!-- Di Jepang, kandidat wajib berdiri di sisi kiri kursi sebelum dipersilakan duduk -->
-            <a-circle position="-0.7 0.02 0" rotation="-90 0 0" radius="0.38" 
-                      material="color: #38bdf8; opacity: 0.35; transparent: true;"></a-circle>
-            <a-ring position="-0.7 0.022 0" rotation="-90 0 0" radius-inner="0.37" radius-outer="0.39" 
-                    material="color: #38bdf8; opacity: 0.85;"></a-ring>
-            <a-text value="Posisi Berdiri Kandidat\n(Kiri Kursi)" align="center" position="-0.7 0.03 0" 
-                    rotation="-90 0 0" color="#f8fafc" width="1.1"></a-text>
+            <a-entity position="-0.7 0 0" jp-floor-marker></a-entity>
 
             <!-- 3. TAS KERJA KANDIDAT (DILETAKKAN DI LANTAI SAMPING KURSI) -->
             <!-- Etika Mensetsu: Tas ditaruh berdiri di lantai di samping kursi, bukan di atas meja/dipangku -->
