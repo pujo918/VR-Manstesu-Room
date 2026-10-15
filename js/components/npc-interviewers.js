@@ -11,36 +11,44 @@
     // Definisi Dialog Resmi Wawancara Akademis S2 Jepang (Skenario Quartet II & Sensei)
     const INTERVIEW_DIALOGS = {
         PERMIT_SIT: {
-            speaker: 'Ketua Pewawancara (Sato-sensei)',
+            speaker: '佐藤先生（面接官）',
             speakerNpcId: 'npc-center',
             gender: 'male_center',
             jp: 'どうぞ、お座りください。',
+            displayJp: 'どうぞ、お座りください。',
             romaji: 'Douzo, osuwari kudasai.',
-            id: 'Silakan duduk di kursi kandidat.'
+            id: 'Silakan duduk di kursi kandidat.',
+            audioSrc: 'assets/audio/npc_permit_sit.mp3'
         },
         QUESTION_1: {
-            speaker: 'Pewawancara Kiri (Tanaka-sensei)',
+            speaker: '田中先生（面接官）',
             speakerNpcId: 'npc-left',
             gender: 'male_left',
             jp: 'それでは、面接を始めます。まず、大学院でこの研究を志望した理由を教えてください。',
+            displayJp: 'それでは、面接を始めます。<br>まず、大学院でこの研究を志望した理由を教えてください。',
             romaji: 'Soredewa, mensetsu o hajimemasu. Mazu, daigakuin de kono kenkyuu o shibou shita riyuu o oshiete kudasai.',
-            id: 'Baiklah, kita mulai wawancara. Pertama, tolong jelaskan alasan Anda memilih bidang riset ini di pascasarjana.'
+            id: 'Baiklah, kita mulai wawancara. Pertama, tolong jelaskan alasan Anda memilih bidang riset ini di pascasarjana.',
+            audioSrc: 'assets/audio/npc_question_1.mp3'
         },
         QUESTION_2: {
-            speaker: 'Pewawancara Kanan (Suzuki-sensei)',
+            speaker: '鈴木先生（面接官）',
             speakerNpcId: 'npc-right',
             gender: 'female_right',
             jp: 'ありがとうございます。次に、あなたの長所と、これまでに困難を乗り越えた具体的な経験について教えてください。',
+            displayJp: 'ありがとうございます。<br>次に、あなたの長所と、これまでに困難を乗り越えた具体的な経験について教えてください。',
             romaji: 'Arigatou gozaimasu. Tsugi ni, anata no choushou to, kore made ni konnan o norikoeta gutaiteki na keiken ni tsuite oshiete kudasai.',
-            id: 'Terima kasih. Selanjutnya, tolong jelaskan kelebihan diri Anda dan pengalaman konkret saat mengatasi kegagalan.'
+            id: 'Terima kasih. Selanjutnya, tolong jelaskan kelebihan diri Anda dan pengalaman konkret saat mengatasi kegagalan.',
+            audioSrc: 'assets/audio/npc_question_2.mp3'
         },
         CLOSING: {
-            speaker: 'Ketua Pewawancara (Sato-sensei)',
+            speaker: '佐藤先生（面接官）',
             speakerNpcId: 'npc-center',
             gender: 'male_center',
             jp: '本日の面接は以上となります。結果は後日連絡いたします。お疲れ様でした。',
+            displayJp: '本日の面接は以上となります。<br>結果は後日連絡いたします。お疲れ様でした。',
             romaji: 'Honjitsu no mensetsu wa ijou to narimasu. Kekka wa gojitsu renraku itashimasu. Otsukaresama deshita.',
-            id: 'Wawancara hari ini selesai. Pengumuman hasil akan diinformasikan kemudian. Terima kasih atas kerja kerasnya.'
+            id: 'Wawancara hari ini selesai. Pengumuman hasil akan diinformasikan kemudian. Terima kasih atas kerja kerasnya.',
+            audioSrc: 'assets/audio/npc_closing.mp3'
         }
     };
 
@@ -50,6 +58,7 @@
         isNpcSpeaking: false,
         activeSpeakerId: null,
         isCandidateAnswering: false,
+        currentAudio: null,
 
         init: function () {
             console.log('Sistem 3 NPC Pewawancara Diaktifkan.');
@@ -63,10 +72,10 @@
             const box = document.createElement('div');
             box.id = 'npc-dialogue-overlay';
             box.innerHTML = `
-                <div class="npc-sub-speaker" id="npc-sub-speaker">Pewawancara</div>
+                <div class="npc-sub-header">
+                    <span class="npc-sub-speaker" id="npc-sub-speaker">佐藤先生（面接官）</span>
+                </div>
                 <div class="npc-sub-jp" id="npc-sub-jp"></div>
-                <div class="npc-sub-id" id="npc-sub-id"></div>
-                <div class="npc-dialogue-actions" id="npc-dialogue-actions" style="display:none;"></div>
             `;
             document.body.appendChild(box);
         },
@@ -81,25 +90,63 @@
             const overlay = document.getElementById('npc-dialogue-overlay');
             const spk = document.getElementById('npc-sub-speaker');
             const jp = document.getElementById('npc-sub-jp');
-            const id = document.getElementById('npc-sub-id');
-            const actions = document.getElementById('npc-dialogue-actions');
 
             if (spk) spk.textContent = data.speaker;
-            if (jp) jp.innerHTML = `「${data.jp}」`;
-            if (id) id.textContent = `${data.romaji} (${data.id})`;
-            if (actions) actions.style.display = 'none';
+            if (jp) jp.innerHTML = `「${data.displayJp || data.jp}」`;
 
             if (overlay) overlay.classList.add('active');
 
-            // Suara Alami Bahasa Jepang (Natural Japanese Voice Synthesis)
-            this.speakJapanese(data.jp, data.gender, () => {
+            // Suara Alami Asli Orang Jepang (Native Japanese Audio)
+            this.speakJapanese(data, () => {
                 this.isNpcSpeaking = false;
                 this.activeSpeakerId = null;
                 if (callback) callback();
             });
         },
 
-        speakJapanese: function (text, genderType, onEnd) {
+        speakJapanese: function (data, onEnd) {
+            // Hentikan audio sebelumnya jika sedang memutar
+            if (this.currentAudio) {
+                try {
+                    this.currentAudio.pause();
+                    this.currentAudio.currentTime = 0;
+                } catch (e) {}
+                this.currentAudio = null;
+            }
+
+            // 1. Prioritaskan pemutaran file audio asli orang Jepang (Studio Native Human Audio)
+            if (data && data.audioSrc) {
+                const audio = new Audio(data.audioSrc);
+                this.currentAudio = audio;
+
+                let hasEnded = false;
+                const endHandler = () => {
+                    if (hasEnded) return;
+                    hasEnded = true;
+                    this.currentAudio = null;
+                    if (onEnd) onEnd();
+                };
+
+                audio.onended = endHandler;
+                audio.onerror = (err) => {
+                    console.warn('Gagal memuat file audio asli, fallback ke speechSynthesis:', data.audioSrc, err);
+                    this.speakWithSpeechSynthesis(data.jp, data.gender, endHandler);
+                };
+
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(err => {
+                        console.warn('Autoplay dicegah browser, fallback ke speechSynthesis:', err);
+                        this.speakWithSpeechSynthesis(data.jp, data.gender, endHandler);
+                    });
+                }
+                return;
+            }
+
+            this.speakWithSpeechSynthesis(typeof data === 'string' ? data : (data.jp || ''), data ? data.gender : null, onEnd);
+        },
+
+        speakWithSpeechSynthesis: function (text, genderType, onEnd) {
             if (!('speechSynthesis' in window)) {
                 setTimeout(onEnd, 3000);
                 return;
@@ -202,19 +249,15 @@
                     window.MannerEvaluation.flags.interviewFinished = true;
                 }
 
-                const actions = document.getElementById('npc-dialogue-actions');
-                if (actions) {
-                    actions.innerHTML = `
-                        <div class="closing-hint">
-                            <strong>Wawancara selesai</strong>: Silakan berdiri dari kursi, beri salam perpisahan (ojigi), lalu melangkah keluar ruangan.
-                        </div>
-                    `;
-                    actions.style.display = 'block';
-                }
+                setTimeout(() => {
+                    const overlay = document.getElementById('npc-dialogue-overlay');
+                    if (overlay) overlay.classList.remove('active');
+                }, 3500);
 
                 if (typeof window.showActionToast === 'function') {
-                    window.showActionToast('Sesi wawancara selesai. Silakan berdiri dan lakukan ojigi perpisahan.');
+                    window.showActionToast('Sesi wawancara selesai. Silakan berdiri dan lakukan ojigi perpisahan (Tombol A).');
                 }
+                window.dispatchEvent(new CustomEvent('mensetsu-prompt-ojigi'));
 
                 // Kirim otomatis seluruh hasil ujian & audio ke Google Apps Script (Drive 5TB & Spreadsheet)
                 if (window.MensetsuRecorder && typeof window.MensetsuRecorder.sendDataToGoogleCloud === 'function') {
@@ -224,56 +267,37 @@
         },
 
         showAnswerControls: function (label, onFinishedAnswer) {
-            const actions = document.getElementById('npc-dialogue-actions');
-            if (!actions) return;
-
             const qKey = this.currentStep === 'ANSWER_1' ? 'question1' : 'question2';
+            this.currentAnswerCallback = onFinishedAnswer;
+            this.currentQuestionKey = qKey;
+            this.isWaitingForCandidateAnswer = true;
 
-            actions.innerHTML = `
-                <div class="answer-row">
-                    <div class="answer-info">
-                        <span class="answer-badge">Sesi Jawaban Kandidat</span>
-                        <div class="answer-label">${label}</div>
-                    </div>
-                    <div class="answer-btn-group">
-                        <button type="button" class="btn-start-rec" id="btn-start-rec">
-                            <span class="rec-icon">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-                            </span>
-                            <span id="rec-btn-text">Rekam audio</span>
-                        </button>
-                        <button type="button" class="btn-finish-answer" id="btn-finish-answer">
-                            <span>Selesai menjawab</span>
-                        </button>
-                    </div>
-                </div>
-            `;
-            actions.style.display = 'block';
+            // Beri tahu tombol Xbox B bahwa pewawancara sedang menunggu jawaban
+            window.dispatchEvent(new CustomEvent('mensetsu-answer-prompt', { detail: { label: label, questionKey: qKey } }));
 
-            const startRecBtn = document.getElementById('btn-start-rec');
-            if (startRecBtn) {
-                startRecBtn.addEventListener('click', () => {
-                    this.isCandidateAnswering = true;
-                    if (window.MensetsuRecorder) {
-                        window.MensetsuRecorder.startRecording(qKey);
-                        startRecBtn.classList.add('recording');
-                        startRecBtn.innerHTML = `
-                            <span class="rec-dot-active"></span>
-                            <span>Perekaman aktif...</span>
-                        `;
-                    }
-                });
+            if (typeof window.showActionToast === 'function') {
+                window.showActionToast('🎙️ Giliran Menjawab: Tekan Tombol B (Mic) untuk mulai bicara.');
+            }
+        },
+
+        finishCandidateAnswer: function () {
+            if (!this.isWaitingForCandidateAnswer && !this.isCandidateAnswering) return;
+
+            this.isCandidateAnswering = false;
+            this.isWaitingForCandidateAnswer = false;
+
+            window.dispatchEvent(new CustomEvent('mensetsu-answer-done'));
+            if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+
+            if (window.MensetsuRecorder && window.MensetsuRecorder.isRecording) {
+                window.MensetsuRecorder.stopRecording();
             }
 
-            document.getElementById('btn-finish-answer').addEventListener('click', () => {
-                this.isCandidateAnswering = false;
-                if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
-                if (window.MensetsuRecorder && window.MensetsuRecorder.isRecording) {
-                    window.MensetsuRecorder.stopRecording();
-                }
-                actions.style.display = 'none';
-                if (onFinishedAnswer) onFinishedAnswer();
-            });
+            if (this.currentAnswerCallback) {
+                const cb = this.currentAnswerCallback;
+                this.currentAnswerCallback = null;
+                cb();
+            }
         }
     };
 

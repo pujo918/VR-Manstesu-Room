@@ -33,23 +33,17 @@ AFRAME.registerComponent('player-collision-and-proximity', {
         // Jika sedang duduk di kursi / sofa, biarkan posisi terkunci di tempat duduk
         if (window.isSitting) {
             window.currentNearbyAction = 'chair';
-            const isDialogueActive = this.dialogueOverlay && this.dialogueOverlay.classList.contains('active');
-            if (this.prompt) {
-                if (isDialogueActive) {
-                    if (this.lastPromptDisplay !== 'none') {
-                        this.prompt.style.display = 'none';
-                        this.lastPromptDisplay = 'none';
-                    }
-                } else {
-                    const seatName = window.currentSeat ? window.currentSeat.name : 'KURSI';
-                    const label = `BERDIRI DARI ${seatName.toUpperCase()} (TEKAN F / WASD)`;
-                    if (this.lastPromptDisplay !== 'flex') {
-                        this.prompt.style.display = 'flex';
-                        this.lastPromptDisplay = 'flex';
-                    }
-                    if (this.lastPromptState !== label) {
-                        this.promptLabel.textContent = label;
-                        this.lastPromptState = label;
+            
+            // Perbarui tombol Y (Aksi) saat sedang duduk
+            const btnY = document.getElementById('mob-btn-y');
+            const subY = document.getElementById('mob-sublabel-y');
+            if (btnY) {
+                btnY.classList.add('can-interact');
+                if (subY) {
+                    if (window.currentSeat && window.currentSeat.id === 'waiting-sofa') {
+                        subY.textContent = 'Video';
+                    } else {
+                        subY.textContent = 'Berdiri';
                     }
                 }
             }
@@ -70,32 +64,24 @@ AFRAME.registerComponent('player-collision-and-proximity', {
             }
         }
 
-        // 2. DETEKSI JARAK KE PINTU, JENDELA & TV PEMBELAJARAN
+        // 2. DETEKSI JARAK KE PINTU & JENDELA (Video TV hanya aktif saat duduk di sofa)
         const distToDoor = Math.hypot(pos.x - 0, pos.z - 6.0);
         const distToWindow = Math.hypot(pos.x - 3.94, pos.z - 0);
-        const distToTv = Math.hypot(pos.x - (-0.75), pos.z - 10.0);
 
         let targetAction = null;
         let targetSeat = null;
-        let targetLabel = '';
 
         if (closestSeat) {
             targetAction = 'chair';
             targetSeat = closestSeat;
-            targetLabel = closestSeat.promptLabel;
-        } else if (distToTv < 2.5) {
-            targetAction = 'tv';
-            targetLabel = 'TONTON VIDEO PEMBELAJARAN';
         } else if (distToDoor < 2.3) {
             targetAction = 'door';
-            targetLabel = window.isDoorOpen ? 'TUTUP PINTU' : 'BUKA PINTU (KETUK: TEKAN K)';
         } else if (distToWindow < 2.5) {
             targetAction = 'window';
-            targetLabel = window.isWindowOpen ? 'TUTUP JENDELA' : 'BUKA JENDELA';
         }
 
-        // Indikator tombol ketuk pintu (hanya aktif visual saat dekat pintu dan belum terbuka)
-        const knockBtn = document.getElementById('mob-btn-knock');
+        // Indikator tombol ketuk pintu X (hanya aktif visual saat dekat pintu dan belum terbuka)
+        const knockBtn = document.getElementById('mob-btn-x') || document.getElementById('mob-btn-knock');
         if (knockBtn) {
             const canKnock = distToDoor < 2.3 && !window.isDoorOpen && pos.z >= 5.8 && !window.isSitting;
             if (canKnock) {
@@ -105,27 +91,26 @@ AFRAME.registerComponent('player-collision-and-proximity', {
             }
         }
 
-        window.currentNearbyAction = targetAction;
-        window.currentNearbySeat = targetSeat;
-
-        if (this.prompt) {
+        // Indikator dinamis tombol Y (Aksi / Interaksi Context-Aware)
+        const btnY = document.getElementById('mob-btn-y');
+        const subY = document.getElementById('mob-sublabel-y');
+        if (btnY) {
             if (targetAction) {
-                if (this.lastPromptDisplay !== 'flex') {
-                    this.prompt.style.display = 'flex';
-                    this.lastPromptDisplay = 'flex';
-                }
-                if (this.lastPromptState !== targetLabel) {
-                    this.promptLabel.textContent = targetLabel;
-                    this.lastPromptState = targetLabel;
+                btnY.classList.add('can-interact');
+                if (subY) {
+                    if (targetAction === 'door') subY.textContent = window.isDoorOpen ? 'Tutup' : 'Buka';
+                    else if (targetAction === 'chair') subY.textContent = 'Duduk';
+                    else if (targetAction === 'window') subY.textContent = 'Jendela';
+                    else subY.textContent = 'Aksi';
                 }
             } else {
-                if (this.lastPromptDisplay !== 'none') {
-                    this.prompt.style.display = 'none';
-                    this.lastPromptDisplay = 'none';
-                    this.lastPromptState = '';
-                }
+                btnY.classList.remove('can-interact');
+                if (subY) subY.textContent = 'Aksi';
             }
         }
+
+        window.currentNearbyAction = targetAction;
+        window.currentNearbySeat = targetSeat;
 
         // 3. SISTEM COLLISION DENGAN PENYELARASAN GESER (SLIDE COLLISION)
         if (typeof isPositionValid === 'function') {

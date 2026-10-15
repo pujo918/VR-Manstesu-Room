@@ -9,40 +9,34 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
     <!-- Stylesheet UI & HUD -->
-    <link rel="stylesheet" href="css/style.css?v=4.0">
+    <link rel="stylesheet" href="css/style.css?v=6.3">
 
     <!-- Modul JavaScript & Logika Interaksi -->
     <script src="js/audio.js"></script>
     <script src="js/collision.js?v=2.0"></script>
-    <script src="js/interaction.js?v=5.0"></script>
-    <script src="js/components/mobile-controls.js?v=2.0"></script>
-    <script src="js/components/gate-screen.js?v=3.0"></script>
+    <script src="js/interaction.js?v=5.3"></script>
+    <script src="js/components/mobile-controls.js?v=3.1"></script>
+    <script src="js/components/gate-screen.js?v=3.2"></script>
     <script src="js/components/manner-evaluator.js?v=1.0"></script>
-    <script src="js/components/video-player.js?v=1.0"></script>
-    <script src="js/components/npc-interviewers.js?v=4.7"></script>
-    <script src="js/components/voice-recorder.js?v=1.0"></script>
+    <script src="js/components/video-player.js?v=2.1"></script>
+    <script src="js/components/npc-interviewers.js?v=5.0"></script>
+    <script src="js/components/voice-recorder.js?v=1.2"></script>
     <script src="js/components/dracaena.js"></script>
     <script src="js/components/books.js"></script>
     <script src="js/components/japanese-signs.js?v=2.1"></script>
-    <script src="js/components/player.js?v=4.0"></script>
+    <script src="js/components/player.js?v=4.2"></script>
     <script src="js/components/mirror.js?v=8.1"></script>
-    <script src="js/scene-loader.js"></script>
+    <script src="js/scene-loader.js?v=2.0"></script>
 </head>
 <body>
 
 
 
-    <!-- Tombol Prompt Interaksi Mengambang [ TEKAN F ] -->
-    <div id="interact-prompt">
-        <span class="key-badge">F</span>
-        <span id="prompt-label">BUKA PINTU</span>
-    </div>
-
     <!-- Titik Reticle Tengah -->
     <div class="reticle-dot"></div>
 
     <!-- 3D VR Scene -->
-    <a-scene background="color: #080c16" renderer="antialias: true; colorManagement: true;">
+    <a-scene background="color: #080c16" renderer="antialias: true; colorManagement: true;" vr-mode-ui="enabled: false">
 
         <!-- ASSETS & MATERIAL REUSABLE -->
         <a-assets>

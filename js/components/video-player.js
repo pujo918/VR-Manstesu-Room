@@ -5,8 +5,23 @@
 // =========================================================================
 
 (function () {
-    // URL Default Video Pembelajaran Etika Mensetsu Jepang (Akane-teki Nihongo Kyoushitsu / Standar Formal)
-    const DEFAULT_VIDEO_URL = "https://www.youtube-nocookie.com/embed/v9Zq4p2h6hQ?enablejsapi=1&rel=0";
+    // URL Default Video Pembelajaran Etika Mensetsu Jepang (Akane Sensei - Tips Wawancara Dasar untuk Siswa Asing)
+    const DEFAULT_VIDEO_URL = "https://www.youtube-nocookie.com/embed/s5eR2_61BzE?enablejsapi=1&rel=0";
+
+    function toYouTubeEmbedUrl(url) {
+        if (!url) return DEFAULT_VIDEO_URL;
+        if (url.includes('youtube.com/embed') || url.includes('youtube-nocookie.com/embed')) return url;
+        
+        const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+        if (shortMatch && shortMatch[1]) {
+            return `https://www.youtube-nocookie.com/embed/${shortMatch[1]}?enablejsapi=1&rel=0`;
+        }
+        const longMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+        if (longMatch && longMatch[1]) {
+            return `https://www.youtube-nocookie.com/embed/${longMatch[1]}?enablejsapi=1&rel=0`;
+        }
+        return url;
+    }
 
     AFRAME.registerComponent('learning-video-screen', {
         init: function () {
@@ -105,11 +120,11 @@
             // Keterangan di Bawah Tombol
             ctx.fillStyle = isWatched ? '#4ade80' : '#e2e8f0';
             ctx.font = 'bold 22px sans-serif';
-            ctx.fillText(isWatched ? 'PANDUAN ETIKA TELAH DIPELAJARI' : 'TEKAN LAYAR ATAU TOMBOL UNTUK MEMUTAR VIDEO', w / 2, 435);
+            ctx.fillText(isWatched ? 'PANDUAN ETIKA TELAH DIPELAJARI' : 'DUDUK DI SOFA UNTUK MENONTON VIDEO', w / 2, 435);
 
             ctx.fillStyle = '#94a3b8';
             ctx.font = '16px sans-serif';
-            ctx.fillText('Pelajari video panduan etika sebelum menuju pintu ruang wawancara.', w / 2, 475);
+            ctx.fillText('Duduklah santai di sofa ruang tunggu untuk memutar video pembelajaran etika.', w / 2, 475);
 
             // Status Bar di Bagian Bawah
             ctx.fillStyle = isWatched ? '#14532d' : '#27272a';
@@ -130,20 +145,31 @@
     window.openLearningVideo = function (customUrl) {
         if (document.getElementById('video-learning-modal')) return;
 
-        const videoUrl = customUrl || DEFAULT_VIDEO_URL;
+        // Validasi: Pengguna HANYA boleh menonton video YouTube jika sudah duduk di sofa ruang tunggu
+        const isSittingOnSofa = window.isSitting && window.currentSeat && window.currentSeat.id === 'waiting-sofa';
+        if (!isSittingOnSofa) {
+            if (typeof window.showActionToast === 'function') {
+                window.showActionToast('Silakan duduk di sofa ruang tunggu untuk menonton video pembelajaran.');
+            }
+            return;
+        }
+
+        const videoUrl = toYouTubeEmbedUrl(customUrl);
 
         const modal = document.createElement('div');
         modal.id = 'video-learning-modal';
         modal.innerHTML = `
             <div class="video-modal-card">
                 <div class="video-modal-header">
-                    <div class="vm-badge">Modul Persiapan Pra-Wawancara</div>
+                    <div class="vm-header-info">
+                        <div class="vm-badge">Pra-Wawancara</div>
+                        <h2 class="video-modal-title">Panduan Etika & Tips Wawancara (Akane Sensei)</h2>
+                    </div>
                     <button type="button" class="btn-close-vm" id="btn-close-vm" title="Tutup">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>
                 </div>
-                <h2 class="video-modal-title">Tata Krama & Etika Wawancara Pascasarjana Jepang</h2>
-                <p class="video-modal-desc">Pelajari langkah-langkah formal: ketuk pintu 3 kali, salam masuk ("Shitsurei shimasu"), ojigi 30 derajat, dan etika duduk sebelum memasuki ruang wawancara.</p>
+                <p class="video-modal-desc">Pelajari 7 poin penting wawancara institusi Jepang: etika duduk formal (o-kake kudasai), salam pembuka/penutup, dan motivasi studi.</p>
 
                 <div class="video-player-container">
                     <iframe id="learning-iframe" 
@@ -171,9 +197,22 @@
         const closeBtn = document.getElementById('btn-close-vm');
         const markWatchedBtn = document.getElementById('btn-mark-watched');
 
-        closeBtn.addEventListener('click', () => {
+        const closeModal = () => {
+            window.removeEventListener('keydown', handleEsc);
             modal.remove();
+        };
+
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') closeModal();
+        };
+
+        window.addEventListener('keydown', handleEsc);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
         });
+
+        closeBtn.addEventListener('click', closeModal);
 
         markWatchedBtn.addEventListener('click', () => {
             if (!window.MensetsuState) window.MensetsuState = {};
@@ -189,7 +228,7 @@
             }
 
             setTimeout(() => {
-                modal.remove();
+                closeModal();
             }, 500);
         });
     };

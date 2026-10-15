@@ -103,6 +103,7 @@
                     this.recordStartTime = Date.now();
                     this.showRecorderHUD(true);
                     this.startTimer();
+                    window.dispatchEvent(new CustomEvent('mensetsu-rec-started', { detail: { questionKey: this.currentQuestionKey } }));
                 })
                 .catch((err) => {
                     console.warn('Akses mikrofon tidak diizinkan. Menggunakan mode simulasi:', err);
@@ -110,6 +111,7 @@
                     this.isRecording = true;
                     this.showRecorderHUD(true);
                     this.startTimer();
+                    window.dispatchEvent(new CustomEvent('mensetsu-rec-started', { detail: { questionKey: this.currentQuestionKey } }));
                     this.mediaRecorder = {
                         state: 'recording',
                         stop: () => {
@@ -126,6 +128,7 @@
             this.isRecording = false;
             this.stopTimer();
             this.showRecorderHUD(false);
+            window.dispatchEvent(new CustomEvent('mensetsu-rec-stopped'));
 
             if (this.mediaRecorder && typeof this.mediaRecorder.stop === 'function') {
                 this.mediaRecorder.stop();

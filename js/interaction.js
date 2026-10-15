@@ -436,19 +436,22 @@ window.triggerOjigi = function () {
     }
 };
 
-// 3. Pemicu Aksi Interaktif Umum (Aksi Tombol F / Tombol Mobile Aksi)
+// 3. Pemicu Aksi Interaktif Umum (Aksi Tombol Y / F)
 window.triggerAction = function () {
     if (window.isSitting) {
+        // Jika sedang duduk di sofa ruang tunggu, tombol Y memutar video YouTube
+        if (window.currentSeat && window.currentSeat.id === 'waiting-sofa') {
+            if (typeof window.openLearningVideo === 'function') {
+                window.openLearningVideo();
+                return;
+            }
+        }
         standUp();
     } else if (window.currentNearbyAction === 'chair') {
         if (window.currentNearbySeat) {
             sitOnSeat(window.currentNearbySeat);
         } else {
             toggleSit();
-        }
-    } else if (window.currentNearbyAction === 'tv') {
-        if (typeof window.openLearningVideo === 'function') {
-            window.openLearningVideo();
         }
     } else if (window.currentNearbyAction === 'door') {
         toggleDoor();
@@ -466,7 +469,6 @@ window.triggerAction = function () {
                 return;
             }
         }
-        window.showActionToast('Tidak ada objek aksi di sekitar posisi Anda.');
     }
 };
 
@@ -495,13 +497,19 @@ window.addEventListener('keydown', function (e) {
 
     const key = e.key.toLowerCase();
     
-    // Tombol F untuk interaksi utama
-    if (key === 'f') {
+    // Tombol F atau Y untuk interaksi utama (Aksi)
+    if (key === 'f' || key === 'y') {
         window.triggerAction();
     }
-    // Tombol K untuk mengetuk pintu
-    else if (key === 'k') {
+    // Tombol K atau X untuk mengetuk pintu
+    else if (key === 'k' || key === 'x') {
         window.triggerKnock();
+    }
+    // Tombol B untuk Open Mic / Rekam Suara
+    else if (key === 'b') {
+        if (typeof window.handleMobileMicButton === 'function') {
+            window.handleMobileMicButton();
+        }
     }
     // Tombol O untuk Ojigi (membungkuk 30°)
     else if (key === 'o') {
@@ -516,3 +524,25 @@ window.addEventListener('keydown', function (e) {
         standUp();
     }
 });
+
+// Listener klik langsung pada kursi / sofa di ruang 3D
+function initSeatClickListeners() {
+    if (!window.ALL_SEATS) return;
+    window.ALL_SEATS.forEach(seat => {
+        const el = document.getElementById(seat.id);
+        if (el && !el._hasClickSit) {
+            el._hasClickSit = true;
+            el.classList.add('clickable');
+            el.addEventListener('click', () => {
+                sitOnSeat(seat);
+            });
+        }
+    });
+}
+
+window.addEventListener('scenes-loaded', initSeatClickListeners);
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initSeatClickListeners, 1000);
+    setTimeout(initSeatClickListeners, 2500);
+});
+

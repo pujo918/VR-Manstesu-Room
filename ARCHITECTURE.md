@@ -29,14 +29,14 @@ Di awal web dibuka (Gate Screen), mahasiswa memilih perangkat yang digunakan:
 [Gate Screen: Input Nama] ┼──► [2] Smartphone / Mobile (Touchscreen)
                           │    - Virtual Analog Joystick (sisi kiri) untuk gerak
                           │    - Touch Swipe Camera (sisi kanan) untuk toleh pandangan
-                          │    - Floating Action Buttons: Ketuk (Tap 3x), Ojigi (Bungkuk 30°),
-                          │      Duduk/Berdiri, Bicara/Rekam (Mic)
+                          │    - Gamepad Xbox ABXY: Y (Aksi/Interaksi), X (Ketuk 3x),
+                          │      B (Open Mic/Rekam Suara), A (Ojigi 30° / Salam)
                           │    - Tombol Toggle Layar Penuh (Fullscreen API / PWA Guide)
                           │
                           └──► [3] Laptop / PC (Desktop)
                                - Kontrol WASD untuk gerak + Mouse look
-                               - Shortcut keyboard: 'F' (Interaksi/Ketuk), 'O' (Ojigi),
-                                 'C' (Duduk/Berdiri), 'Space' (Rekam Suara)
+                               - Shortcut keyboard: 'F' / 'Y' (Interaksi), 'K' / 'X' (Ketuk),
+                                 'B' (Mic), 'O' (Ojigi), 'C' (Duduk/Berdiri)
 ```
 
 ---

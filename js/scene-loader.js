@@ -25,6 +25,7 @@ async function initScenes() {
         loadScenePart('scene-waiting-room', 'scenes/waiting-room.html')
     ]);
     console.log('Semua scene ruangan 3D Mensetsu VR berhasil dimuat.');
+    window.dispatchEvent(new CustomEvent('scenes-loaded'));
 }
 
 if (document.readyState === 'loading') {

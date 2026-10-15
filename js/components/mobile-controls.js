@@ -4,6 +4,52 @@
 // =========================================================================
 
 (function () {
+    // Handler Khusus Tombol Xbox B (Mic / Bicara Jawaban)
+    window.handleMobileMicButton = function () {
+        const interview = window.MensetsuInterview;
+
+        // 1. Sedang merekam suara -> selesaikan rekaman dan teruskan alur wawancara
+        if (window.MensetsuRecorder && window.MensetsuRecorder.isRecording) {
+            if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+            if (typeof window.showActionToast === 'function') {
+                window.showActionToast('🎙️ Rekaman suara selesai & tersimpan.');
+            }
+            if (interview && typeof interview.finishCandidateAnswer === 'function') {
+                interview.finishCandidateAnswer();
+            } else if (window.MensetsuRecorder) {
+                window.MensetsuRecorder.stopRecording();
+            }
+            return;
+        }
+
+        // 2. Sesi tanya jawab aktif & menunggu jawaban kandidat -> mulai merekam
+        if (interview && (interview.isWaitingForCandidateAnswer || interview.currentStep === 'ANSWER_1' || interview.currentStep === 'ANSWER_2')) {
+            const qKey = interview.currentQuestionKey || (interview.currentStep === 'ANSWER_1' ? 'question1' : 'question2');
+            interview.isCandidateAnswering = true;
+            if (window.MensetsuRecorder) {
+                window.MensetsuRecorder.startRecording(qKey);
+            }
+            if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+            if (typeof window.showActionToast === 'function') {
+                window.showActionToast('🔴 Merekam jawaban... Tekan B lagi setelah selesai bicara.');
+            }
+            return;
+        }
+
+        // 3. Jika sedang duduk di kursi kandidat tapi belum giliran menjawab (NPC sedang bicara)
+        if (window.isSitting) {
+            if (typeof window.showActionToast === 'function') {
+                window.showActionToast('🎙️ Dengarkan pertanyaan pewawancara terlebih dahulu.');
+            }
+            return;
+        }
+
+        // 4. Jika di luar sesi tanya jawab (masih di ruang tunggu atau berdiri)
+        if (typeof window.showActionToast === 'function') {
+            window.showActionToast('🎙️ Tombol B (Mic): Gunakan saat menjawab pertanyaan pewawancara di kursi.');
+        }
+    };
+
     window.MensetsuControls = {
         activeMode: 'pc', // 'mobile' | 'pc' | 'vr'
         isJoystickActive: false,
@@ -12,6 +58,7 @@
         lastLookTouch: { x: 0, y: 0 },
         lookSensitivity: 0.0038,
         moveSpeed: 2.8, // meter per detik
+        _xboxListenersAttached: false,
 
         init: function (mode) {
             this.activeMode = mode || 'pc';
@@ -50,71 +97,101 @@
                 document.body.appendChild(joyZone);
             }
 
-            // 2. Container Tombol Aksi Sentuh di Kanan Bawah
+            // 2. Container Gamepad Xbox ABXY di Kanan Bawah
             if (!document.getElementById('mobile-action-buttons')) {
                 const btnContainer = document.createElement('div');
                 btnContainer.id = 'mobile-action-buttons';
                 btnContainer.innerHTML = `
-                    <button class="mob-btn btn-knock" id="mob-btn-knock" title="Ketuk pintu">
-                        <span class="mob-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v17"/><path d="M14 12v.01"/></svg>
-                        </span>
-                        <span class="mob-text">Ketuk</span>
-                    </button>
-                    <button class="mob-btn btn-ojigi" id="mob-btn-ojigi" title="Ojigi 30 derajat">
-                        <span class="mob-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="4" r="2"/><path d="M6 18l4-8 5 2 3-5"/></svg>
-                        </span>
-                        <span class="mob-text">Ojigi</span>
-                    </button>
-                    <button class="mob-btn btn-sit" id="mob-btn-sit" title="Duduk atau berdiri">
-                        <span class="mob-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4"/><path d="M5 16v5"/><path d="M19 16v5"/><path d="M5 10h14"/></svg>
-                        </span>
-                        <span class="mob-text" id="mob-text-sit">Duduk</span>
-                    </button>
-                    <button class="mob-btn btn-action" id="mob-btn-action" title="Interaksi objek">
-                        <span class="mob-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
-                        </span>
-                        <span class="mob-text">Aksi</span>
-                    </button>
+                    <div class="xbox-pad-plate" id="xbox-pad-plate">
+                        <!-- Y (Atas / Kuning) - Interaksi & Aksi -->
+                        <button class="xbox-btn btn-y mob-btn btn-action" id="mob-btn-y" title="Aksi / Interaksi (Y)" data-key="Y" aria-label="Aksi">
+                            <span class="xbox-letter">Y</span>
+                            <span class="xbox-sublabel" id="mob-sublabel-y">Aksi</span>
+                        </button>
+
+                        <!-- X (Kiri / Biru) - Ketuk Pintu 3x -->
+                        <button class="xbox-btn btn-x mob-btn btn-knock" id="mob-btn-x" title="Ketuk Pintu (X)" data-key="X" aria-label="Ketuk">
+                            <span class="xbox-letter">X</span>
+                            <span class="xbox-sublabel" id="mob-sublabel-x">Ketuk</span>
+                        </button>
+
+                        <!-- Center Pivot Disc -->
+                        <div class="xbox-pad-center">
+                            <div class="xbox-center-dot"></div>
+                        </div>
+
+                        <!-- B (Kanan / Merah) - Open Mic / Rekam Suara -->
+                        <button class="xbox-btn btn-b mob-btn btn-mic" id="mob-btn-b" title="Bicara / Rekam Suara (B)" data-key="B" aria-label="Bicara">
+                            <span class="xbox-letter">B</span>
+                            <span class="xbox-sublabel" id="mob-sublabel-b">Mic</span>
+                        </button>
+
+                        <!-- A (Bawah / Hijau) - Ojigi Membungkuk 30° / Salam -->
+                        <button class="xbox-btn btn-a mob-btn btn-ojigi" id="mob-btn-a" title="Ojigi 30° / Membungkuk (A)" data-key="A" aria-label="Ojigi">
+                            <span class="xbox-letter">A</span>
+                            <span class="xbox-sublabel" id="mob-sublabel-a">Ojigi</span>
+                        </button>
+                    </div>
                 `;
                 document.body.appendChild(btnContainer);
 
-                // Event Listeners Tombol Aksi Mobile
-                document.getElementById('mob-btn-knock').addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (typeof window.triggerKnock === 'function') window.triggerKnock();
-                });
-                document.getElementById('mob-btn-ojigi').addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (typeof window.triggerOjigi === 'function') window.triggerOjigi();
-                });
-                document.getElementById('mob-btn-sit').addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (typeof window.toggleSit === 'function') window.toggleSit();
-                    this.updateSitButtonText();
-                });
-                document.getElementById('mob-btn-action').addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (typeof window.triggerAction === 'function') window.triggerAction();
+                // Helper touch/click handler dengan micro-haptic & visual feedback
+                const bindXboxBtn = (id, callback) => {
+                    const btn = document.getElementById(id);
+                    if (!btn) return;
+                    let lastTrigger = 0;
+                    const onTrigger = (e) => {
+                        if (e && e.type === 'touchstart') {
+                            e.preventDefault();
+                        }
+                        const now = Date.now();
+                        if (now - lastTrigger < 200) return;
+                        lastTrigger = now;
+
+                        btn.classList.add('is-active');
+                        setTimeout(() => btn.classList.remove('is-active'), 150);
+
+                        if (navigator.vibrate) {
+                            try { navigator.vibrate(25); } catch (_) {}
+                        }
+
+                        callback();
+                    };
+
+                    btn.addEventListener('touchstart', onTrigger, { passive: false });
+                    btn.addEventListener('click', onTrigger);
+                };
+
+                // Y: Interaksi / Aksi (Buka Pintu, Duduk Kursi/Sofa, Nonton Video TV, Berdiri)
+                bindXboxBtn('mob-btn-y', () => {
+                    if (typeof window.triggerAction === 'function') {
+                        window.triggerAction();
+                    }
                 });
 
-                // Fallback untuk klik mouse di desktop saat uji coba mode mobile
-                document.getElementById('mob-btn-knock').addEventListener('click', () => {
-                    if (typeof window.triggerKnock === 'function') window.triggerKnock();
+                // X: Ketuk Pintu (Knock)
+                bindXboxBtn('mob-btn-x', () => {
+                    if (typeof window.triggerKnock === 'function') {
+                        window.triggerKnock();
+                    }
                 });
-                document.getElementById('mob-btn-ojigi').addEventListener('click', () => {
-                    if (typeof window.triggerOjigi === 'function') window.triggerOjigi();
+
+                // B: Open Mic / Rekam Suara Jawaban
+                bindXboxBtn('mob-btn-b', () => {
+                    if (typeof window.handleMobileMicButton === 'function') {
+                        window.handleMobileMicButton();
+                    }
                 });
-                document.getElementById('mob-btn-sit').addEventListener('click', () => {
-                    if (typeof window.toggleSit === 'function') window.toggleSit();
-                    this.updateSitButtonText();
+
+                // A: Ojigi 30 Derajat (Salam Hormat Wawancara)
+                bindXboxBtn('mob-btn-a', () => {
+                    if (typeof window.triggerOjigi === 'function') {
+                        window.triggerOjigi();
+                    }
                 });
-                document.getElementById('mob-btn-action').addEventListener('click', () => {
-                    if (typeof window.triggerAction === 'function') window.triggerAction();
-                });
+
+                // Inisialisasi listener reaktif status audio & tata krama
+                this.setupXboxReactiveListeners();
             }
 
             // 3. Area Panduan Geser Kamera Kanan
@@ -129,6 +206,61 @@
             }
         },
 
+        setupXboxReactiveListeners: function () {
+            if (this._xboxListenersAttached) return;
+            this._xboxListenersAttached = true;
+
+            // 1. Pewawancara selesai mengajukan pertanyaan -> tombol B prompt siap bicara
+            window.addEventListener('mensetsu-answer-prompt', () => {
+                const btnB = document.getElementById('mob-btn-b');
+                const subB = document.getElementById('mob-sublabel-b');
+                if (btnB) btnB.classList.add('ready-to-answer');
+                if (subB) subB.textContent = 'Bicara';
+            });
+
+            // 2. Rekaman suara mulai aktif
+            window.addEventListener('mensetsu-rec-started', () => {
+                const btnB = document.getElementById('mob-btn-b');
+                const subB = document.getElementById('mob-sublabel-b');
+                if (btnB) {
+                    btnB.classList.remove('ready-to-answer');
+                    btnB.classList.add('is-recording');
+                }
+                if (subB) subB.textContent = 'Rekam...';
+            });
+
+            // 3. Rekaman suara selesai
+            window.addEventListener('mensetsu-rec-stopped', () => {
+                const btnB = document.getElementById('mob-btn-b');
+                const subB = document.getElementById('mob-sublabel-b');
+                if (btnB) {
+                    btnB.classList.remove('is-recording');
+                    btnB.classList.remove('ready-to-answer');
+                }
+                if (subB) subB.textContent = 'Mic';
+            });
+
+            window.addEventListener('mensetsu-answer-done', () => {
+                const btnB = document.getElementById('mob-btn-b');
+                const subB = document.getElementById('mob-sublabel-b');
+                if (btnB) {
+                    btnB.classList.remove('is-recording');
+                    btnB.classList.remove('ready-to-answer');
+                }
+                if (subB) subB.textContent = 'Mic';
+            });
+
+            // 4. Prompt Ojigi saat masuk / selesai wawancara
+            window.addEventListener('mensetsu-prompt-ojigi', () => {
+                const btnA = document.getElementById('mob-btn-a');
+                if (btnA) btnA.classList.add('should-ojigi');
+            });
+            window.addEventListener('mensetsu-ojigi', () => {
+                const btnA = document.getElementById('mob-btn-a');
+                if (btnA) btnA.classList.remove('should-ojigi');
+            });
+        },
+
         removeMobileUI: function () {
             const joy = document.getElementById('virtual-joystick-zone');
             if (joy) joy.remove();
@@ -139,17 +271,30 @@
         },
 
         updateSitButtonText: function () {
-            const txt = document.getElementById('mob-text-sit');
-            if (txt) {
-                txt.textContent = window.isSitting ? 'Berdiri' : 'Duduk';
+            const subY = document.getElementById('mob-sublabel-y');
+            const btnY = document.getElementById('mob-btn-y');
+            if (subY) {
+                if (window.isSitting) {
+                    if (window.currentSeat && window.currentSeat.id === 'waiting-sofa') {
+                        subY.textContent = 'Video';
+                    } else {
+                        subY.textContent = 'Berdiri';
+                    }
+                } else {
+                    subY.textContent = 'Aksi';
+                }
+            }
+            if (btnY) {
+                if (window.isSitting) {
+                    btnY.classList.add('can-interact');
+                } else if (!window.currentNearbyAction) {
+                    btnY.classList.remove('can-interact');
+                }
             }
         },
 
         updatePromptBadges: function () {
-            const badge = document.querySelector('.key-badge');
-            if (badge) {
-                badge.textContent = this.activeMode === 'mobile' ? 'SENTUH' : 'F';
-            }
+            // interact-prompt telah dinonaktifkan agar layar clean
         },
 
         // --- SISTEM ANALOG JOYSTICK (KIRI BAWAH) ---

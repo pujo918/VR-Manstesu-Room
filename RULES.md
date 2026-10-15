@@ -13,8 +13,8 @@ Aturan wajib saat mengembangkan dan memodifikasi proyek ini. Konteks lengkap men
 ## 2. Multi-Device & Kontrol
 3. **Pilihan Perangkat di Layar Awal (Gate Screen):** Mahasiswa wajib memilih mode perangkat saat awal membuka web:
    - **VR Headset (WebXR):** Kontroler 6DoF, ayunan tangan, dan Gaze Tracking ke wajah NPC.
-   - **Mobile (Smartphone):** Virtual Analog Joystick di kiri bawah, Touch Swipe Camera di kanan, tombol aksi virtual (Ketuk, Ojigi, Duduk, Mic), serta tombol toggle Layar Penuh.
-   - **Laptop / PC:** Keyboard WASD untuk berjalan, Mouse look untuk kamera, dan tombol shortcut (F = Interaksi/Ketuk, O = Ojigi, C = Duduk/Berdiri, Space = Mic).
+   - **Mobile (Smartphone):** Virtual Analog Joystick di kiri bawah, Touch Swipe Camera di kanan, Gamepad Xbox ABXY (Y: Aksi/Interaksi, X: Ketuk 3x, B: Open Mic/Rekam, A: Ojigi 30°), serta tombol toggle Layar Penuh.
+   - **Laptop / PC:** Keyboard WASD untuk berjalan, Mouse look untuk kamera, dan tombol shortcut (F/Y = Interaksi, K/X = Ketuk, B = Mic, O = Ojigi, C = Duduk/Berdiri).
 4. **Wajib HTTPS:** Diperlukan untuk akses mikrofon, sensor gerak, dan Fullscreen API.
 
 ---

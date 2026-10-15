@@ -36,8 +36,8 @@
         mobile: {
             name: 'Smartphone / HP',
             icon: 'assets/device-mobile.png',
-            desc: 'Layar Sentuh & Joystick',
-            actionDesc: 'Gunakan analog virtual di kiri untuk jalan, geser layar di kanan untuk arah pandang, dan tombol aksi di kanan.'
+            desc: 'Layar Sentuh & Gamepad Xbox',
+            actionDesc: 'Joystick kiri untuk jalan. Tombol Xbox kanan: <span style="color:#ffc800"><strong>Y</strong> (Aksi)</span>, <span style="color:#38bdf8"><strong>X</strong> (Ketuk)</span>, <span style="color:#f87171"><strong>B</strong> (Mic)</span>, <span style="color:#4ade80"><strong>A</strong> (Ojigi)</span>.'
         },
         vr: {
             name: 'Headset VR',
