@@ -379,6 +379,7 @@
             } else if (this.activeMode === 'vr') {
                 this.removeMobileUI();
                 this.enableStereoVR();
+                this.startMotionLoop();
             }
 
             this.updatePromptBadges();
@@ -814,6 +815,7 @@
                 const dt = Math.min((now - lastTime) / 1000, 0.08);
                 lastTime = now;
 
+                // 1. Gerakan Virtual Touch Joystick di Layar Mobile
                 if (this.activeMode === 'mobile' && this.isJoystickActive && !window.isSitting) {
                     const jx = this.joystickVector.x;
                     const jy = this.joystickVector.y; // -1 saat ditekan ke atas (maju)
@@ -859,10 +861,147 @@
                     }
                 }
 
+                // 2. Baca Controller Fisik Bluetooth / Gamepad VR (Analog & Tombol ABCD)
+                this.pollGamepadControls(dt);
+
                 requestAnimationFrame(motionTick);
             };
 
             requestAnimationFrame(motionTick);
+        },
+
+        // --- SISTEM KONTROL GAMEPAD BLUETOOTH / VR CONTROLLER FISIK (ANALOG & ABCD) ---
+        pollGamepadControls: function (dt) {
+            if (typeof navigator.getGamepads !== 'function') return;
+
+            const gamepads = navigator.getGamepads();
+            if (!gamepads) return;
+
+            let gp = null;
+            for (let i = 0; i < gamepads.length; i++) {
+                if (gamepads[i] && gamepads[i].connected) {
+                    gp = gamepads[i];
+                    break;
+                }
+            }
+            if (!gp) return;
+
+            // 1. Baca Analog Joystick (Axes: axes[0] = Kiri/Kanan, axes[1] = Maju/Mundur)
+            let ax = gp.axes[0] || 0;
+            let ay = gp.axes[1] || 0;
+
+            const deadzone = 0.15;
+            if (Math.abs(ax) < deadzone) ax = 0;
+            if (Math.abs(ay) < deadzone) ay = 0;
+
+            if (Math.abs(ax) > 0 || Math.abs(ay) > 0) {
+                if (window.isSitting) {
+                    if (typeof window.standUp === 'function') {
+                        window.standUp();
+                        this.updateSitButtonText();
+                    }
+                } else {
+                    const camEl = document.getElementById('player-camera');
+                    if (camEl && camEl.object3D) {
+                        const camQuat = camEl.object3D.quaternion;
+                        const euler = new AFRAME.THREE.Euler().setFromQuaternion(camQuat, 'YXZ');
+                        const yawRad = euler.y;
+
+                        const forwardX = -Math.sin(yawRad);
+                        const forwardZ = -Math.cos(yawRad);
+                        const rightX = Math.cos(yawRad);
+                        const rightZ = -Math.sin(yawRad);
+
+                        const moveDist = this.moveSpeed * dt;
+                        // ay < 0 = stick ditekan ke depan (maju), ay > 0 = mundur
+                        const vx = (-ay * forwardX + ax * rightX) * moveDist;
+                        const vz = (-ay * forwardZ + ax * rightZ) * moveDist;
+
+                        const curPos = camEl.object3D.position;
+                        const targetX = curPos.x + vx;
+                        const targetZ = curPos.z + vz;
+
+                        // Validasi Collision Sliding
+                        if (typeof isPositionValid === 'function') {
+                            if (isPositionValid(targetX, targetZ)) {
+                                curPos.x = targetX;
+                                curPos.z = targetZ;
+                            } else if (isPositionValid(targetX, curPos.z)) {
+                                curPos.x = targetX;
+                            } else if (isPositionValid(curPos.x, targetZ)) {
+                                curPos.z = targetZ;
+                            }
+                        } else {
+                            curPos.x = targetX;
+                            curPos.z = targetZ;
+                        }
+                    }
+                }
+            }
+
+            // 2. Baca Tombol-Tombol Controller (A, B, C, D, Triggers) dengan Debounce
+            if (!this._prevButtons) this._prevButtons = {};
+
+            const checkButton = (index, callback) => {
+                const btn = gp.buttons[index];
+                const isPressed = btn && (btn.pressed || btn.value > 0.5);
+                const wasPressed = !!this._prevButtons[index];
+                this._prevButtons[index] = isPressed;
+
+                if (isPressed && !wasPressed) {
+                    callback();
+                }
+            };
+
+            // Tombol 0 (A): Ojigi 30° / Membungkuk Salam Hormat
+            checkButton(0, () => {
+                if (typeof window.triggerOjigi === 'function') {
+                    window.triggerOjigi();
+                }
+            });
+
+            // Tombol 1 (B): Mic / Rekam Suara Jawaban Wawancara
+            checkButton(1, () => {
+                if (typeof window.handleMobileMicButton === 'function') {
+                    window.handleMobileMicButton();
+                }
+            });
+
+            // Tombol 2 (X / C): Ketuk Pintu 3x
+            checkButton(2, () => {
+                if (typeof window.triggerKnock === 'function') {
+                    window.triggerKnock();
+                }
+            });
+
+            // Tombol 3 (Y / D): Aksi / Interaksi (Buka Pintu, Duduk, Berdiri, Nonton Video)
+            checkButton(3, () => {
+                if (typeof window.triggerAction === 'function') {
+                    window.triggerAction();
+                }
+            });
+
+            // Tombol 4 & 5 (2 Tombol Samping / Shoulder / Trigger pada VR Controller):
+            // Samping Atas: Aksi (Sangat ergonomis dijangkau jari telunjuk)
+            checkButton(4, () => {
+                if (typeof window.triggerAction === 'function') {
+                    window.triggerAction();
+                }
+            });
+            // Samping Bawah: Ojigi
+            checkButton(5, () => {
+                if (typeof window.triggerOjigi === 'function') {
+                    window.triggerOjigi();
+                }
+            });
         }
     };
+
+    // Notifikasi reaktif saat Controller VR terhubung via Bluetooth
+    window.addEventListener('gamepadconnected', (e) => {
+        console.log('Gamepad VR terhubung:', e.gamepad.id);
+        if (typeof window.showActionToast === 'function') {
+            window.showActionToast(`🎮 Controller VR Terhubung! Analog = Jalan, A/B/C/D = Aksi.`);
+        }
+    });
 })();

@@ -497,8 +497,8 @@ window.addEventListener('keydown', function (e) {
 
     const key = e.key.toLowerCase();
     
-    // Tombol F atau Y untuk interaksi utama (Aksi)
-    if (key === 'f' || key === 'y') {
+    // Tombol F, Y, atau D (VR Controller) untuk interaksi utama (Aksi)
+    if (key === 'f' || key === 'y' || key === 'd') {
         window.triggerAction();
     }
     // Tombol K atau X untuk mengetuk pintu

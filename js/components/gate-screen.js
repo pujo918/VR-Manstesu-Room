@@ -46,7 +46,7 @@
             name: 'Headset VR',
             icon: 'assets/device-vr.png',
             desc: 'Doble Layar Stereoskopik',
-            actionDesc: 'Mode VR dual display stereoskopik (layar ganda kiri-kanan untuk Cardboard / VR Box) dengan sensor orientasi kepala 360°.'
+            actionDesc: 'Mode VR dual display. Controller VR (tekan <strong>@ + B</strong> untuk Game Mode): <strong>Analog</strong> = Jalan, <strong>A</strong> = Ojigi, <strong>B</strong> = Mic, <strong>C</strong> = Ketuk, <strong>D</strong> = Aksi, <strong>Trigger Samping</strong> = Aksi.'
         }
     };
 
