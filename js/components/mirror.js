@@ -126,6 +126,9 @@ AFRAME.registerComponent('realtime-mirror', {
 
     tick: function () {
         if (!this.mesh) return;
+        // Di mode VR ganda, lewati rendering cermin untuk menjaga kestabilan 60 FPS tanpa patah-patah
+        if (window.MensetsuControls && window.MensetsuControls.activeMode === 'vr') return;
+
         const sceneEl = this.el.sceneEl;
         if (!sceneEl || !sceneEl.renderer) return;
 
