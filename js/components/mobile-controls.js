@@ -56,24 +56,201 @@
         joystickVector: { x: 0, y: 0 },
         touchLookActive: false,
         lastLookTouch: { x: 0, y: 0 },
-        lookSensitivity: 0.0038,
+        lookSensitivity: 0.0040,
         moveSpeed: 2.8, // meter per detik
         _xboxListenersAttached: false,
+        _joystickEventsAttached: false,
+        _cameraSwipeAttached: false,
+        _motionLoopStarted: false,
+        _isStereoActive: false,
+        _stereoCam: null,
+        _origRender: null,
+        _vrClickAttached: false,
+
+        // Menonaktifkan Gyroscope (Device Orientation) di mode mobile agar murni pergeseran tangan
+        disableGyro: function () {
+            const applyLookConfig = () => {
+                const camEl = document.getElementById('player-camera');
+                if (!camEl) return;
+                camEl.setAttribute('look-controls', {
+                    magicWindowTrackingEnabled: false,
+                    touchEnabled: false,
+                    mouseEnabled: true
+                });
+                const lc = camEl.components['look-controls'];
+                if (lc) {
+                    lc.data.magicWindowTrackingEnabled = false;
+                    lc.data.touchEnabled = false;
+                    if (typeof lc.removeMagicWindowEvents === 'function') {
+                        lc.removeMagicWindowEvents();
+                    }
+                    if (typeof lc.removeTouchEvents === 'function') {
+                        lc.removeTouchEvents();
+                    }
+                }
+            };
+
+            applyLookConfig();
+            const scene = document.querySelector('a-scene');
+            if (scene) {
+                if (scene.hasLoaded) {
+                    applyLookConfig();
+                } else {
+                    scene.addEventListener('loaded', applyLookConfig, { once: true });
+                }
+            }
+        },
+
+        // Mengaktifkan Mode VR Doble Layar (Stereoscopic Side-by-Side Dual Display)
+        enableStereoVR: function () {
+            const scene = document.querySelector('a-scene');
+            if (!scene) return;
+
+            const setupStereo = () => {
+                const renderer = scene.renderer;
+                if (!renderer) return;
+
+                // 1. Inisialisasi THREE.StereoCamera bawaan A-Frame
+                if (!this._stereoCam) {
+                    this._stereoCam = new AFRAME.THREE.StereoCamera();
+                    this._stereoCam.aspect = 0.5;
+                    this._stereoCam.eyeSep = 0.064; // Interpupillary distance standar ~64mm
+                }
+
+                // 2. Intersepsi loop render renderer untuk membelah layar jadi 2 (mata kiri & mata kanan)
+                if (!this._origRender) {
+                    this._origRender = renderer.render.bind(renderer);
+                    const self = this;
+
+                    renderer.render = function (s, c) {
+                        if (!self._isStereoActive || !c) {
+                            return self._origRender(s, c);
+                        }
+
+                        const size = renderer.getSize(new AFRAME.THREE.Vector2());
+                        const width = size.x;
+                        const height = size.y;
+                        const halfW = Math.floor(width / 2);
+
+                        // Perbarui kamera stereo berdasarkan orientasi & posisi kamera aktif
+                        self._stereoCam.aspect = 0.5;
+                        self._stereoCam.update(c);
+
+                        // Aktifkan Scissor Test untuk merender 2 bidang pandang terpisah
+                        renderer.setScissorTest(true);
+
+                        // --- MATA KIRI (LEFT EYE) ---
+                        renderer.setScissor(0, 0, halfW, height);
+                        renderer.setViewport(0, 0, halfW, height);
+                        self._origRender(s, self._stereoCam.cameraL);
+
+                        // --- MATA KANAN (RIGHT EYE) ---
+                        renderer.setScissor(halfW, 0, width - halfW, height);
+                        renderer.setViewport(halfW, 0, width - halfW, height);
+                        self._origRender(s, self._stereoCam.cameraR);
+
+                        // Kembalikan konfigurasi default
+                        renderer.setScissorTest(false);
+                        renderer.setViewport(0, 0, width, height);
+                    };
+                }
+
+                this._isStereoActive = true;
+
+                // 3. Aktifkan Head Tracking (Device Orientation / Gyroscope) untuk Headset VR
+                const camEl = document.getElementById('player-camera');
+                if (camEl) {
+                    camEl.setAttribute('look-controls', {
+                        magicWindowTrackingEnabled: true,
+                        touchEnabled: true,
+                        mouseEnabled: true
+                    });
+                    const lc = camEl.components['look-controls'];
+                    if (lc) {
+                        lc.data.magicWindowTrackingEnabled = true;
+                        if (typeof lc.addMagicWindowEvents === 'function') {
+                            lc.addMagicWindowEvents();
+                        }
+                    }
+                }
+
+                // 4. Buat Elemen UI VR (Garis pemisah tengah & Dual Reticle Dot)
+                this.setupStereoVRUI();
+
+                // 5. Tambahkan interaksi sentuh layar / tombol headset Cardboard
+                if (!this._vrClickAttached) {
+                    this._vrClickAttached = true;
+                    window.addEventListener('click', (e) => {
+                        if (this.activeMode !== 'vr') return;
+                        if (e.target && e.target.closest('#top-nav-controls, #gate-screen')) {
+                            return;
+                        }
+                        if (typeof window.triggerAction === 'function') {
+                            window.triggerAction();
+                        }
+                    });
+                }
+            };
+
+            if (scene.hasLoaded && scene.renderer) {
+                setupStereo();
+            } else {
+                scene.addEventListener('loaded', setupStereo, { once: true });
+                scene.addEventListener('render-target-loaded', setupStereo, { once: true });
+            }
+        },
+
+        disableStereoVR: function () {
+            this._isStereoActive = false;
+            this.removeStereoVRUI();
+        },
+
+        setupStereoVRUI: function () {
+            // Sembunyikan reticle single default
+            const singleReticle = document.querySelector('.reticle-dot');
+            if (singleReticle) singleReticle.style.display = 'none';
+
+            if (!document.getElementById('vr-stereo-overlay')) {
+                const overlay = document.createElement('div');
+                overlay.id = 'vr-stereo-overlay';
+                overlay.innerHTML = `
+                    <div class="vr-divider-line"></div>
+                    <div class="vr-center-marker"></div>
+                    <div class="vr-reticle vr-reticle-left"></div>
+                    <div class="vr-reticle vr-reticle-right"></div>
+                    <div class="vr-mode-badge">
+                        <span>👓 MODE VR STEREOSKOPIK (DOBLE LAYAR KANAN-KIRI)</span>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            }
+        },
+
+        removeStereoVRUI: function () {
+            const overlay = document.getElementById('vr-stereo-overlay');
+            if (overlay) overlay.remove();
+            const singleReticle = document.querySelector('.reticle-dot');
+            if (singleReticle) singleReticle.style.display = 'block';
+        },
 
         init: function (mode) {
             this.activeMode = mode || 'pc';
             console.log(`Inisialisasi kontrol mode: [${this.activeMode.toUpperCase()}]`);
 
             if (this.activeMode === 'mobile') {
+                this.disableStereoVR();
+                this.disableGyro();
                 this.setupMobileUI();
                 this.setupJoystickEvents();
                 this.setupCameraSwipeEvents();
                 this.startMotionLoop();
             } else if (this.activeMode === 'pc') {
+                this.disableStereoVR();
+                this.disableGyro();
                 this.removeMobileUI();
             } else if (this.activeMode === 'vr') {
                 this.removeMobileUI();
-                // A-Frame WebXR menangani kontrol 6DoF secara otomatis
+                this.enableStereoVR();
             }
 
             this.updatePromptBadges();
@@ -194,11 +371,11 @@
                 this.setupXboxReactiveListeners();
             }
 
-            // 3. Area Panduan Geser Kamera Kanan
+            // 3. Area Panduan Geser Kamera Layar Sentuh
             if (!document.getElementById('mobile-swipe-guide')) {
                 const swipeGuide = document.createElement('div');
                 swipeGuide.id = 'mobile-swipe-guide';
-                swipeGuide.innerHTML = `<span>Geser sisi kanan layar untuk memutar kamera</span>`;
+                swipeGuide.innerHTML = `<span>Geser layar untuk memutar kamera (Sentuhan Tangan • Bebas Gyro)</span>`;
                 document.body.appendChild(swipeGuide);
                 setTimeout(() => {
                     if (swipeGuide) swipeGuide.classList.add('fade-out');
@@ -299,6 +476,9 @@
 
         // --- SISTEM ANALOG JOYSTICK (KIRI BAWAH) ---
         setupJoystickEvents: function () {
+            if (this._joystickEventsAttached) return;
+            this._joystickEventsAttached = true;
+
             const base = document.getElementById('joystick-base');
             const stick = document.getElementById('joystick-stick');
             if (!base || !stick) return;
@@ -397,28 +577,49 @@
             window.addEventListener('touchcancel', onTouchEnd, { passive: false });
         },
 
-        // --- SISTEM TOUCH SWIPE CAMERA LOOK (KANAN LAYAR) ---
+        // --- SISTEM TOUCH SWIPE CAMERA LOOK (PERGESERAN TANGAN • BEBAS GYRO) ---
         setupCameraSwipeEvents: function () {
+            if (this._cameraSwipeAttached) return;
+            this._cameraSwipeAttached = true;
+
             let lookTouchId = null;
 
             window.addEventListener('touchstart', (e) => {
                 if (this.activeMode !== 'mobile') return;
                 const screenW = window.innerWidth;
+                const screenH = window.innerHeight;
 
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
-                    // Sentuhan di sisi kanan layar (X > 45% lebar layar)
-                    if (t.clientX > screenW * 0.42 && lookTouchId === null) {
-                        // Pastikan tidak menyentuh tombol aksi kanan
-                        const el = document.elementFromPoint(t.clientX, t.clientY);
-                        if (el && el.closest('#mobile-action-buttons, #top-nav-controls, #gate-screen')) {
+                    if (lookTouchId !== null) continue;
+
+                    // Hindari pojok kiri bawah (area analog joystick) agar jari kiri tidak memutar kamera saat jalan
+                    const isJoystickCorner = (t.clientX < screenW * 0.40 && t.clientY > screenH * 0.45);
+                    if (isJoystickCorner) {
+                        continue;
+                    }
+
+                    // Pastikan tidak menyentuh tombol gamepad atau navigasi atas
+                    const el = document.elementFromPoint(t.clientX, t.clientY);
+                    if (el && el.closest('#virtual-joystick-zone, #mobile-action-buttons, #top-nav-controls, #gate-screen, .interactive-modal')) {
+                        continue;
+                    }
+
+                    // Verifikasi jarak langsung ke base joystick jika ada
+                    const joyBase = document.getElementById('joystick-base');
+                    if (joyBase) {
+                        const bRect = joyBase.getBoundingClientRect();
+                        const bcX = bRect.left + bRect.width / 2;
+                        const bcY = bRect.top + bRect.height / 2;
+                        if (Math.hypot(t.clientX - bcX, t.clientY - bcY) < 85) {
                             continue;
                         }
-                        lookTouchId = t.identifier;
-                        this.touchLookActive = true;
-                        this.lastLookTouch = { x: t.clientX, y: t.clientY };
-                        break;
                     }
+
+                    lookTouchId = t.identifier;
+                    this.touchLookActive = true;
+                    this.lastLookTouch = { x: t.clientX, y: t.clientY };
+                    break;
                 }
             }, { passive: true });
 
@@ -432,10 +633,15 @@
                         this.lastLookTouch = { x: t.clientX, y: t.clientY };
 
                         this.applyCameraRotation(deltaX, deltaY);
+
+                        // Cegah pull-to-refresh / scroll layar bawaan browser saat menggeser kamera
+                        if (e.cancelable) {
+                            e.preventDefault();
+                        }
                         break;
                     }
                 }
-            }, { passive: true });
+            }, { passive: false });
 
             const endLook = (e) => {
                 if (lookTouchId === null) return;
@@ -462,7 +668,7 @@
                 lookControls.yawObject.rotation.y -= deltaX * this.lookSensitivity;
             }
 
-            // Putar Pitch (Atas - Bawah) dengan batas kemiringan aman (-1.4 s/d 1.4 rad)
+            // Putar Pitch (Atas - Bawah) dengan batas kemiringan aman (-1.35 s/d 1.35 rad)
             if (lookControls.pitchObject) {
                 const newPitch = lookControls.pitchObject.rotation.x - deltaY * this.lookSensitivity;
                 lookControls.pitchObject.rotation.x = Math.max(-1.35, Math.min(1.35, newPitch));
@@ -471,6 +677,9 @@
 
         // --- LOOP GERAKAN JOYSTICK KE KAMERA PEMAIN ---
         startMotionLoop: function () {
+            if (this._motionLoopStarted) return;
+            this._motionLoopStarted = true;
+
             let lastTime = performance.now();
 
             const motionTick = (now) => {

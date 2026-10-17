@@ -5,11 +5,14 @@
 // =========================================================================
 
 (function () {
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                           (window.matchMedia && window.matchMedia('(max-width: 768px)').matches && 'ontouchstart' in window);
+
     // Inisialisasi State Global Mensetsu
     window.MensetsuState = {
         studentName: localStorage.getItem('mensetsu_student_name') || '',
         sessionId: localStorage.getItem('mensetsu_session_id') || generateSessionId(),
-        deviceMode: 'pc', // 'pc' | 'mobile' | 'vr'
+        deviceMode: isMobileDevice ? 'mobile' : 'pc', // 'pc' | 'mobile' | 'vr'
         isStarted: false,
         startTime: null,
         knockCount: 0,
@@ -36,14 +39,14 @@
         mobile: {
             name: 'Smartphone / HP',
             icon: 'assets/device-mobile.png',
-            desc: 'Layar Sentuh & Gamepad Xbox',
-            actionDesc: 'Joystick kiri untuk jalan. Tombol Xbox kanan: <span style="color:#ffc800"><strong>Y</strong> (Aksi)</span>, <span style="color:#38bdf8"><strong>X</strong> (Ketuk)</span>, <span style="color:#f87171"><strong>B</strong> (Mic)</span>, <span style="color:#4ade80"><strong>A</strong> (Ojigi)</span>.'
+            desc: 'Layar Sentuh (Bebas Gyro)',
+            actionDesc: 'Geser layar dengan tangan untuk putar kamera (bebas gyro). Joystick kiri untuk jalan. Tombol Xbox kanan: <span style="color:#ffc800"><strong>Y</strong> (Aksi)</span>, <span style="color:#38bdf8"><strong>X</strong> (Ketuk)</span>, <span style="color:#f87171"><strong>B</strong> (Mic)</span>, <span style="color:#4ade80"><strong>A</strong> (Ojigi)</span>.'
         },
         vr: {
             name: 'Headset VR',
             icon: 'assets/device-vr.png',
-            desc: 'WebXR Imersif 6DoF',
-            actionDesc: 'WebXR imersif dengan penjejakan arah pandang mata (Gaze) dan kontroler 6DoF.'
+            desc: 'Doble Layar Stereoskopik',
+            actionDesc: 'Mode VR dual display stereoskopik (layar ganda kiri-kanan untuk Cardboard / VR Box) dengan sensor orientasi kepala 360°.'
         }
     };
 
@@ -123,7 +126,7 @@
                                     </div>
                                     <div class="device-choice-info">
                                         <h3 class="device-choice-title">Smartphone / HP</h3>
-                                        <p class="device-choice-desc">Layar Sentuh & Joystick</p>
+                                        <p class="device-choice-desc">Layar Sentuh (Bebas Gyro)</p>
                                         <span class="device-choice-btn">Pilih Perangkat →</span>
                                     </div>
                                 </div>
@@ -135,7 +138,7 @@
                                     </div>
                                     <div class="device-choice-info">
                                         <h3 class="device-choice-title">Headset VR</h3>
-                                        <p class="device-choice-desc">WebXR Imersif 6DoF</p>
+                                        <p class="device-choice-desc">Doble Layar Kanan-Kiri</p>
                                         <span class="device-choice-btn">Pilih Perangkat →</span>
                                     </div>
                                 </div>
@@ -363,9 +366,24 @@
                 }, 350);
             }
 
+            // Jika mode VR dan di iOS, minta izin sensor orientasi kepala saat tombol diklik
+            if (window.MensetsuState.deviceMode === 'vr' && typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(resp => {
+                    console.log('Izin orientasi sensor VR iOS:', resp);
+                }).catch(() => {});
+            }
+
             // Aktifkan Kontrol Sesuai Mode Perangkat yang Dipilih
             if (window.MensetsuControls && typeof window.MensetsuControls.init === 'function') {
                 window.MensetsuControls.init(window.MensetsuState.deviceMode);
+            }
+
+            // Coba aktifkan fullscreen otomatis untuk kenyamanan VR headset jika didukung
+            if (window.MensetsuState.deviceMode === 'vr' && typeof this.toggleFullscreen === 'function') {
+                const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+                if (!isFs) {
+                    try { this.toggleFullscreen(); } catch (_) {}
+                }
             }
 
             console.log(`Mahasiswa "${name}" (${window.MensetsuState.sessionId}) memulai simulasi dalam mode: ${window.MensetsuState.deviceMode}`);
