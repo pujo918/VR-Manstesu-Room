@@ -23,15 +23,15 @@
         }
 
         // 2. Sesi tanya jawab aktif & menunggu jawaban kandidat -> mulai merekam
-        if (interview && (interview.isWaitingForCandidateAnswer || interview.currentStep === 'ANSWER_1' || interview.currentStep === 'ANSWER_2')) {
-            const qKey = interview.currentQuestionKey || (interview.currentStep === 'ANSWER_1' ? 'question1' : 'question2');
+        if (interview && (interview.isWaitingForCandidateAnswer || (typeof interview.currentStep === 'string' && interview.currentStep.startsWith('ANSWER_')))) {
+            const qKey = interview.currentQuestionKey || 'question1';
             interview.isCandidateAnswering = true;
             if (window.MensetsuRecorder) {
                 window.MensetsuRecorder.startRecording(qKey);
             }
             if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
             if (typeof window.showActionToast === 'function') {
-                window.showActionToast('🔴 Merekam jawaban... Tekan B lagi setelah selesai bicara.');
+                window.showActionToast('Merekam jawaban... Tekan B lagi setelah selesai bicara.');
             }
             return;
         }
@@ -39,7 +39,7 @@
         // 3. Jika sedang duduk di kursi kandidat tapi belum giliran menjawab (NPC sedang bicara)
         if (window.isSitting) {
             if (typeof window.showActionToast === 'function') {
-                window.showActionToast('🎙️ Dengarkan pertanyaan pewawancara terlebih dahulu.');
+                window.showActionToast('Dengarkan pertanyaan pewawancara terlebih dahulu.');
             }
             return;
         }
@@ -68,117 +68,8 @@
         _vrClickAttached: false,
         _origPixelRatio: null,
 
-        // --- SISTEM ULTRA-SMOOTH VR HEAD TRACKING (QUATERNION SLERP & ANTI-JITTER) ---
-        _vrTracker: {
-            isActive: false,
-            hasSensorData: false,
-            initialYawOffset: 0,
-            hasCalibratedYaw: false,
-            targetQuat: null,
-            currentQuat: null,
-            tempEuler: null,
-            q0: null,
-            q1: null,
-            zee: null,
-            _finalQuat: null,
-            _yawQuat: null,
-            _handler: null,
-
-            init: function () {
-                if (this.targetQuat) return;
-                this.targetQuat = new AFRAME.THREE.Quaternion();
-                this.currentQuat = new AFRAME.THREE.Quaternion();
-                this.tempEuler = new AFRAME.THREE.Euler();
-                this.q0 = new AFRAME.THREE.Quaternion();
-                this.q1 = new AFRAME.THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // -PI/2 sumbu X
-                this.zee = new AFRAME.THREE.Vector3(0, 0, 1);
-                this._finalQuat = new AFRAME.THREE.Quaternion();
-                this._yawQuat = new AFRAME.THREE.Quaternion();
-            },
-
-            start: function () {
-                this.init();
-                this.isActive = true;
-                this.hasSensorData = false;
-                this.hasCalibratedYaw = false;
-                this.initialYawOffset = 0;
-
-                if (!this._handler) {
-                    this._handler = (e) => this.onOrientation(e);
-                }
-
-                window.addEventListener('deviceorientationabsolute', this._handler, { passive: true });
-                window.addEventListener('deviceorientation', this._handler, { passive: true });
-            },
-
-            stop: function () {
-                this.isActive = false;
-                if (this._handler) {
-                    window.removeEventListener('deviceorientationabsolute', this._handler);
-                    window.removeEventListener('deviceorientation', this._handler);
-                }
-            },
-
-            onOrientation: function (e) {
-                if (!this.isActive) return;
-                if (e.alpha === null || e.beta === null || e.gamma === null) return;
-
-                const degToRad = Math.PI / 180;
-                const alpha = (e.alpha || 0) * degToRad;
-                const beta = (e.beta || 0) * degToRad;
-                const gamma = (e.gamma || 0) * degToRad;
-
-                // Dapatkan sudut orientasi layar (landscape 90/-90 vs portrait 0)
-                let screenAngle = 0;
-                if (window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined) {
-                    screenAngle = window.screen.orientation.angle;
-                } else if (typeof window.orientation === 'number') {
-                    screenAngle = window.orientation;
-                }
-                const screenAngleRad = screenAngle * degToRad;
-
-                // 1. Hitung Quaternion rotasi dari sudut sensor (Euler order 'YXZ')
-                this.tempEuler.set(beta, alpha, -gamma, 'YXZ');
-                this.targetQuat.setFromEuler(this.tempEuler);
-
-                // 2. Koreksi arah hadap kamera (kamera menghadap ke belakang smartphone)
-                this.targetQuat.multiply(this.q1);
-
-                // 3. Kompensasi sudut layar landscape
-                this.targetQuat.multiply(this.q0.setFromAxisAngle(this.zee, -screenAngleRad));
-
-                // 4. Kalibrasi orientasi awal saat pertama masuk VR
-                if (!this.hasCalibratedYaw) {
-                    this.hasCalibratedYaw = true;
-                    const rawEuler = new AFRAME.THREE.Euler().setFromQuaternion(this.targetQuat, 'YXZ');
-                    // Menghadap arah ruang tunggu / pintu (180 derajat)
-                    this.initialYawOffset = Math.PI - rawEuler.y;
-                    this.currentQuat.copy(this.targetQuat);
-                }
-
-                this.hasSensorData = true;
-            },
-
-            update: function (camEl) {
-                if (!this.isActive || !this.hasSensorData || !camEl) return;
-
-                // Spherical Linear Interpolation (SLERP) untuk membuang patah-patah & noise sensor
-                // Faktor 0.28 memberikan responsivitas instan tanpa latency dan pergerakan 100% mulus 60 FPS
-                this.currentQuat.slerp(this.targetQuat, 0.28);
-
-                this._yawQuat.setFromAxisAngle(AFRAME.THREE.Object3D.DEFAULT_UP, this.initialYawOffset);
-                this._finalQuat.multiplyQuaternions(this._yawQuat, this.currentQuat);
-
-                if (camEl.object3D) {
-                    camEl.object3D.quaternion.copy(this._finalQuat);
-                    camEl.object3D.updateMatrixWorld(true);
-                }
-            }
-        },
-
         // Menonaktifkan Gyroscope (Device Orientation) di mode mobile agar murni pergeseran tangan
         disableGyro: function () {
-            this._vrTracker.stop();
             const applyLookConfig = () => {
                 const camEl = document.getElementById('player-camera');
                 if (!camEl) return;
@@ -233,24 +124,26 @@
                     this._stereoCam.eyeSep = 0.064; // Interpupillary distance standar ~64mm
                 }
 
-                // 3. Mulai pelacakan orientasi kepala VR super halus (Slerp Filter)
-                this._vrTracker.start();
-
-                // 4. Pastikan look-controls tidak menjalankan magicWindow bawaan A-Frame yang patah-patah
+                // 3. Aktifkan Head Tracking (Device Orientation / Gyroscope) bawaan A-Frame yang stabil & bebas glitch
                 const camEl = document.getElementById('player-camera');
                 if (camEl) {
                     camEl.setAttribute('look-controls', {
-                        magicWindowTrackingEnabled: false,
+                        magicWindowTrackingEnabled: true,
                         touchEnabled: false,
-                        mouseEnabled: true
+                        mouseEnabled: false
                     });
                     const lc = camEl.components['look-controls'];
-                    if (lc && typeof lc.removeMagicWindowEvents === 'function') {
-                        lc.removeMagicWindowEvents();
+                    if (lc) {
+                        lc.data.magicWindowTrackingEnabled = true;
+                        lc.data.touchEnabled = false;
+                        lc.data.mouseEnabled = false;
+                        if (typeof lc.addMagicWindowEvents === 'function') {
+                            lc.addMagicWindowEvents();
+                        }
                     }
                 }
 
-                // 5. Intersepsi loop render renderer untuk membelah layar jadi 2 (mata kiri & mata kanan)
+                // 4. Intersepsi loop render renderer untuk membelah layar jadi 2 (mata kiri & mata kanan)
                 if (!this._origRender) {
                     this._origRender = renderer.render.bind(renderer);
                     const self = this;
@@ -258,12 +151,6 @@
                     renderer.render = function (s, c) {
                         if (!self._isStereoActive || !c) {
                             return self._origRender(s, c);
-                        }
-
-                        // Update orientasi kepala mulus sebelum kalkulasi kamera stereo
-                        const playerCam = document.getElementById('player-camera');
-                        if (playerCam) {
-                            self._vrTracker.update(playerCam);
                         }
 
                         const size = renderer.getSize(new AFRAME.THREE.Vector2());
@@ -296,15 +183,15 @@
 
                 this._isStereoActive = true;
 
-                // 6. Buat Elemen UI VR (Garis pemisah tengah & Dual Reticle Dot)
+                // 5. Buat Elemen UI VR (Garis pemisah tengah & Dual Reticle Dot)
                 this.setupStereoVRUI();
 
-                // 7. Tambahkan interaksi sentuh layar / tombol headset Cardboard
+                // 6. Tambahkan interaksi sentuh layar / tombol headset Cardboard
                 if (!this._vrClickAttached) {
                     this._vrClickAttached = true;
                     window.addEventListener('click', (e) => {
                         if (this.activeMode !== 'vr') return;
-                        if (e.target && e.target.closest('#top-nav-controls, #gate-screen')) {
+                        if (e.target && e.target.closest('#top-nav-controls, #gate-screen, #reception-menu-overlay')) {
                             return;
                         }
                         if (typeof window.triggerAction === 'function') {
@@ -324,7 +211,7 @@
 
         disableStereoVR: function () {
             this._isStereoActive = false;
-            this._vrTracker.stop();
+            document.body.classList.remove('vr-stereo-mode');
             this.removeStereoVRUI();
 
             const scene = document.querySelector('a-scene');
@@ -334,6 +221,8 @@
         },
 
         setupStereoVRUI: function () {
+            document.body.classList.add('vr-stereo-mode');
+
             // Sembunyikan reticle single default
             const singleReticle = document.querySelector('.reticle-dot');
             if (singleReticle) singleReticle.style.display = 'none';
@@ -347,7 +236,7 @@
                     <div class="vr-reticle vr-reticle-left"></div>
                     <div class="vr-reticle vr-reticle-right"></div>
                     <div class="vr-mode-badge">
-                        <span>👓 MODE VR STEREOSKOPIK (DOBLE LAYAR KANAN-KIRI)</span>
+                        <span>MODE VR STEREOSKOPIK (LAYAR KANAN-KIRI)</span>
                     </div>
                 `;
                 document.body.appendChild(overlay);
@@ -355,6 +244,7 @@
         },
 
         removeStereoVRUI: function () {
+            document.body.classList.remove('vr-stereo-mode');
             const overlay = document.getElementById('vr-stereo-overlay');
             if (overlay) overlay.remove();
             const singleReticle = document.querySelector('.reticle-dot');
@@ -890,6 +780,12 @@
             let ax = gp.axes[0] || 0;
             let ay = gp.axes[1] || 0;
 
+            // Fallback jika controller memetakan D-Pad ke buttons (12: Up, 13: Down, 14: Left, 15: Right)
+            if (gp.buttons[12] && (gp.buttons[12].pressed || gp.buttons[12].value > 0.5)) ay = -1;
+            if (gp.buttons[13] && (gp.buttons[13].pressed || gp.buttons[13].value > 0.5)) ay = 1;
+            if (gp.buttons[14] && (gp.buttons[14].pressed || gp.buttons[14].value > 0.5)) ax = -1;
+            if (gp.buttons[15] && (gp.buttons[15].pressed || gp.buttons[15].value > 0.5)) ax = 1;
+
             const deadzone = 0.15;
             if (Math.abs(ax) < deadzone) ax = 0;
             if (Math.abs(ay) < deadzone) ay = 0;
@@ -981,17 +877,26 @@
                 }
             });
 
-            // Tombol 4 & 5 (2 Tombol Samping / Shoulder / Trigger pada VR Controller):
-            // Samping Atas: Aksi (Sangat ergonomis dijangkau jari telunjuk)
+            // Tombol 4, 5, 6, 7 (Tombol Samping / Shoulder / Trigger pada VR Controller):
+            // Samping Atas (L1/R1 / Trigger Depan): Aksi (Paling mudah ditekan telunjuk)
             checkButton(4, () => {
                 if (typeof window.triggerAction === 'function') {
                     window.triggerAction();
                 }
             });
-            // Samping Bawah: Ojigi
             checkButton(5, () => {
                 if (typeof window.triggerOjigi === 'function') {
                     window.triggerOjigi();
+                }
+            });
+            checkButton(6, () => {
+                if (typeof window.triggerAction === 'function') {
+                    window.triggerAction();
+                }
+            });
+            checkButton(7, () => {
+                if (typeof window.triggerAction === 'function') {
+                    window.triggerAction();
                 }
             });
         }

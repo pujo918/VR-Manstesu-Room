@@ -17,8 +17,12 @@
         mediaRecorder: null,
         audioChunks: [],
         recordedAudios: {
-            question1: null, // Base64 data
-            question2: null
+            question_intro: null,
+            question1: null,
+            question2: null,
+            question3: null,
+            question4: null,
+            question5: null
         },
         currentQuestionKey: null,
         isRecording: false,
@@ -174,8 +178,12 @@
                 hasWatchedVideo: (window.MensetsuState && window.MensetsuState.hasWatchedVideo) ? 'Sudah Ditonton' : 'Belum Ditonton',
                 totalMannerScore: window.MannerEvaluation ? window.MannerEvaluation.getTotalScore() : 0,
                 mannerDetails: window.MannerEvaluation ? window.MannerEvaluation.getSummaryPayload().conciseNote : '-',
+                audioIntro: this.recordedAudios.question_intro || '',
                 audioQ1: this.recordedAudios.question1 || '',
-                audioQ2: this.recordedAudios.question2 || ''
+                audioQ2: this.recordedAudios.question2 || '',
+                audioQ3: this.recordedAudios.question3 || '',
+                audioQ4: this.recordedAudios.question4 || '',
+                audioQ5: this.recordedAudios.question5 || ''
             };
 
             const endpoint = window.MensetsuGoogleConfig.scriptUrl;

@@ -64,7 +64,8 @@ AFRAME.registerComponent('player-collision-and-proximity', {
             }
         }
 
-        // 2. DETEKSI JARAK KE PINTU & JENDELA (Video TV hanya aktif saat duduk di sofa)
+        // 2. DETEKSI JARAK KE MEJA RESEPSIONIS, PINTU & JENDELA
+        const distToReception = (pos.z > 6.2) ? Math.hypot(pos.x - 1.85, pos.z - 10.45) : 99;
         const distToDoor = Math.hypot(pos.x - 0, pos.z - 6.0);
         const distToWindow = Math.hypot(pos.x - 3.94, pos.z - 0);
 
@@ -74,6 +75,8 @@ AFRAME.registerComponent('player-collision-and-proximity', {
         if (closestSeat) {
             targetAction = 'chair';
             targetSeat = closestSeat;
+        } else if (distToReception < 2.5) {
+            targetAction = 'receptionist';
         } else if (distToDoor < 2.3) {
             targetAction = 'door';
         } else if (distToWindow < 2.5) {
@@ -98,7 +101,10 @@ AFRAME.registerComponent('player-collision-and-proximity', {
             if (targetAction) {
                 btnY.classList.add('can-interact');
                 if (subY) {
-                    if (targetAction === 'door') subY.textContent = window.isDoorOpen ? 'Tutup' : 'Buka';
+                    if (targetAction === 'receptionist') {
+                        const isMenuOpen = window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen;
+                        subY.textContent = isMenuOpen ? 'Tutup' : 'Bicara';
+                    } else if (targetAction === 'door') subY.textContent = window.isDoorOpen ? 'Tutup' : 'Buka';
                     else if (targetAction === 'chair') subY.textContent = 'Duduk';
                     else if (targetAction === 'window') subY.textContent = 'Jendela';
                     else subY.textContent = 'Aksi';

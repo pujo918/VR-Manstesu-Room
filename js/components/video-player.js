@@ -140,16 +140,38 @@
     });
 
     // =========================================================================
-    // MODAL POPUP VIDEO PEMBELAJARAN
+    // MODAL POPUP VIDEO PEMBELAJARAN & PANGGILAN OTOMATIS MASUK RUANG MENSETSU
     // =========================================================================
+    function completeVideoAndCallCandidate() {
+        if (!window.MensetsuState) window.MensetsuState = {};
+        const wasAlreadyCalled = !!window.MensetsuState.isCalledForInterview;
+
+        window.MensetsuState.hasWatchedVideo = true;
+        window.MensetsuState.isCalledForInterview = true;
+
+        window.dispatchEvent(new CustomEvent('mensetsu-video-watched'));
+        window.dispatchEvent(new CustomEvent('mensetsu-called-to-enter'));
+
+        if (!wasAlreadyCalled) {
+            setTimeout(() => {
+                if (window.MensetsuReceptionist && typeof window.MensetsuReceptionist.callCandidateToEnter === 'function') {
+                    window.MensetsuReceptionist.callCandidateToEnter();
+                } else if (typeof window.showActionToast === 'function') {
+                    window.showActionToast('Giliran wawancara Anda telah tiba. Lampu di atas pintu telah hijau, silakan masuk.');
+                }
+            }, 450);
+        }
+    }
+
     window.openLearningVideo = function (customUrl) {
         if (document.getElementById('video-learning-modal')) return;
 
-        // Validasi: Pengguna HANYA boleh menonton video YouTube jika sudah duduk di sofa ruang tunggu
+        // Validasi: Pengguna cukup duduk di sofa ruang tunggu untuk langsung menonton video panduan di TV
+        // (Interaksi ke resepsionis bersifat opsional jika pengguna ingin bertanya panduan)
         const isSittingOnSofa = window.isSitting && window.currentSeat && window.currentSeat.id === 'waiting-sofa';
         if (!isSittingOnSofa) {
             if (typeof window.showActionToast === 'function') {
-                window.showActionToast('Silakan duduk di sofa ruang tunggu untuk menonton video pembelajaran.');
+                window.showActionToast('Silakan duduk di sofa ruang tunggu untuk menonton video panduan.');
             }
             return;
         }
@@ -187,7 +209,7 @@
                         <span id="vm-status-text">${window.MensetsuState && window.MensetsuState.hasWatchedVideo ? 'Status: Selesai dipelajari' : 'Status: Sedang dipelajari'}</span>
                     </div>
                     <button type="button" class="btn-mark-watched" id="btn-mark-watched">
-                        <span>Konfirmasi selesai belajar</span>
+                        <span>Selesai menonton panduan</span>
                     </button>
                 </div>
             </div>
@@ -196,40 +218,57 @@
 
         const closeBtn = document.getElementById('btn-close-vm');
         const markWatchedBtn = document.getElementById('btn-mark-watched');
+        const iframeEl = document.getElementById('learning-iframe');
 
-        const closeModal = () => {
+        let isClosing = false;
+        const finishAndCloseModal = () => {
+            if (isClosing) return;
+            isClosing = true;
             window.removeEventListener('keydown', handleEsc);
+            window.removeEventListener('message', handleYouTubeMessage);
             modal.remove();
+            completeVideoAndCallCandidate();
         };
 
         const handleEsc = (e) => {
-            if (e.key === 'Escape') closeModal();
+            if (e.key === 'Escape') finishAndCloseModal();
         };
 
+        // Deteksi otomatis saat video YouTube selesai diputar (ENDED: playerState === 0)
+        const handleYouTubeMessage = (e) => {
+            if (!e.data || typeof e.data !== 'string') return;
+            try {
+                const data = JSON.parse(e.data);
+                if (
+                    (data.event === 'infoDelivery' && data.info && data.info.playerState === 0) ||
+                    (data.event === 'onStateChange' && data.info === 0)
+                ) {
+                    finishAndCloseModal();
+                }
+            } catch (_) {}
+        };
+
+        if (iframeEl) {
+            iframeEl.addEventListener('load', () => {
+                try {
+                    iframeEl.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'learning-iframe' }), '*');
+                } catch (_) {}
+            });
+        }
+
         window.addEventListener('keydown', handleEsc);
+        window.addEventListener('message', handleYouTubeMessage);
 
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
+            if (e.target === modal) finishAndCloseModal();
         });
 
-        closeBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', finishAndCloseModal);
 
         markWatchedBtn.addEventListener('click', () => {
-            if (!window.MensetsuState) window.MensetsuState = {};
-            window.MensetsuState.hasWatchedVideo = true;
-
             const statusTxt = document.getElementById('vm-status-text');
             if (statusTxt) statusTxt.textContent = 'Status: Selesai dipelajari';
-
-            window.dispatchEvent(new CustomEvent('mensetsu-video-watched'));
-
-            if (typeof window.showActionToast === 'function') {
-                window.showActionToast('Video pembelajaran selesai dipelajari.');
-            }
-
-            setTimeout(() => {
-                closeModal();
-            }, 500);
+            finishAndCloseModal();
         });
     };
 })();

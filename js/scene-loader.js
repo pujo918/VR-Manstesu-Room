@@ -21,8 +21,8 @@ async function loadScenePart(elementId, filePath) {
 
 async function initScenes() {
     await Promise.all([
-        loadScenePart('scene-interview-room', 'scenes/interview-room.html'),
-        loadScenePart('scene-waiting-room', 'scenes/waiting-room.html')
+        loadScenePart('scene-interview-room', 'scenes/interview-room.html?v=2.1'),
+        loadScenePart('scene-waiting-room', 'scenes/waiting-room.html?v=2.1')
     ]);
     console.log('Semua scene ruangan 3D Mensetsu VR berhasil dimuat.');
     window.dispatchEvent(new CustomEvent('scenes-loaded'));

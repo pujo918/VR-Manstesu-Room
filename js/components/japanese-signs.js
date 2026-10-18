@@ -395,66 +395,124 @@ AFRAME.registerComponent('jp-door-sign', {
 
 // -------------------------------------------------------------------------
 // 5. KOMPONEN LAMPU STATUS DI ATAS PINTU: jp-door-indicator
-// Menghasilkan kotak lampu status menyala merah "第1面接室 / 【 面接中 】"
+// Awal: Menyala Merah "第1面接室 / 【 準 備 中 】" (Belum Boleh Masuk)
+// Setelah Dipanggil: Menyala Hijau "第1面接室 / 【 入 室 可 】" (Silakan Masuk)
 // -------------------------------------------------------------------------
 AFRAME.registerComponent('jp-door-indicator', {
     init: function () {
-        const canvas = document.createElement('canvas');
-        canvas.width = 512;
-        canvas.height = 200;
-        const ctx = canvas.getContext('2d');
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = 512;
+        this.canvas.height = 200;
+        this.ctx = this.canvas.getContext('2d');
 
-        // Latar belakang merah glowing
-        ctx.fillStyle = '#b91c1c';
-        ctx.fillRect(0, 0, 512, 200);
-
-        // Border list putih bercahaya
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(10, 10, 492, 180);
-
-        // Header: 第1面接室
-        ctx.fillStyle = '#fecaca';
-        ctx.font = 'bold 44px "Yu Gothic", "Meiryo", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('第 1 面 接 室', 256, 68);
-
-        // Status: 【 面 接 中 】
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 64px "Yu Gothic", "Meiryo", sans-serif';
-        ctx.fillText('【 面 接 中 】', 256, 140);
-
-        const tex = new THREE.CanvasTexture(canvas);
-        tex.generateMipmaps = true;
+        this.tex = new THREE.CanvasTexture(this.canvas);
+        this.tex.generateMipmaps = true;
 
         const group = new THREE.Group();
 
-        // Bodi lampu merah emissive
-        const box = new THREE.Mesh(
-            new THREE.BoxGeometry(0.60, 0.22, 0.04),
-            new THREE.MeshStandardMaterial({
-                color: 0xdc2626,
-                emissive: 0xb91c1c,
-                emissiveIntensity: 0.4,
-                roughness: 0.35
-            })
-        );
-        group.add(box);
+        this.boxMat = new THREE.MeshStandardMaterial({
+            color: 0xdc2626,
+            emissive: 0xb91c1c,
+            emissiveIntensity: 0.45,
+            roughness: 0.35
+        });
 
-        // Muka tulisan bercahaya
-        const face = new THREE.Mesh(
-            new THREE.PlaneGeometry(0.58, 0.20),
-            new THREE.MeshStandardMaterial({
-                map: tex,
-                emissive: 0xffffff,
-                emissiveIntensity: 0.3,
-                roughness: 0.3
-            })
+        this.boxMesh = new THREE.Mesh(
+            new THREE.BoxGeometry(0.60, 0.22, 0.04),
+            this.boxMat
         );
-        face.position.set(0, 0, 0.022);
-        group.add(face);
+        group.add(this.boxMesh);
+
+        this.faceMat = new THREE.MeshStandardMaterial({
+            map: this.tex,
+            emissive: 0xffffff,
+            emissiveIntensity: 0.35,
+            roughness: 0.3
+        });
+
+        this.faceMesh = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.58, 0.20),
+            this.faceMat
+        );
+        this.faceMesh.position.set(0, 0, 0.022);
+        group.add(this.faceMesh);
 
         this.el.setObject3D('mesh', group);
+
+        const isAlreadyCalled = !!(window.MensetsuState && window.MensetsuState.isCalledForInterview);
+        this.updateIndicatorState(isAlreadyCalled);
+
+        this._onCalled = () => {
+            this.updateIndicatorState(true);
+        };
+        window.addEventListener('mensetsu-called-to-enter', this._onCalled);
+        window.addEventListener('mensetsu-video-watched', this._onCalled);
+    },
+
+    updateIndicatorState: function (isAllowed) {
+        const ctx = this.ctx;
+        if (!ctx) return;
+
+        if (isAllowed) {
+            // Latar belakang Hijau Emerald Menyala (Boleh Masuk)
+            ctx.fillStyle = '#15803d';
+            ctx.fillRect(0, 0, 512, 200);
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(10, 10, 492, 180);
+
+            ctx.fillStyle = '#bbf7d0';
+            ctx.font = 'bold 44px "Yu Gothic", "Meiryo", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('第 1 面 接 室', 256, 68);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 64px "Yu Gothic", "Meiryo", sans-serif';
+            ctx.fillText('【 入 室 可 】', 256, 140);
+
+            if (this.boxMat) {
+                this.boxMat.color.setHex(0x16a34a);
+                this.boxMat.emissive.setHex(0x15803d);
+                this.boxMat.emissiveIntensity = 0.65;
+                this.boxMat.needsUpdate = true;
+            }
+        } else {
+            // Latar belakang Merah Menyala (Belum Dipanggil / Tidak Boleh Masuk)
+            ctx.fillStyle = '#b91c1c';
+            ctx.fillRect(0, 0, 512, 200);
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(10, 10, 492, 180);
+
+            ctx.fillStyle = '#fecaca';
+            ctx.font = 'bold 44px "Yu Gothic", "Meiryo", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('第 1 面 接 室', 256, 68);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 64px "Yu Gothic", "Meiryo", sans-serif';
+            ctx.fillText('【 準 備 中 】', 256, 140);
+
+            if (this.boxMat) {
+                this.boxMat.color.setHex(0xdc2626);
+                this.boxMat.emissive.setHex(0xb91c1c);
+                this.boxMat.emissiveIntensity = 0.45;
+                this.boxMat.needsUpdate = true;
+            }
+        }
+
+        if (this.tex) {
+            this.tex.needsUpdate = true;
+        }
+    },
+
+    remove: function () {
+        if (this._onCalled) {
+            window.removeEventListener('mensetsu-called-to-enter', this._onCalled);
+            window.removeEventListener('mensetsu-video-watched', this._onCalled);
+        }
     }
 });
 
@@ -681,7 +739,7 @@ AFRAME.registerComponent('jp-interview-desk', {
         rirekiPaper.rotation.z = Math.PI; // Menghadap pewawancara
         rirekiPaper.position.set(0, 0.007, 0);
         rirekiGroup.add(rirekiPaper);
-        rirekiGroup.position.set(-0.16, 0.005, 0);
+        rirekiGroup.position.set(0.17, 0.005, 0);
         group.add(rirekiGroup);
 
         // -------------------------------------------------------------
@@ -804,7 +862,7 @@ AFRAME.registerComponent('jp-interview-desk', {
         scorePaper.position.set(0, 0.008, -0.01);
         scoreGroup.add(scorePaper);
 
-        scoreGroup.position.set(0.18, 0.006, 0);
+        scoreGroup.position.set(-0.17, 0.006, 0);
         group.add(scoreGroup);
 
         // -------------------------------------------------------------
@@ -1004,7 +1062,7 @@ AFRAME.registerComponent('jp-interview-desk', {
             paperMesh.position.set(0, 0.008, -0.01);
             cGroup.add(paperMesh);
 
-            cGroup.position.set(xPos, 0.006, -0.05);
+            cGroup.position.set(xPos, 0.006, 0.0);
             return cGroup;
         };
 

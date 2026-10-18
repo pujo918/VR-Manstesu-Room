@@ -86,25 +86,23 @@ window.ALL_SEATS = [
         sitPos: { x: -3.25, y: 1.05, z: 10.0 }, // Selalu tepat di tengah sofa
         standPos: { x: -2.60, y: 1.6, z: 10.0 }, // Berdiri nyaman di lorong depan sofa (clearance lega)
         lookRotation: { x: 0, y: -90, z: 0 } // Menghadap lurus sejajar TV (+X)
-    },
-    // 6. Kursi Kerja Ergonomis Resepsionis
-    // Duduk menghadap ke arah counter & lobby ruang tunggu (-X)
-    {
-        id: 'reception-chair',
-        name: 'Kursi Resepsionis',
-        promptLabel: 'DUDUK DI KURSI RESEPSIONIS',
-        statusName: 'Duduk di Kursi Resepsionis (受付席)',
-        detectX: 2.1,
-        detectZ: 10.5,
-        radius: 2.2,
-        sitPos: { x: 3.48, y: 1.15, z: 10.5 },
-        standPos: { x: 1.4, y: 1.6, z: 10.5 },
-        lookRotation: { x: 0, y: 90, z: 0 } // Menghadap ke arah tamu & lobby (-X)
     }
 ];
 
 // Buka / Tutup Pintu Mensetsu
 function toggleDoor() {
+    // Validasi Alur sebelum pintu dapat dibuka dari ruang tunggu:
+    // User cukup menonton panduan di televisi sofa hingga dipanggil (lampu atas pintu hijau).
+    // Resepsionis bersifat opsional untuk bertanya panduan.
+    if (!window.isDoorOpen) {
+        if (!window.MensetsuState || !window.MensetsuState.hasWatchedVideo || !window.MensetsuState.isCalledForInterview) {
+            if (typeof window.showActionToast === 'function') {
+                window.showActionToast('Belum dipanggil masuk (Lampu atas pintu masih merah). Silakan duduk di sofa dan tonton panduan di TV terlebih dahulu.');
+            }
+            return;
+        }
+    }
+
     window.isDoorOpen = !window.isDoorOpen;
     const doorPivot = document.getElementById('door-pivot');
     if (doorPivot) {
@@ -150,6 +148,16 @@ function toggleWindow() {
 // Duduk di Kursi/Sofa Tertentu
 function sitOnSeat(seat) {
     if (!seat || window.isTransitioningSeat) return;
+
+    // Cegah duduk di kursi dalam ruang wawancara jika pemain masih berada di ruang tunggu
+    if (seat.id !== 'waiting-sofa') {
+        const cam = document.getElementById('player-camera');
+        const camPos = cam && cam.object3D ? cam.object3D.position : null;
+        if (camPos && camPos.z > 5.8) {
+            return;
+        }
+    }
+
     window.isSitting = true;
     window.isTransitioningSeat = true;
     window.currentSeat = seat;
@@ -337,6 +345,12 @@ window.triggerKnock = function () {
             return;
         }
 
+        // Validasi Alur sebelum mengetuk pintu ruang wawancara (cukup menonton panduan TV hingga dipanggil)
+        if (!window.MensetsuState || !window.MensetsuState.hasWatchedVideo || !window.MensetsuState.isCalledForInterview) {
+            window.showActionToast('Belum dipanggil masuk (Lampu atas pintu masih merah). Silakan duduk di sofa dan tonton panduan di TV terlebih dahulu.');
+            return;
+        }
+
         // Jika pintu sudah dalam keadaan terbuka lebar
         if (window.isDoorOpen) {
             window.showActionToast('Pintu sudah terbuka. Silakan langsung masuk ke ruang wawancara.');
@@ -438,6 +452,11 @@ window.triggerOjigi = function () {
 
 // 3. Pemicu Aksi Interaktif Umum (Aksi Tombol Y / F)
 window.triggerAction = function () {
+    if (window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen) {
+        window.MensetsuReceptionist.closeMenu(true);
+        return;
+    }
+
     if (window.isSitting) {
         // Jika sedang duduk di sofa ruang tunggu, tombol Y memutar video YouTube
         if (window.currentSeat && window.currentSeat.id === 'waiting-sofa') {
@@ -447,6 +466,10 @@ window.triggerAction = function () {
             }
         }
         standUp();
+    } else if (window.currentNearbyAction === 'receptionist') {
+        if (window.MensetsuReceptionist && typeof window.MensetsuReceptionist.interact === 'function') {
+            window.MensetsuReceptionist.interact();
+        }
     } else if (window.currentNearbyAction === 'chair') {
         if (window.currentNearbySeat) {
             sitOnSeat(window.currentNearbySeat);
@@ -497,8 +520,9 @@ window.addEventListener('keydown', function (e) {
 
     const key = e.key.toLowerCase();
     
-    // Tombol F, Y, atau D (VR Controller) untuk interaksi utama (Aksi)
-    if (key === 'f' || key === 'y' || key === 'd') {
+    // Tombol F, E, atau Y untuk interaksi utama (Aksi)
+    // Catatan: Tombol D KHUSUS untuk WASD (gerak nyamping kanan), JANGAN dijadikan tombol interaksi
+    if (key === 'f' || key === 'e' || key === 'y') {
         window.triggerAction();
     }
     // Tombol K atau X untuk mengetuk pintu
