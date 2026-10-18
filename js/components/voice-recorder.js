@@ -6,8 +6,8 @@
 (function () {
     // URL Endpoint Google Apps Script Web App (Dapat diubah oleh Sensei/Developer)
     window.MensetsuGoogleConfig = {
-        // Ganti URL di bawah ini dengan URL Web App Deployment dari script Code.gs
-        scriptUrl: localStorage.getItem('mensetsu_gas_url') || '',
+        // URL Web App Deployment dari script Code.gs
+        scriptUrl: localStorage.getItem('mensetsu_gas_url') || 'https://script.google.com/macros/s/AKfycbxvC0Ft6EhIAQY3wNUT3Xk2p0hpYrEpTrHvGSakIXPFiTOmWjtSfllQBvmcchEpKBh7/exec',
         isConfigured: function () {
             return !!this.scriptUrl && this.scriptUrl.startsWith('https://script.google.com');
         }
