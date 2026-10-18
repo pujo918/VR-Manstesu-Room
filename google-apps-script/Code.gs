@@ -48,14 +48,16 @@ function doPost(e) {
       sheet.setFrozenRows(1);
     }
 
-    // 2. Buat Folder Penyimpanan Audio di Google Drive Sensei (5TB)
-    var rootFolderName = "Mensetsu_Recordings";
-    var rootFolders = DriveApp.getFoldersByName(rootFolderName);
+    // 2. Akses Folder Penyimpanan Audio Resmi di Google Drive Sensei
+    var targetFolderId = "1DJneZ0RNYYFVDi6YVTW7rLFn-evZa_J-";
     var rootFolder;
-    if (rootFolders.hasNext()) {
-      rootFolder = rootFolders.next();
-    } else {
-      rootFolder = DriveApp.createFolder(rootFolderName);
+    try {
+      rootFolder = DriveApp.getFolderById(targetFolderId);
+    } catch (err) {
+      // Fallback jika folder ID Sensei belum memiliki izin edit
+      var rootFolderName = "Mensetsu_Recordings";
+      var rootFolders = DriveApp.getFoldersByName(rootFolderName);
+      rootFolder = rootFolders.hasNext() ? rootFolders.next() : DriveApp.createFolder(rootFolderName);
     }
 
     // Subfolder per Mahasiswa: [Nama]_[SessionID]
