@@ -26,27 +26,35 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName("Nilai_Wawancara");
 
-    // Jika sheet belum ada, buat dan buatkan header resmi
+    var headers = [
+      "Timestamp",
+      "Session ID",
+      "Nama Mahasiswa",
+      "Perangkat",
+      "Status Video",
+      "Nilai Etika Otomatis (0-30)",
+      "Rincian Etika",
+      "Nilai Bahasa & Kelancaran (0-35)",
+      "Nilai Struktur Quartet II (0-35)",
+      "Total Skor (0-100)",
+      "Link Folder Drive Mahasiswa",
+      "Audio Intro (Perkenalan Diri / Jikoshoukai)",
+      "Audio Q1 (Alasan Studi ke Jepang)",
+      "Audio Q2 (Alasan Memilih Kampus)",
+      "Audio Q3 (Sumber Informasi Kampus)",
+      "Audio Q4 (Kelebihan Diri / Chousho)",
+      "Audio Q5 (Kekurangan & Solusi / Tansho)"
+    ];
+
+    // Jika sheet belum ada, buat baru; jika sudah ada, pastikan header ter-update lengkap 17 kolom
     if (!sheet) {
       sheet = ss.insertSheet("Nilai_Wawancara");
-      var headers = [
-        "Timestamp",
-        "Session ID",
-        "Nama Mahasiswa",
-        "Perangkat",
-        "Status Video",
-        "Nilai Etika Otomatis (0-30)",
-        "Rincian Etika",
-        "Nilai Bahasa & Kelancaran (0-35)",
-        "Nilai Struktur Quartet II (0-35)",
-        "Total Skor (0-100)",
-        "Link Audio Jawaban 1 (Alasan Riset)",
-        "Link Audio Jawaban 2 (Kelebihan & JLPT)"
-      ];
       sheet.appendRow(headers);
-      sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#0284c7").setFontColor("#ffffff");
-      sheet.setFrozenRows(1);
+    } else if (sheet.getLastColumn() < headers.length) {
+      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     }
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#0284c7").setFontColor("#ffffff");
+    sheet.setFrozenRows(1);
 
     // 2. Akses Folder Penyimpanan Audio Resmi di Google Drive Sensei
     var targetFolderId = "1DJneZ0RNYYFVDi6YVTW7rLFn-evZa_J-";
@@ -63,30 +71,36 @@ function doPost(e) {
     // Subfolder per Mahasiswa: [Nama]_[SessionID]
     var safeName = (data.studentName || "Kandidat").replace(/[^a-zA-Z0-9_-]/g, "_");
     var sessionFolder = rootFolder.createFolder(safeName + "_" + data.sessionId);
+    sessionFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    var folderUrl = sessionFolder.getUrl();
 
-    // 3. Simpan File Audio Jawaban 1
-    var audioUrl1 = "-";
-    if (data.audioQ1 && data.audioQ1.indexOf("base64,") !== -1) {
-      var base64Part1 = data.audioQ1.split("base64,")[1];
-      var decoded1 = Utilities.base64Decode(base64Part1);
-      var blob1 = Utilities.newBlob(decoded1, "audio/webm", "Jawaban_1_Alasan_Riset.webm");
-      var file1 = sessionFolder.createFile(blob1);
-      file1.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      audioUrl1 = file1.getUrl();
+    // Helper untuk menyimpan base64 audio ke Google Drive (Mendukung format standar WAV agar langsung bisa diputar di Google Drive)
+    function saveAudioFile(base64Data, baseFileName) {
+      if (!base64Data || base64Data.indexOf("base64,") === -1) {
+        return "-";
+      }
+      var isWav = base64Data.indexOf("audio/wav") !== -1;
+      var mimeType = isWav ? "audio/wav" : "audio/webm";
+      var ext = isWav ? ".wav" : ".webm";
+      var cleanName = baseFileName.replace(/\.(wav|webm|mp3|ogg)$/i, "") + ext;
+
+      var base64Part = base64Data.split("base64,")[1];
+      var decoded = Utilities.base64Decode(base64Part);
+      var blob = Utilities.newBlob(decoded, mimeType, cleanName);
+      var file = sessionFolder.createFile(blob);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      return file.getUrl();
     }
 
-    // 4. Simpan File Audio Jawaban 2
-    var audioUrl2 = "-";
-    if (data.audioQ2 && data.audioQ2.indexOf("base64,") !== -1) {
-      var base64Part2 = data.audioQ2.split("base64,")[1];
-      var decoded2 = Utilities.base64Decode(base64Part2);
-      var blob2 = Utilities.newBlob(decoded2, "audio/webm", "Jawaban_2_Kelebihan_JLPT.webm");
-      var file2 = sessionFolder.createFile(blob2);
-      file2.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      audioUrl2 = file2.getUrl();
-    }
+    // 3. Simpan Keenam File Audio Jawaban Wawancara (Format .wav Jernih)
+    var audioUrlIntro = saveAudioFile(data.audioIntro, "00_Perkenalan_Diri_Jikoshoukai.wav");
+    var audioUrl1     = saveAudioFile(data.audioQ1,    "01_Alasan_Studi_ke_Jepang.wav");
+    var audioUrl2     = saveAudioFile(data.audioQ2,    "02_Alasan_Memilih_Kampus.wav");
+    var audioUrl3     = saveAudioFile(data.audioQ3,    "03_Sumber_Informasi_Kampus.wav");
+    var audioUrl4     = saveAudioFile(data.audioQ4,    "04_Kelebihan_Diri_Chousho.wav");
+    var audioUrl5     = saveAudioFile(data.audioQ5,    "05_Kekurangan_dan_Solusi_Tansho.wav");
 
-    // 5. Masukkan Baris Nilai Baru ke Google Spreadsheet
+    // 4. Masukkan Baris Nilai Baru ke Google Spreadsheet
     var nextRow = sheet.getLastRow() + 1;
     var formulaTotal = "=F" + nextRow + "+H" + nextRow + "+I" + nextRow;
 
@@ -98,18 +112,28 @@ function doPost(e) {
       data.hasWatchedVideo || "Belum Ditonton",
       data.totalMannerScore || 0,
       data.mannerDetails || "-",
-      "", // Kolom kosong untuk nilai Bahasa oleh Sensei (0-35)
-      "", // Kolom kosong untuk nilai Struktur Quartet II oleh Sensei (0-35)
-      formulaTotal, // Total skor otomatis saat Sensei mengisi kolom H dan I
+      "", // Kolom H: Nilai Bahasa oleh Sensei (0-35)
+      "", // Kolom I: Nilai Struktur Quartet II oleh Sensei (0-35)
+      formulaTotal, // Kolom J: Total skor otomatis saat Sensei mengisi kolom H dan I
+      folderUrl,
+      audioUrlIntro,
       audioUrl1,
-      audioUrl2
+      audioUrl2,
+      audioUrl3,
+      audioUrl4,
+      audioUrl5
     ]);
 
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      message: "Data wawancara dan rekaman audio berhasil disimpan!",
+      message: "Seluruh data wawancara dan 6 rekaman audio berhasil disimpan!",
+      folder: folderUrl,
+      audioIntro: audioUrlIntro,
       audio1: audioUrl1,
-      audio2: audioUrl2
+      audio2: audioUrl2,
+      audio3: audioUrl3,
+      audio4: audioUrl4,
+      audio5: audioUrl5
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {

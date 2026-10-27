@@ -104,6 +104,12 @@ function toggleDoor() {
     }
 
     window.isDoorOpen = !window.isDoorOpen;
+    if (window.isDoorOpen) {
+        const interviewRoom = document.getElementById('scene-interview-room');
+        if (interviewRoom && interviewRoom.object3D) {
+            interviewRoom.object3D.visible = true;
+        }
+    }
     const doorPivot = document.getElementById('door-pivot');
     if (doorPivot) {
         const targetY = window.isDoorOpen ? 95 : 0;
@@ -453,7 +459,7 @@ window.triggerOjigi = function () {
 // 3. Pemicu Aksi Interaktif Umum (Aksi Tombol Y / F)
 window.triggerAction = function () {
     if (window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen) {
-        window.MensetsuReceptionist.closeMenu(true);
+        window.MensetsuReceptionist.confirmSelectedMenu();
         return;
     }
 
@@ -523,24 +529,29 @@ window.addEventListener('keydown', function (e) {
     // Tombol F, E, atau Y untuk interaksi utama (Aksi)
     // Catatan: Tombol D KHUSUS untuk WASD (gerak nyamping kanan), JANGAN dijadikan tombol interaksi
     if (key === 'f' || key === 'e' || key === 'y') {
+        e.preventDefault();
         window.triggerAction();
     }
     // Tombol K atau X untuk mengetuk pintu
     else if (key === 'k' || key === 'x') {
+        e.preventDefault();
         window.triggerKnock();
     }
     // Tombol B untuk Open Mic / Rekam Suara
     else if (key === 'b') {
+        e.preventDefault();
         if (typeof window.handleMobileMicButton === 'function') {
             window.handleMobileMicButton();
         }
     }
     // Tombol O untuk Ojigi (membungkuk 30°)
     else if (key === 'o') {
+        e.preventDefault();
         window.triggerOjigi();
     }
     // Tombol C untuk Duduk / Berdiri
     else if (key === 'c') {
+        e.preventDefault();
         window.toggleSit();
     }
     // Jika sedang duduk dan menekan tombol WASD / Spasi, langsung berdiri secara intuitif

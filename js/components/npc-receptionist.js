@@ -88,6 +88,10 @@
         currentSpeechDoneCallback: null,
         subtitleTimeout: null,
 
+        // Daftar topik pertanyaan resepsionis sesuai urutan tampilan menu
+        menuTopics: ['TOPIC_CHECKIN', 'TOPIC_MANNER', 'TOPIC_LOCATION', 'CLOSE'],
+        selectedOptionIndex: 0,
+
         // Koordinat dunia konter resepsionis untuk deteksi jarak pemain
         counterPos: { x: 2.35, z: 10.45 },
 
@@ -133,6 +137,15 @@
 
             const topicBtns = menu.querySelectorAll('.reception-rpg-btn');
             topicBtns.forEach((btn) => {
+                btn.addEventListener('mouseenter', () => {
+                    const topic = btn.getAttribute('data-topic');
+                    const idx = this.menuTopics.indexOf(topic);
+                    if (idx !== -1) {
+                        this.selectedOptionIndex = idx;
+                        this.updateMenuHighlight();
+                    }
+                });
+
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const topic = btn.getAttribute('data-topic');
@@ -145,6 +158,42 @@
             });
         },
 
+        updateMenuHighlight: function () {
+            const menu = document.getElementById('reception-menu-overlay');
+            if (!menu) return;
+            const targetTopic = this.menuTopics[this.selectedOptionIndex];
+            const btns = menu.querySelectorAll('.reception-rpg-btn');
+            btns.forEach((btn) => {
+                const isSelected = btn.getAttribute('data-topic') === targetTopic;
+                btn.classList.toggle('is-selected', isSelected);
+                if (isSelected) {
+                    btn.setAttribute('aria-selected', 'true');
+                } else {
+                    btn.removeAttribute('aria-selected');
+                }
+            });
+        },
+
+        navigateMenu: function (dir) {
+            if (!this.isMenuOpen) return;
+            const len = this.menuTopics.length;
+            this.selectedOptionIndex = (this.selectedOptionIndex + dir + len) % len;
+            this.updateMenuHighlight();
+            if (typeof playAudioFeedback === 'function') {
+                playAudioFeedback('click');
+            }
+        },
+
+        confirmSelectedMenu: function () {
+            if (!this.isMenuOpen) return;
+            const topic = this.menuTopics[this.selectedOptionIndex];
+            if (topic === 'CLOSE') {
+                this.closeMenu(true);
+            } else {
+                this.selectTopic(topic);
+            }
+        },
+
         bindEvents: function () {
             // Respons Ojigi: Jika pemain membungkuk (Ojigi) di dekat meja resepsionis, resepsionis membalas bungkukan
             window.addEventListener('mensetsu-ojigi', () => {
@@ -154,7 +203,7 @@
                 }
             });
 
-            // Shortcut angka 1, 2, 3, 4 dan 0/Escape saat pilihan pertanyaan terbuka
+            // Shortcut angka 1, 2, 3, 4, panah atas/bawah, Enter dan 0/Escape saat pilihan pertanyaan terbuka
             window.addEventListener('keydown', (e) => {
                 if (!this.isInConversation) return;
                 if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
@@ -167,7 +216,16 @@
 
                 if (!this.isMenuOpen) return;
 
-                if (e.key === '1') {
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.navigateMenu(-1);
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    this.navigateMenu(1);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.confirmSelectedMenu();
+                } else if (e.key === '1') {
                     e.preventDefault();
                     this.selectTopic('TOPIC_CHECKIN');
                 } else if (e.key === '2') {
@@ -214,6 +272,8 @@
             const menu = document.getElementById('reception-menu-overlay');
             if (menu) {
                 this.isMenuOpen = true;
+                this.selectedOptionIndex = 0;
+                this.updateMenuHighlight();
                 menu.classList.add('active');
                 menu.setAttribute('aria-hidden', 'false');
             }
@@ -236,7 +296,11 @@
                     this.skipCurrentSpeechToChoices();
                     return;
                 }
-                // Jika pilihan pertanyaan sedang terbuka, tombol aksi akan menutup percakapan
+                // Jika pilihan pertanyaan sedang terbuka, tombol aksi akan mengeksekusi pilihan yang sedang disorot
+                if (this.isMenuOpen) {
+                    this.confirmSelectedMenu();
+                    return;
+                }
                 this.closeMenu(true);
                 return;
             }
@@ -363,20 +427,9 @@
             // Pastikan pilihan pertanyaan disembunyikan selama transkrip pembicaraan NPC tampil
             this.hideChoicesMenu();
 
-            // Tampilkan teks dialog Jepang pada overlay subtitle (mendukung mode PC/Mobile & Dual-Eye VR)
+            // Tampilkan teks dialog Jepang secara berkala pada 3D Speech Bubble di atas kepala resepsionis
             if (window.MensetsuInterview && typeof window.MensetsuInterview.setSubtitleContent === 'function') {
-                window.MensetsuInterview.setSubtitleContent(data.speaker, `「${data.displayJp || data.jp}」`);
-            } else {
-                const overlay = document.getElementById('npc-dialogue-overlay');
-                if (overlay) {
-                    overlay.querySelectorAll('.npc-sub-speaker').forEach((el) => {
-                        el.textContent = data.speaker;
-                    });
-                    overlay.querySelectorAll('.npc-sub-jp').forEach((el) => {
-                        el.innerHTML = `「${data.displayJp || data.jp}」`;
-                    });
-                    overlay.classList.add('active');
-                }
+                window.MensetsuInterview.setSubtitleContent(data.speaker, `「${data.jp || data.displayJp}」`, 'npc-receptionist');
             }
 
             const overlay = document.getElementById('npc-dialogue-overlay');

@@ -79,46 +79,399 @@
         bowTriggerTime: 0,
         lastQuestionEndTime: 0,
 
+        bubbleMesh: null,
+        bubbleCanvas: null,
+        bubbleCtx: null,
+        bubbleTexture: null,
+        bubbleTargetNpcId: null,
+        bubbleVisible: false,
+        bubblePopTime: 0,
+        bubbleChunkTimers: [],
+        _bubbleTickerStarted: false,
+
         init: function () {
-            console.log('Sistem 3 NPC Pewawancara Diaktifkan.');
+            console.log('Sistem 3 NPC Pewawancara & 3D Speech Bubble Diaktifkan.');
             this.createSubtitleOverlay();
+            this.ensure3DSpeechBubble();
             this.startProximityWatcher();
         },
 
         createSubtitleOverlay: function () {
             if (document.getElementById('npc-dialogue-overlay')) return;
 
+            // Elemen dummy tersembunyi untuk kompatibilitas pemicu penutupan dialog
             const box = document.createElement('div');
             box.id = 'npc-dialogue-overlay';
+            box.style.display = 'none';
             box.innerHTML = `
                 <div class="npc-sub-pane npc-sub-pane-left">
-                    <div class="npc-sub-header">
-                        <span class="npc-sub-speaker" id="npc-sub-speaker">佐藤先生（面接官）</span>
-                    </div>
+                    <div class="npc-sub-header"><span class="npc-sub-speaker" id="npc-sub-speaker"></span></div>
                     <div class="npc-sub-jp" id="npc-sub-jp"></div>
-                </div>
-                <div class="npc-sub-pane npc-sub-pane-right" aria-hidden="true">
-                    <div class="npc-sub-header">
-                        <span class="npc-sub-speaker" id="npc-sub-speaker-vr">佐藤先生（面接官）</span>
-                    </div>
-                    <div class="npc-sub-jp" id="npc-sub-jp-vr"></div>
                 </div>
             `;
             document.body.appendChild(box);
+
+            // Jika ada komponen yang memanggil overlay.classList.remove('active'), otomatis sembunyikan balon 3D
+            const origRemove = box.classList.remove.bind(box.classList);
+            box.classList.remove = (...args) => {
+                origRemove(...args);
+                if (args.includes('active')) {
+                    this.hideSubtitleBubble();
+                }
+            };
         },
 
-        setSubtitleContent: function (speakerText, jpHtml) {
-            this.createSubtitleOverlay();
-            const overlay = document.getElementById('npc-dialogue-overlay');
-            if (!overlay) return;
+        ensure3DSpeechBubble: function () {
+            const scene = document.querySelector('a-scene');
+            if (!scene || !scene.object3D || typeof THREE === 'undefined') return null;
 
-            overlay.querySelectorAll('.npc-sub-speaker').forEach((el) => {
-                el.textContent = speakerText || '';
+            if (!this.bubbleCanvas) {
+                this.bubbleCanvas = document.createElement('canvas');
+                this.bubbleCanvas.width = 1024;
+                this.bubbleCanvas.height = 512;
+                this.bubbleCtx = this.bubbleCanvas.getContext('2d');
+
+                this.bubbleTexture = new THREE.CanvasTexture(this.bubbleCanvas);
+                this.bubbleTexture.minFilter = THREE.LinearFilter;
+                this.bubbleTexture.magFilter = THREE.LinearFilter;
+                this.bubbleTexture.needsUpdate = true;
+
+                // Geometri bidang balon dengan titik jangkar (origin Y=0) tepat di ujung lancip ekor balon bawah
+                const geo = new THREE.PlaneGeometry(1.52, 0.76);
+                geo.translate(0, 0.38, 0);
+
+                const mat = new THREE.MeshBasicMaterial({
+                    map: this.bubbleTexture,
+                    transparent: true,
+                    depthTest: false,
+                    depthWrite: false,
+                    side: THREE.DoubleSide
+                });
+
+                this.bubbleMesh = new THREE.Mesh(geo, mat);
+                this.bubbleMesh.renderOrder = 9999;
+                this.bubbleMesh.visible = false;
+                this.bubbleMesh.frustumCulled = false;
+                scene.object3D.add(this.bubbleMesh);
+            } else if (this.bubbleMesh && !this.bubbleMesh.parent) {
+                scene.object3D.add(this.bubbleMesh);
+            }
+
+            if (!this._bubbleTickerStarted) {
+                this._bubbleTickerStarted = true;
+                this.startBubbleFollowTicker();
+            }
+
+            return this.bubbleMesh;
+        },
+
+        getNpcHeadWorldPosition: function (npcId, outVec) {
+            const el = document.getElementById(npcId);
+            if (el && el.components) {
+                const comp = el.components['npc-interviewer'] || el.components['npc-receptionist'];
+                if (comp && comp.bones && comp.bones['Head']) {
+                    comp.bones['Head'].getWorldPosition(outVec);
+                    outVec.y += 0.21; // Tepat di atas puncak rambut/kepala NPC
+                    return outVec;
+                }
+                if (el.object3D) {
+                    el.object3D.getWorldPosition(outVec);
+                    outVec.y += 1.38;
+                    return outVec;
+                }
+            }
+            if (npcId === 'npc-left') return outVec.set(-1.3, 1.38, -4.02);
+            if (npcId === 'npc-right') return outVec.set(1.3, 1.36, -4.02);
+            if (npcId === 'npc-receptionist') return outVec.set(2.96, 1.52, 10.50);
+            return outVec.set(0.0, 1.40, -4.02);
+        },
+
+        startBubbleFollowTicker: function () {
+            const headPos = new THREE.Vector3();
+            const camPos = new THREE.Vector3();
+
+            const updateLoop = () => {
+                requestAnimationFrame(updateLoop);
+                if (!this.bubbleMesh || !this.bubbleVisible || !this.bubbleTargetNpcId) return;
+
+                const camEl = document.getElementById('player-camera');
+                if (!camEl || !camEl.object3D) return;
+
+                this.getNpcHeadWorldPosition(this.bubbleTargetNpcId, headPos);
+                camEl.object3D.getWorldPosition(camPos);
+
+                // Sembunyikan otomatis jika pemain berada di ruangan berbeda (terhalang tembok Z=6.0) atau terlalu jauh
+                const dist = camPos.distanceTo(headPos);
+                const isPlayerInWaitingRoom = camPos.z > 6.05;
+                const isNpcInWaitingRoom = headPos.z > 6.05;
+                if (dist > 11.5 || (isPlayerInWaitingRoom !== isNpcInWaitingRoom && !window.isDoorOpen)) {
+                    this.bubbleMesh.visible = false;
+                    return;
+                }
+                this.bubbleMesh.visible = true;
+
+                // Posisikan ujung ekor balon komik tepat di atas kepala NPC yang sedang bicara
+                this.bubbleMesh.position.copy(headPos);
+
+                // Auto-billboard: selalu menghadap lurus ke arah kamera pemain
+                this.bubbleMesh.lookAt(camPos.x, headPos.y + 0.12, camPos.z);
+
+                // Animasi pop-in elastis + skala adaptif yang lebih besar agar teks sangat jelas terbaca
+                const elapsed = Math.min(1, (performance.now() - this.bubblePopTime) / 180);
+                const popEase = 0.25 + 0.75 * (1 - Math.pow(1 - elapsed, 3));
+                const distScale = THREE.MathUtils.clamp(dist * 0.36, 0.72, 2.20);
+                const finalScale = distScale * popEase;
+                this.bubbleMesh.scale.set(finalScale, finalScale, finalScale);
+            };
+            requestAnimationFrame(updateLoop);
+        },
+
+        // Memecah kalimat panjang Jepang menjadi potongan kalimat pendek (chunks) agar ditampilkan berkala dengan huruf besar
+        splitIntoProgressiveChunks: function (rawHtml) {
+            let clean = String(rawHtml || '')
+                .replace(/<br\s*\/?>/gi, ' ')
+                .replace(/^[「\s]+|[」\s]+$/g, '')
+                .trim();
+
+            if (!clean) return ['...'];
+
+            // 1. Pisahkan berdasarkan akhir kalimat Jepang (。 ？ ！)
+            const rawSentences = clean.match(/[^。？！]+[。？！]?/g) || [clean];
+            const chunks = [];
+
+            rawSentences.forEach((sent) => {
+                const s = sent.trim();
+                if (!s) return;
+
+                // Jika kalimat pendek (<= 22 karakter), tampilkan utuh sebagai 1 tahap
+                if (s.length <= 22) {
+                    // Gabungkan sapaan super pendek (<= 9 huruf, misal "失礼します。") dengan klausa pendek berikutnya bila muat
+                    if (chunks.length > 0 && chunks[chunks.length - 1].length + s.length <= 20) {
+                        chunks[chunks.length - 1] += s;
+                    } else {
+                        chunks.push(s);
+                    }
+                    return;
+                }
+
+                // 2. Jika kalimat agak panjang (> 22 karakter), pecah secara alami pada tanda koma Jepang (、)
+                const subClauses = s.split(/(?<=、)/);
+                let buffer = '';
+                subClauses.forEach((clause) => {
+                    const c = clause.trim();
+                    if (!c) return;
+                    if ((buffer + c).length <= 22) {
+                        buffer += c;
+                    } else {
+                        if (buffer) chunks.push(buffer);
+                        // Jika klausa tunggal masih > 26 karakter tanpa koma, bagi dua di tengah
+                        if (c.length > 26) {
+                            const mid = Math.ceil(c.length / 2);
+                            chunks.push(c.slice(0, mid));
+                            buffer = c.slice(mid);
+                        } else {
+                            buffer = c;
+                        }
+                    }
+                });
+                if (buffer) chunks.push(buffer);
             });
-            overlay.querySelectorAll('.npc-sub-jp').forEach((el) => {
-                el.innerHTML = jpHtml || '';
-            });
-            overlay.classList.add('active');
+
+            return chunks.length > 0 ? chunks : [clean];
+        },
+
+        clearBubbleChunkTimers: function () {
+            if (this.bubbleChunkTimers && this.bubbleChunkTimers.length > 0) {
+                this.bubbleChunkTimers.forEach((t) => clearTimeout(t));
+                this.bubbleChunkTimers = [];
+            }
+        },
+
+        drawComicSpeechBubble: function (speakerText, chunkText, npcId, chunkIdx, totalChunks) {
+            this.ensure3DSpeechBubble();
+            if (!this.bubbleCtx || !this.bubbleCanvas) return;
+
+            const ctx = this.bubbleCtx;
+            const W = this.bubbleCanvas.width;
+            const H = this.bubbleCanvas.height;
+            ctx.clearRect(0, 0, W, H);
+
+            // Tema warna identitas per NPC agar mudah dibedakan siapa yang berbicara
+            let accentColor = '#0284c7'; // Sato-sensei (Tengah - Biru Utama)
+            if (npcId === 'npc-left') accentColor = '#0d9488'; // Tanaka-sensei (Kiri - Teal)
+            else if (npcId === 'npc-right') accentColor = '#be185d'; // Suzuki-sensei (Kanan - Rose/Burgundy)
+            else if (npcId === 'npc-receptionist') accentColor = '#2563eb'; // Resepsionis (Biru Royal)
+
+            const displayStr = `「${String(chunkText || '').replace(/^[「]+|[」]+$/g, '')}」`;
+
+            // Ukuran font jauh lebih besar (52px - 58px) karena teks ditampilkan bertahap per kalimat pendek
+            const fontSize = displayStr.length <= 14 ? 58 : 52;
+            const fontMain = `bold ${fontSize}px "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif`;
+            ctx.font = fontMain;
+
+            const maxTextWidth = W - 150;
+            const lines = [];
+            let currentLine = '';
+            for (let i = 0; i < displayStr.length; i++) {
+                const ch = displayStr[i];
+                const testLine = currentLine + ch;
+                if (ctx.measureText(testLine).width > maxTextWidth && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = ch;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            if (lines.length === 0) lines.push('...');
+
+            const lineHeight = fontSize + 18;
+            const textBlockH = lines.length * lineHeight;
+            const tailH = 44;
+            const tailTipY = H - 8;
+            const boxBottom = tailTipY - tailH;
+            const boxH = Math.min(H - 56, Math.max(230, textBlockH + 132));
+            const boxTop = boxBottom - boxH;
+            const boxLeft = 32;
+            const boxRight = W - 32;
+            const radius = 40;
+            const tailCenterX = W / 2;
+            const tailHalfW = 30;
+
+            // Gambar bayangan lembut balon komik
+            ctx.save();
+            ctx.shadowColor = 'rgba(2, 6, 23, 0.58)';
+            ctx.shadowBlur = 22;
+            ctx.shadowOffsetY = 8;
+
+            // Path Balon Komik (Kotak Melengkung + Ekor Segitiga Menunjuk Kepala NPC di Bawah)
+            ctx.beginPath();
+            ctx.moveTo(boxLeft + radius, boxTop);
+            ctx.lineTo(boxRight - radius, boxTop);
+            ctx.quadraticCurveTo(boxRight, boxTop, boxRight, boxTop + radius);
+            ctx.lineTo(boxRight, boxBottom - radius);
+            ctx.quadraticCurveTo(boxRight, boxBottom, boxRight - radius, boxBottom);
+            // Sisi kanan ekor balon
+            ctx.lineTo(tailCenterX + tailHalfW, boxBottom);
+            ctx.lineTo(tailCenterX, tailTipY); // Ujung lancip bawah menunjuk ke kepala NPC
+            ctx.lineTo(tailCenterX - tailHalfW, boxBottom);
+            // Sisi kiri bawah
+            ctx.lineTo(boxLeft + radius, boxBottom);
+            ctx.quadraticCurveTo(boxLeft, boxBottom, boxLeft, boxBottom - radius);
+            ctx.lineTo(boxLeft, boxTop + radius);
+            ctx.quadraticCurveTo(boxLeft, boxTop, boxLeft + radius, boxTop);
+            ctx.closePath();
+
+            // Latar putih gading bersih khas balon komik manga/visual novel
+            const grad = ctx.createLinearGradient(0, boxTop, 0, boxBottom);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(1, '#f1f5f9');
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.restore();
+
+            // Garis tepi luar tebal bergaya komik + aksen warna pembicara
+            ctx.lineWidth = 9;
+            ctx.strokeStyle = '#0f172a';
+            ctx.stroke();
+
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = accentColor;
+            ctx.stroke();
+
+            // Badge Nama Pembicara di Kiri Atas Dalam Balon
+            const speakerStr = speakerText || '面接官';
+            ctx.font = 'bold 28px "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif';
+            const badgeTextW = ctx.measureText(speakerStr).width;
+            const badgeW = badgeTextW + 56;
+            const badgeH = 48;
+            const badgeX = boxLeft + 28;
+            const badgeY = boxTop + 20;
+
+            ctx.beginPath();
+            ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 24);
+            ctx.fillStyle = accentColor;
+            ctx.fill();
+
+            // Titik indikator suara aktif di dalam badge
+            ctx.beginPath();
+            ctx.arc(badgeX + 22, badgeY + badgeH / 2, 7, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(speakerStr, badgeX + 36, badgeY + badgeH / 2 + 1);
+
+            // Indikator halaman/tahap kalimat di kanan atas balon (misal: 1/2, 2/2) jika lebih dari 1 potongan
+            if (totalChunks && totalChunks > 1) {
+                const stepStr = `${chunkIdx + 1} / ${totalChunks}`;
+                ctx.font = 'bold 24px "Inter", "Meiryo", sans-serif';
+                ctx.fillStyle = '#64748b';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(stepStr, boxRight - 32, badgeY + badgeH / 2 + 1);
+            }
+
+            // Teks Dialog Bahasa Jepang Ukuran Besar di Tengah Balon
+            ctx.font = fontMain;
+            ctx.fillStyle = '#0f172a';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const contentTop = badgeY + badgeH + 14;
+            const contentAreaH = boxBottom - contentTop - 14;
+            const startY = contentTop + (contentAreaH - textBlockH) / 2 + lineHeight / 2;
+
+            for (let i = 0; i < lines.length; i++) {
+                ctx.fillText(lines[i], W / 2, startY + i * lineHeight);
+            }
+
+            if (this.bubbleTexture) {
+                this.bubbleTexture.needsUpdate = true;
+            }
+        },
+
+        setSubtitleContent: function (speakerText, jpHtml, targetNpcId) {
+            this.createSubtitleOverlay();
+            this.clearBubbleChunkTimers();
+
+            const resolvedNpcId = targetNpcId || this.activeSpeakerId || 'npc-center';
+            this.bubbleTargetNpcId = resolvedNpcId;
+            this.bubbleVisible = true;
+            this.bubblePopTime = performance.now();
+
+            const chunks = this.splitIntoProgressiveChunks(jpHtml);
+            // Tampilkan potongan kalimat pertama seketika dengan huruf besar
+            this.drawComicSpeechBubble(speakerText, chunks[0], resolvedNpcId, 0, chunks.length);
+            if (this.bubbleMesh) {
+                this.bubbleMesh.visible = true;
+            }
+
+            // Jadwalkan potongan kalimat berikutnya secara berkala mengikuti irama bicara Jepang (~175ms per huruf + jeda)
+            if (chunks.length > 1) {
+                let cumulativeMs = 0;
+                for (let i = 0; i < chunks.length - 1; i++) {
+                    const charCount = chunks[i].length;
+                    const durationMs = Math.max(1500, Math.min(4200, charCount * 175 + 320));
+                    cumulativeMs += durationMs;
+                    const nextIndex = i + 1;
+                    const timerId = setTimeout(() => {
+                        if (!this.bubbleVisible || this.bubbleTargetNpcId !== resolvedNpcId) return;
+                        this.drawComicSpeechBubble(speakerText, chunks[nextIndex], resolvedNpcId, nextIndex, chunks.length);
+                    }, cumulativeMs);
+                    this.bubbleChunkTimers.push(timerId);
+                }
+            }
+        },
+
+        hideSubtitleBubble: function () {
+            this.clearBubbleChunkTimers();
+            this.bubbleVisible = false;
+            if (this.bubbleMesh) {
+                this.bubbleMesh.visible = false;
+            }
         },
 
         showDialogue: function (dialogKey, callback) {
@@ -133,7 +486,7 @@
                 this.bowTriggerTime = performance.now();
             }
 
-            this.setSubtitleContent(data.speaker, `「${data.displayJp || data.jp}」`);
+            this.setSubtitleContent(data.speaker, `「${data.displayJp || data.jp}」`, data.speakerNpcId);
 
             // Suara Alami Asli Orang Jepang (Native Japanese Audio)
             this.speakJapanese(data, () => {

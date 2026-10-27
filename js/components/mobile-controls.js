@@ -776,21 +776,32 @@
             }
             if (!gp) return;
 
-            // 1. Baca Analog Joystick (Axes: axes[0] = Kiri/Kanan, axes[1] = Maju/Mundur)
-            let ax = gp.axes[0] || 0;
-            let ay = gp.axes[1] || 0;
-
-            // Fallback jika controller memetakan D-Pad ke buttons (12: Up, 13: Down, 14: Left, 15: Right)
-            if (gp.buttons[12] && (gp.buttons[12].pressed || gp.buttons[12].value > 0.5)) ay = -1;
-            if (gp.buttons[13] && (gp.buttons[13].pressed || gp.buttons[13].value > 0.5)) ay = 1;
-            if (gp.buttons[14] && (gp.buttons[14].pressed || gp.buttons[14].value > 0.5)) ax = -1;
-            if (gp.buttons[15] && (gp.buttons[15].pressed || gp.buttons[15].value > 0.5)) ax = 1;
+            // 1. Baca Analog Joystick (Kalibrasi Orientasi Sesuai Mode Remote VR)
+            // Push Depan: gp.axes[0] = -1 -> Maju (+1)
+            // Push Belakang: gp.axes[0] = +1 -> Mundur (-1)
+            // Push Kanan: gp.axes[1] = -1 -> Geser Kanan (+1)
+            // Push Kiri: gp.axes[1] = +1 -> Geser Kiri (-1)
+            const rawAx = gp.axes[0] || 0;
+            const rawAy = gp.axes[1] || 0;
 
             const deadzone = 0.15;
-            if (Math.abs(ax) < deadzone) ax = 0;
-            if (Math.abs(ay) < deadzone) ay = 0;
+            let forwardAmount = 0;
+            let rightAmount = 0;
 
-            if (Math.abs(ax) > 0 || Math.abs(ay) > 0) {
+            if (Math.abs(rawAx) > deadzone) {
+                forwardAmount = -rawAx; // rawAx < 0 (Depan) -> Maju (+1); rawAx > 0 (Belakang) -> Mundur (-1)
+            }
+            if (Math.abs(rawAy) > deadzone) {
+                rightAmount = -rawAy; // rawAy < 0 (Kanan) -> Kanan (+1); rawAy > 0 (Kiri) -> Kiri (-1)
+            }
+
+            // Fallback jika controller memetakan D-Pad ke buttons (12: Up, 13: Down, 14: Left, 15: Right)
+            if (gp.buttons[12] && (gp.buttons[12].pressed || gp.buttons[12].value > 0.5)) forwardAmount = 1;
+            if (gp.buttons[13] && (gp.buttons[13].pressed || gp.buttons[13].value > 0.5)) forwardAmount = -1;
+            if (gp.buttons[14] && (gp.buttons[14].pressed || gp.buttons[14].value > 0.5)) rightAmount = -1;
+            if (gp.buttons[15] && (gp.buttons[15].pressed || gp.buttons[15].value > 0.5)) rightAmount = 1;
+
+            if (Math.abs(forwardAmount) > 0 || Math.abs(rightAmount) > 0) {
                 if (window.isSitting) {
                     if (typeof window.standUp === 'function') {
                         window.standUp();
@@ -809,9 +820,8 @@
                         const rightZ = -Math.sin(yawRad);
 
                         const moveDist = this.moveSpeed * dt;
-                        // ay < 0 = stick ditekan ke depan (maju), ay > 0 = mundur
-                        const vx = (-ay * forwardX + ax * rightX) * moveDist;
-                        const vz = (-ay * forwardZ + ax * rightZ) * moveDist;
+                        const vx = (forwardAmount * forwardX + rightAmount * rightX) * moveDist;
+                        const vz = (forwardAmount * forwardZ + rightAmount * rightZ) * moveDist;
 
                         const curPos = camEl.object3D.position;
                         const targetX = curPos.x + vx;
@@ -849,9 +859,11 @@
                 }
             };
 
-            // Tombol 0 (A): Ojigi 30° / Membungkuk Salam Hormat
+            // Tombol 0 (A): Ojigi 30° / Membungkuk Salam Hormat (atau Konfirmasi jika Menu Resepsionis terbuka)
             checkButton(0, () => {
-                if (typeof window.triggerOjigi === 'function') {
+                if (window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen) {
+                    window.MensetsuReceptionist.confirmSelectedMenu();
+                } else if (typeof window.triggerOjigi === 'function') {
                     window.triggerOjigi();
                 }
             });
@@ -870,35 +882,43 @@
                 }
             });
 
-            // Tombol 3 (Y / D): Aksi / Interaksi (Buka Pintu, Duduk, Berdiri, Nonton Video)
+            // Tombol 3 (Y / D): Aksi / Interaksi / Konfirmasi Pilihan Menu Resepsionis
             checkButton(3, () => {
-                if (typeof window.triggerAction === 'function') {
+                if (window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen) {
+                    window.MensetsuReceptionist.confirmSelectedMenu();
+                } else if (typeof window.triggerAction === 'function') {
                     window.triggerAction();
                 }
             });
 
-            // Tombol 4, 5, 6, 7 (Tombol Samping / Shoulder / Trigger pada VR Controller):
-            // Samping Atas (L1/R1 / Trigger Depan): Aksi (Paling mudah ditekan telunjuk)
-            checkButton(4, () => {
-                if (typeof window.triggerAction === 'function') {
+            // Handler Navigasi Menu Pertanyaan Resepsionis via Tombol Shoulder L1 (Atas) & L2 (Bawah)
+            const handleL1 = () => {
+                if (window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen) {
+                    window.MensetsuReceptionist.navigateMenu(-1);
+                } else if (typeof window.triggerAction === 'function') {
                     window.triggerAction();
                 }
-            });
-            checkButton(5, () => {
-                if (typeof window.triggerOjigi === 'function') {
+            };
+
+            const handleL2 = () => {
+                if (window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen) {
+                    window.MensetsuReceptionist.navigateMenu(1);
+                } else if (typeof window.triggerOjigi === 'function') {
                     window.triggerOjigi();
                 }
-            });
-            checkButton(6, () => {
-                if (typeof window.triggerAction === 'function') {
-                    window.triggerAction();
-                }
-            });
-            checkButton(7, () => {
-                if (typeof window.triggerAction === 'function') {
-                    window.triggerAction();
-                }
-            });
+            };
+
+            // Tombol 4 (L1 / Shoulder Atas): Scroll Pilihan Menu ke Atas
+            checkButton(4, handleL1);
+
+            // Tombol 5 (R1 / Shoulder Kanan Atas): Scroll Pilihan Menu ke Bawah / Ojigi
+            checkButton(5, handleL2);
+
+            // Tombol 6 (L2 / Trigger Bawah): Scroll Pilihan Menu ke Bawah
+            checkButton(6, handleL2);
+
+            // Tombol 7 (R2 / Trigger Bawah Kanan): Scroll Pilihan Menu ke Bawah
+            checkButton(7, handleL2);
         }
     };
 

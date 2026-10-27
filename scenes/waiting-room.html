@@ -773,8 +773,7 @@
 
                     <!-- Lampu Ambient Downlight Halus di Plafon Ceruk -->
                     <a-circle position="0 0.825 0.11" radius="0.025" rotation="90 0 0" 
-                              material="color: #e2e8f0; emissive: #f1f5f9; emissiveIntensity: 0.5;"></a-circle>
-                    <a-light type="point" color="#f1f5f9" intensity="0.25" distance="0.75" position="0 0.78 0.12"></a-light>
+                              material="color: #e2e8f0; emissive: #f1f5f9; emissiveIntensity: 0.8;"></a-circle>
 
                     <!-- KRAN AIR PANAS KIRI (DENGAN KUNCI PENGAMAN ANAK / SAFETY LOCK LEVER) -->
                     <a-entity position="-0.06 0.73 0.115">
@@ -820,135 +819,50 @@
                     <a-box position="0 0.45 0.187" width="0.088" height="0.008" depth="0.006" material="color: #0f172a;"></a-box>
 
                     <!-- ========================================================================= -->
-                    <!-- GALON AIR MINERAL 12L ULTRA-REALISTIS MULTI-LAYER & ANIMASI AIR          -->
-                    <!-- Menggunakan multi-lapisan polikarbonat, pantulan cahaya, kontur rusuk 3D, -->
-                    <!-- dan gelembung udara beranimasi loop mengapung ke atas secara berkelanjutan -->
+                    <!-- GALON AIR MINERAL 12L RESMI (CLEAN SOLID AQUA WATER BOTTLE)               -->
+                    <!-- Bebas glitch, bebas Z-fighting, dan 100% stabil di semua sudut pandang   -->
                     <!-- ========================================================================= -->
                     <a-entity id="water-gallon" position="0 1.0 0">
 
-                        <!-- 1. LEHER GALON DENGAN SEGEL ANTI-TUMPAH (PULL-RING TEAR CAP) -->
-                        <a-cylinder position="0 0.025 0" radius="0.052" height="0.05" material="color: #0284c7; roughness: 0.3;"></a-cylinder>
-                        <!-- Cincin Pengaman Segel Botol (Tamper Evident Band) -->
-                        <a-torus position="0 0.042 0" radius="0.053" radius-tubular="0.004" rotation="90 0 0" material="color: #0369a1;"></a-torus>
-                        <!-- Pita Tarik Segel Putih (Tear-Off Pull Strip) -->
-                        <a-box position="0.051 0.025 0" width="0.004" height="0.02" depth="0.015" material="color: #ffffff;"></a-box>
-                        <a-box position="0.053 0.016 0" width="0.008" height="0.006" depth="0.012" material="color: #ffffff;"></a-box>
+                        <!-- 1. LEHER GALON & SEGEL PULL-TAB (TAMPER-EVIDENT NECK & CAP) -->
+                        <a-cylinder position="0 0.025 0" radius="0.052" height="0.05" 
+                                    material="color: #0284c7; roughness: 0.3;"></a-cylinder>
+                        <a-torus position="0 0.042 0" radius="0.053" radius-tubular="0.004" rotation="90 0 0" 
+                                 material="color: #0369a1; roughness: 0.3;"></a-torus>
+                        <a-box position="0.051 0.025 0" width="0.004" height="0.02" depth="0.015" 
+                               material="color: #ffffff; roughness: 0.4;"></a-box>
+                        <a-box position="0.053 0.016 0" width="0.008" height="0.006" depth="0.012" 
+                               material="color: #ffffff; roughness: 0.4;"></a-box>
 
-                        <!-- Tabung Siphon Intake Stainless Steel yang Menembus Galon (Terlihat dari Luar) -->
-                        <a-cylinder position="0 0.14 0" radius="0.012" height="0.22" mixin="metal-chrome" 
-                                    material="opacity: 0.85; transparent: true;"></a-cylinder>
+                        <!-- Pipa Stainless Siphon Probe Intake di Dalam Leher -->
+                        <a-cylinder position="0 0.12 0" radius="0.010" height="0.18" mixin="metal-chrome"></a-cylinder>
 
-                        <!-- 2. BAHU KERUCUT GALON BERLAPIS (CONICAL TAPERED SHOULDER) -->
-                        <!-- Lapisan Luar Polikarbonat Bahu Galon -->
-                        <a-cone position="0 0.09 0" radius-bottom="0.142" radius-top="0.062" height="0.08" 
-                                material="color: #38bdf8; opacity: 0.52; transparent: true; roughness: 0.08; metalness: 0.12;"></a-cone>
-                        <!-- Lapisan Dalam Massa Air di Bahu Galon -->
-                        <a-cone position="0 0.09 0" radius-bottom="0.136" radius-top="0.056" height="0.076" 
-                                material="color: #0284c7; opacity: 0.72; transparent: true; roughness: 0.1;"></a-cone>
+                        <!-- 2. BODI UTAMA BOTOL AIR 12L (SOLID VIBRANT AQUA-BLUE BOTTLE) -->
+                        <!-- Bahu Botol (Conical Shoulder) -->
+                        <a-cone position="0 0.088 0" radius-bottom="0.144" radius-top="0.060" height="0.08" 
+                                material="color: #0284c7; roughness: 0.25; metalness: 0.05;"></a-cone>
+                        <!-- Bodi Silinder Utama Botol -->
+                        <a-cylinder position="0 0.31 0" radius="0.144" height="0.36" 
+                                    material="color: #0284c7; roughness: 0.25; metalness: 0.05;"></a-cylinder>
+                        <!-- Kubah Puncak Botol -->
+                        <a-cone position="0 0.52 0" radius-bottom="0.144" radius-top="0.065" height="0.06" 
+                                material="color: #0284c7; roughness: 0.25; metalness: 0.05;"></a-cone>
+                        <a-cylinder position="0 0.555 0" radius="0.065" height="0.015" 
+                                    material="color: #0369a1; roughness: 0.3;"></a-cylinder>
+                        <a-torus position="0 0.555 0" radius="0.060" radius-tubular="0.005" rotation="90 0 0" 
+                                 material="color: #0284c7; roughness: 0.3;"></a-torus>
 
-                        <!-- 3. BODI SILINDER GALON UTAMA MULTI-LAYER (TINGGI 38cm, DIAMETER 28.5cm) -->
-                        <!-- A. Lapisan Polikarbonat Terluar (High-Gloss Clear Shell) -->
-                        <a-cylinder position="0 0.32 0" radius="0.143" height="0.38" 
-                                    material="color: #38bdf8; opacity: 0.42; transparent: true; roughness: 0.06; metalness: 0.15;"></a-cylinder>
-
-                        <!-- B. Lapisan Dinding Dalam Botol (Inner Wall Refraction) -->
-                        <a-cylinder position="0 0.32 0" radius="0.140" height="0.378" 
-                                    material="color: #0284c7; opacity: 0.48; transparent: true; roughness: 0.08;"></a-cylinder>
-
-                        <!-- C. Kolom Air Mineral Alami Segar (Deep Aquamarine Fluid Core) -->
-                        <a-cylinder position="0 0.28 0" radius="0.135" height="0.32" 
-                                    material="color: #0284c7; opacity: 0.72; transparent: true; roughness: 0.1;"></a-cylinder>
-                        
-                        <!-- D. Inti Kedalaman Densitas Air (Dense Core Gradient) -->
-                        <a-cylinder position="0 0.28 0" radius="0.105" height="0.318" 
-                                    material="color: #0369a1; opacity: 0.42; transparent: true; roughness: 0.15;"></a-cylinder>
-
-                        <!-- 4. PANTULAN CAHAYA KILAU VERTIKAL (SPECULAR GLASS HIGHLIGHT STREAKS) -->
-                        <!-- Memberikan ilusi lekukan 3D yang sangat kuat dari berbagai sudut pandang -->
-                        <a-entity rotation="0 32 0">
-                            <a-plane position="0 0.32 0.144" width="0.024" height="0.36" 
-                                     material="color: #ffffff; opacity: 0.32; transparent: true; roughness: 0.2;"></a-plane>
-                            <a-plane position="0 0.32 0.144" width="0.008" height="0.36" 
-                                     material="color: #ffffff; opacity: 0.65; transparent: true; roughness: 0.1;"></a-plane>
-                        </a-entity>
-                        <a-entity rotation="0 -48 0">
-                            <a-plane position="0 0.32 0.144" width="0.016" height="0.36" 
-                                     material="color: #bae6fd; opacity: 0.25; transparent: true; roughness: 0.2;"></a-plane>
-                        </a-entity>
-
-                        <!-- 5. LIMA CINCIN RUSUK PENGUAT HORISONTAL 3D (STRUCTURAL REINFORCING RIBS) -->
-                        <!-- Cincin 1 (Bawah) -->
-                        <a-torus position="0 0.16 0" radius="0.144" radius-tubular="0.008" rotation="90 0 0" 
-                                 material="color: #0284c7; opacity: 0.75; transparent: true; roughness: 0.1;"></a-torus>
-                        <!-- Cincin 2 (Bawah-Tengah) -->
-                        <a-torus position="0 0.23 0" radius="0.144" radius-tubular="0.008" rotation="90 0 0" 
-                                 material="color: #0284c7; opacity: 0.75; transparent: true; roughness: 0.1;"></a-torus>
-                        <!-- Cincin 3 (Lekukan Pinggang Tengah / Ergonomic Grip Waist) -->
-                        <a-torus position="0 0.30 0" radius="0.141" radius-tubular="0.009" rotation="90 0 0" 
-                                 material="color: #0369a1; opacity: 0.85; transparent: true; roughness: 0.1;"></a-torus>
-                        <!-- Cincin 4 (Atas-Tengah) -->
-                        <a-torus position="0 0.37 0" radius="0.144" radius-tubular="0.008" rotation="90 0 0" 
-                                 material="color: #0284c7; opacity: 0.75; transparent: true; roughness: 0.1;"></a-torus>
-                        <!-- Cincin 5 (Atas) -->
-                        <a-torus position="0 0.44 0" radius="0.144" radius-tubular="0.008" rotation="90 0 0" 
-                                 material="color: #0284c7; opacity: 0.75; transparent: true; roughness: 0.1;"></a-torus>
-
-                        <!-- 6. PERMUKAAN AIR DENGAN ANIMASI GELOMBANG & MENISCUS DINAMIS -->
-                        <a-circle id="water-surface" position="0 0.44 0" radius="0.134" rotation="-90 0 0" 
-                                  material="color: #67e8f9; opacity: 0.82; transparent: true; roughness: 0.08; metalness: 0.25;"
-                                  animation="property: position; from: 0 0.438 0; to: 0 0.443 0; dur: 1800; dir: alternate; loop: true; easing: easeInOutSine"
-                                  animation__scale="property: scale; from: 0.985 0.985 1; to: 1.015 1.015 1; dur: 2400; dir: alternate; loop: true; easing: easeInOutSine">
-                        </a-circle>
-                        <!-- Cincin Kilau Meniscus Air di Tepi Dinding Kaca -->
-                        <a-ring position="0 0.441 0" radius-inner="0.128" radius-outer="0.136" rotation="-90 0 0" 
-                                material="color: #e0f2fe; opacity: 0.7; transparent: true; roughness: 0.1;"
-                                animation="property: scale; from: 0.99 0.99 1; to: 1.01 1.01 1; dur: 1800; dir: alternate; loop: true; easing: easeInOutSine">
-                        </a-ring>
-
-                        <!-- 7. ANIMASI GELEMBUNG AIR MENGAPUNG KE ATAS (CONTINUOUS RISING AIR BUBBLES) -->
-                        <!-- Gelembung 1: Gelembung Utama Kanan Depan -->
-                        <a-sphere position="0.035 0.08 0.025" radius="0.011" 
-                                  material="color: #ffffff; opacity: 0.85; transparent: true; roughness: 0.05; metalness: 0.3;"
-                                  animation="property: position; from: 0.035 0.08 0.025; to: 0.028 0.438 0.02; dur: 2200; loop: true; easing: easeInQuad"
-                                  animation__scale="property: scale; from: 0.75 0.75 0.75; to: 1.3 1.3 1.3; dur: 2200; loop: true; easing: easeInQuad">
-                        </a-sphere>
-
-                        <!-- Gelembung 2: Gelembung Sedang Kiri Belakang -->
-                        <a-sphere position="-0.04 0.12 -0.02" radius="0.014" 
-                                  material="color: #e0f2fe; opacity: 0.8; transparent: true; roughness: 0.05; metalness: 0.3;"
-                                  animation="property: position; from: -0.04 0.10 -0.02; to: -0.032 0.438 -0.015; dur: 2700; loop: true; easing: easeInQuad"
-                                  animation__scale="property: scale; from: 0.8 0.8 0.8; to: 1.35 1.35 1.35; dur: 2700; loop: true; easing: easeInQuad">
-                        </a-sphere>
-
-                        <!-- Gelembung 3: Gelembung Kecil Lincah Tengah -->
-                        <a-sphere position="0.01 0.06 -0.035" radius="0.007" 
-                                  material="color: #ffffff; opacity: 0.9; transparent: true; roughness: 0.05;"
-                                  animation="property: position; from: 0.01 0.06 -0.035; to: 0.018 0.438 -0.028; dur: 1800; loop: true; easing: easeInQuad"
-                                  animation__scale="property: scale; from: 0.7 0.7 0.7; to: 1.2 1.2 1.2; dur: 1800; loop: true; easing: easeInQuad">
-                        </a-sphere>
-
-                        <!-- Gelembung 4: Gelembung Kiri Depan -->
-                        <a-sphere position="-0.025 0.15 0.038" radius="0.009" 
-                                  material="color: #e0f2fe; opacity: 0.82; transparent: true; roughness: 0.05; metalness: 0.25;"
-                                  animation="property: position; from: -0.025 0.11 0.038; to: -0.018 0.438 0.03; dur: 2450; loop: true; easing: easeInQuad"
-                                  animation__scale="property: scale; from: 0.8 0.8 0.8; to: 1.25 1.25 1.25; dur: 2450; loop: true; easing: easeInQuad">
-                        </a-sphere>
-
-                        <!-- Gelembung 5: Gelembung Halus di Leher Siphon -->
-                        <a-sphere position="0 0.05 0" radius="0.006" 
-                                  material="color: #ffffff; opacity: 0.88; transparent: true;"
-                                  animation="property: position; from: 0 0.05 0; to: 0.005 0.438 0.005; dur: 1650; loop: true; easing: easeInQuad"
-                                  animation__scale="property: scale; from: 0.6 0.6 0.6; to: 1.15 1.15 1.15; dur: 1650; loop: true; easing: easeInQuad">
-                        </a-sphere>
-
-                        <!-- 8. KUBAH LENGKUNG PUNCAK GALON (TOP DOMED CAP & HANDLE RECESS) -->
-                        <a-cone position="0 0.53 0" radius-bottom="0.143" radius-top="0.065" height="0.06" 
-                                material="color: #38bdf8; opacity: 0.52; transparent: true; roughness: 0.1;"></a-cone>
-                        <a-cylinder position="0 0.565 0" radius="0.065" height="0.02" 
-                                    material="color: #38bdf8; opacity: 0.62; transparent: true; roughness: 0.1;"></a-cylinder>
-                        <!-- Lekukan Bawah Dasar Galon (Punted Concave Base) -->
-                        <a-torus position="0 0.565 0" radius="0.06" radius-tubular="0.006" rotation="90 0 0" 
-                                 material="color: #0284c7; opacity: 0.8; transparent: true;"></a-torus>
+                        <!-- 3. LIMA CINCIN RUSUK PENGUAT 3D BOTOL (5 EXTERNAL STRENGTH RIBS) -->
+                        <a-torus position="0 0.17 0" radius="0.147" radius-tubular="0.004" rotation="90 0 0" 
+                                 material="color: #0369a1; roughness: 0.3; metalness: 0.05;"></a-torus>
+                        <a-torus position="0 0.24 0" radius="0.147" radius-tubular="0.004" rotation="90 0 0" 
+                                 material="color: #0369a1; roughness: 0.3; metalness: 0.05;"></a-torus>
+                        <a-torus position="0 0.31 0" radius="0.147" radius-tubular="0.005" rotation="90 0 0" 
+                                 material="color: #0284c7; roughness: 0.3; metalness: 0.05;"></a-torus>
+                        <a-torus position="0 0.38 0" radius="0.147" radius-tubular="0.004" rotation="90 0 0" 
+                                 material="color: #0369a1; roughness: 0.3; metalness: 0.05;"></a-torus>
+                        <a-torus position="0 0.45 0" radius="0.147" radius-tubular="0.004" rotation="90 0 0" 
+                                 material="color: #0369a1; roughness: 0.3; metalness: 0.05;"></a-torus>
 
                     </a-entity>
                 </a-entity>
@@ -999,35 +913,35 @@
             <!-- --------------------------------------------------------------------- -->
             <!-- 1. CERMIN BERDIRI SELURUH BADAN (FULL-LENGTH DRESS MIRROR / 姿見鏡) -->
             <!-- Calon pelamar wajib memeriksa kerapian jas, simpul dasi & rambut sebelum wawancara -->
-            <!-- Dilengkapi cermin real-time Three.js Reflector & pencahayaan vanity LED -->
+            <!-- Dioptimalkan untuk 60 FPS Solid & 100% Bebas Glitch Pantulan Cahaya -->
             <a-entity id="grooming-mirror" position="-4.92 1.35 15.0" rotation="0 90 0">
-                <!-- Bingkai Kayu & Logam Elegan -->
-                <a-box position="0 0 0" width="0.76" height="2.05" depth="0.04" mixin="wood-dark"></a-box>
-                <a-box position="0 0 0.01" width="0.72" height="2.01" depth="0.02" mixin="metal-chrome"></a-box>
+                <!-- 1. Papan Belakang Kayu Solid (Backboard) -->
+                <a-box position="0 0 -0.01" width="0.76" height="2.05" depth="0.02" mixin="wood-dark"></a-box>
                 
-                <!-- BIDANG KACA CERMIN REAL-TIME (PLANAR REFLECTION WEBGL DUAL-LAYER) -->
-                <a-entity position="0 0 0.022" realtime-mirror="width: 0.66; height: 1.93"></a-entity>
+                <!-- 2. Lis Bingkai Luar Logam Chrome 4 Sisi (Hollow Center - Bebas Z-Fighting) -->
+                <!-- Lis Atas & Bawah -->
+                <a-box position="0 0.99 0.012" width="0.72" height="0.05" depth="0.02" mixin="metal-chrome"></a-box>
+                <a-box position="0 -0.99 0.012" width="0.72" height="0.05" depth="0.02" mixin="metal-chrome"></a-box>
+                <!-- Lis Kiri & Kanan -->
+                <a-box position="-0.34 0 0.012" width="0.05" height="1.95" depth="0.02" mixin="metal-chrome"></a-box>
+                <a-box position="0.34 0 0.012" width="0.05" height="1.95" depth="0.02" mixin="metal-chrome"></a-box>
 
-                <!-- Lampu Vanity LED Bar di Atas Cermin -->
-                <a-box position="0 1.05 0.06" width="0.48" height="0.03" depth="0.05" material="color: #0f172a;"></a-box>
-                <a-box position="0 1.05 0.09" width="0.44" height="0.018" depth="0.015" 
+                <!-- 3. Pelat Dasar Kaca Obsidian Cermin (Flat Shader - Bebas Pantulan Strobe) -->
+                <a-plane position="0 0 0.004" width="0.64" height="1.93" 
+                         material="color: #080c16; shader: flat;"></a-plane>
+                
+                <!-- 4. Refleksi Jas Formal Recruit Kandidat (Flat Shader - Warna Tajam & Sempurna Tanpa Glitch) -->
+                <a-plane position="0 -0.04 0.008" width="0.64" height="1.84" 
+                         material="src: #tex-candidate-avatar; transparent: true; alphaTest: 0.5; shader: flat; depthWrite: true;"></a-plane>
+
+                <!-- 5. Lampu Vanity LED Bar di Atas Cermin -->
+                <a-box position="0 1.05 0.04" width="0.48" height="0.03" depth="0.04" material="color: #0f172a;"></a-box>
+                <a-box position="0 1.05 0.062" width="0.44" height="0.018" depth="0.01" 
                        material="color: #ffffff; emissive: #ffffff; emissiveIntensity: 1.0; roughness: 0.2;"></a-box>
-                
-                <!-- Pencahayaan Vanity Terang & Merata Menempel pada Bingkai Cermin (+Z lokal = +X dunia) -->
-                <!-- Cahaya selalu berada di depan pemain bahkan saat mendekat sangat dekat ke kaca (X = -4.65) -->
-                <!-- 1. Lampu Atas: Tepat di fixture LED bar atas cermin, menerangi kepala, rambut, wajah & kerah -->
-                <a-light type="point" color="#ffffff" intensity="1.8" distance="5.0" position="0 1.02 0.08"></a-light>
-                <!-- 2. Lampu Tengah: Setinggi dada, menerangi simpul dasi, kemeja putih & kerah jas formal -->
-                <a-light type="point" color="#ffffff" intensity="1.6" distance="4.5" position="0 0.35 0.08"></a-light>
-                <!-- 3. Lampu Bawah: Setinggi pinggang, menerangi jas bawah, tangan, tas koper & celana bahan -->
-                <a-light type="point" color="#f8fafc" intensity="1.3" distance="4.0" position="0 -0.45 0.08"></a-light>
 
-                <!-- Plakat Pengingat Kerapian Diri (Minashinami Check) -->
+                <!-- 6. Plakat Pengingat Kerapian Diri (Minashinami Check) -->
                 <a-entity position="0 1.15 0.03" jp-text="value: 身だしなみチェック\n服装・髪型・ネクタイ確認; color: #38bdf8; fontSize: 32; width: 1.1; height: 0.28;"></a-entity>
             </a-entity>
-
-            <!-- 2. AVATAR KANDIDAT WAWANCARA (RECRUIT SUIT AVATAR) - Mengikuti pemain secara real-time -->
-            <a-entity id="candidate-player-avatar" candidate-avatar></a-entity>
 
 
 

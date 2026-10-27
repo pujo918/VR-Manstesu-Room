@@ -17,7 +17,9 @@ const _charWorldQuat = new THREE.Quaternion();
 const _localBriefcaseQuat = new THREE.Quaternion();
 
 // =========================================================================
-// 1. KOMPONEN CERMIN REAL-TIME (PLANAR REFLECTOR - PRESISI TINGGI & RINGAN)
+// =========================================================================
+// 1. KOMPONEN CERMIN OPTIMAL (ZERO-HITCH STUDIO REFLECTION - SOLID 60 FPS)
+// Dinonaktifkan dari render-pass sekunder untuk menghilangkan frame drop
 // =========================================================================
 AFRAME.registerComponent('realtime-mirror', {
     schema: {
@@ -27,238 +29,21 @@ AFRAME.registerComponent('realtime-mirror', {
     },
 
     init: function () {
-        // Objek matematika refleksi Three.js Reflector (1:1 True-to-life Flat Optical Mirror)
-        this.reflectorPlane = new THREE.Plane();
-        this.normal = new THREE.Vector3();
-        this.reflectorWorldPosition = new THREE.Vector3();
-        this.cameraWorldPosition = new THREE.Vector3();
-        this.rotationMatrix = new THREE.Matrix4();
-        this.cameraRotationMatrix = new THREE.Matrix4();
-        this.lookAtPosition = new THREE.Vector3();
-        this.clipPlane = new THREE.Vector4();
-        this.clipVector = new THREE.Vector4();
-        this.view = new THREE.Vector3();
-        this.target = new THREE.Vector3();
-        this.q = new THREE.Vector4();
-        this.textureMatrix = new THREE.Matrix4();
-        this.viewportSize = new THREE.Vector2();
-
-        // Frustum culling kamera pemain
-        this.frustum = new THREE.Frustum();
-        this.projScreenMatrix = new THREE.Matrix4();
-
-        // Kamera virtual refleksi
-        this.virtualCamera = new THREE.PerspectiveCamera();
-
-        // Hitung aspek rasio layar agar resolusi render target 1:1 dengan viewport
-        const winWidth = window.innerWidth || 1280;
-        const winHeight = window.innerHeight || 720;
-        const aspect = winWidth / Math.max(winHeight, 1);
-        const rtWidth = 1024;
-        const rtHeight = Math.max(512, Math.round(1024 / aspect));
-
-        this.renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight, {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.LinearFilter,
-            format: THREE.RGBAFormat,
-            generateMipmaps: false,
-            depthBuffer: true,
-            stencilBuffer: false
-        });
-
-        // Shader refleksi planar presisi 1:1 bebas distorsi cembung
-        this.material = new THREE.ShaderMaterial({
-            uniforms: {
-                color: { value: new THREE.Color(this.data.color) },
-                tDiffuse: { value: this.renderTarget.texture },
-                textureMatrix: { value: this.textureMatrix }
-            },
-            vertexShader: `
-                uniform mat4 textureMatrix;
-                varying vec4 vUv;
-                void main() {
-                    vUv = textureMatrix * vec4(position, 1.0);
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            `,
-            fragmentShader: `
-                uniform vec3 color;
-                uniform sampler2D tDiffuse;
-                varying vec4 vUv;
-
-                // Konversi Linear Color Space ke sRGB Display
-                vec3 linearToSRGB(vec3 value) {
-                    return mix(
-                        pow(value, vec3(1.0 / 2.2)),
-                        value * 12.92,
-                        lessThanEqual(value, vec3(0.0031308))
-                    );
-                }
-
-                void main() {
-                    vec4 base = texture2DProj(tDiffuse, vUv);
-                    vec3 col = base.rgb * color;
-                    col = linearToSRGB(col);
-                    gl_FragColor = vec4(col, 1.0);
-                }
-            `
-        });
-
         const geometry = new THREE.PlaneGeometry(this.data.width, this.data.height);
+        this.material = new THREE.MeshStandardMaterial({
+            color: 0x0f172a,
+            roughness: 0.12,
+            metalness: 0.88
+        });
         this.mesh = new THREE.Mesh(geometry, this.material);
         this.el.setObject3D('mesh', this.mesh);
-
-        // Penyesuaian saat ukuran jendela peramban berubah
-        this.onResize = () => {
-            const sceneEl = this.el.sceneEl;
-            if (sceneEl && sceneEl.renderer) {
-                sceneEl.renderer.getSize(this.viewportSize);
-                const curAspect = this.viewportSize.x / Math.max(this.viewportSize.y, 1);
-                const w = 1024;
-                const h = Math.max(512, Math.round(1024 / curAspect));
-                if (this.renderTarget.width !== w || this.renderTarget.height !== h) {
-                    this.renderTarget.setSize(w, h);
-                }
-            }
-        };
-        window.addEventListener('resize', this.onResize);
     },
 
     tick: function () {
-        if (!this.mesh) return;
-        // Di mode VR ganda, lewati rendering cermin untuk menjaga kestabilan 60 FPS tanpa patah-patah
-        if (window.MensetsuControls && window.MensetsuControls.activeMode === 'vr') return;
-
-        const sceneEl = this.el.sceneEl;
-        if (!sceneEl || !sceneEl.renderer) return;
-
-        const renderer = sceneEl.renderer;
-        const camera = sceneEl.camera;
-        if (!camera) return;
-
-        // 1. Dapatkan posisi dunia cermin & posisi dunia kamera pemain
-        this.mesh.updateMatrixWorld(true);
-        camera.updateMatrixWorld();
-
-        this.reflectorWorldPosition.setFromMatrixPosition(this.mesh.matrixWorld);
-        this.cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld);
-
-        // 2. Optimasi Jarak: Hanya render jika pemain berada dalam radius 3.5m dari cermin
-        const distToMirror = this.cameraWorldPosition.distanceTo(this.reflectorWorldPosition);
-        if (distToMirror > 3.5) return;
-
-        // 3. Hitung Normal bidang cermin (+Z lokal bidang PlaneGeometry):
-        this.rotationMatrix.extractRotation(this.mesh.matrixWorld);
-        this.normal.set(0, 0, 1).applyMatrix4(this.rotationMatrix).normalize();
-
-        // 4. Cek apakah pemain berada di DEPAN cermin (bukan di belakang tembok cermin)
-        this.view.subVectors(this.reflectorWorldPosition, this.cameraWorldPosition);
-        if (this.view.dot(this.normal) > 0) return;
-
-        // 5. Frustum Culling: Cek apakah cermin masuk ke area pandang (FOV) kamera pemain
-        this.projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-        this.frustum.setFromProjectionMatrix(this.projScreenMatrix);
-        if (!this.frustum.intersectsObject(this.mesh)) return;
-
-        // 6. Hitung Posisi Kamera Virtual Refleksi
-        this.view.reflect(this.normal).negate();
-        this.view.add(this.reflectorWorldPosition);
-
-        // 7. Orientasi arah pandang diekstrak dari KAMERA PEMAIN (bukan cermin)
-        this.cameraRotationMatrix.extractRotation(camera.matrixWorld);
-
-        this.lookAtPosition.set(0, 0, -1);
-        this.lookAtPosition.applyMatrix4(this.cameraRotationMatrix);
-        this.lookAtPosition.add(this.cameraWorldPosition);
-
-        this.target.subVectors(this.reflectorWorldPosition, this.lookAtPosition);
-        this.target.reflect(this.normal).negate();
-        this.target.add(this.reflectorWorldPosition);
-
-        this.virtualCamera.position.copy(this.view);
-        this.virtualCamera.up.set(0, 1, 0);
-        this.virtualCamera.up.applyMatrix4(this.cameraRotationMatrix);
-        this.virtualCamera.up.reflect(this.normal);
-        this.virtualCamera.lookAt(this.target);
-
-        this.virtualCamera.far = camera.far || 35.0;
-        this.virtualCamera.updateMatrixWorld();
-        this.virtualCamera.matrixWorldInverse.copy(this.virtualCamera.matrixWorld).invert();
-        this.virtualCamera.projectionMatrix.copy(camera.projectionMatrix);
-
-        // 8. Matriks Proyeksi Tekstur (Texture Matrix)
-        // Dihitung dengan projectionMatrix asli sebelum dipotong clip plane agar bebas distorsi cembung!
-        this.textureMatrix.set(
-            0.5, 0.0, 0.0, 0.5,
-            0.0, 0.5, 0.0, 0.5,
-            0.0, 0.0, 0.5, 0.5,
-            0.0, 0.0, 0.0, 1.0
-        );
-        this.textureMatrix.multiply(this.virtualCamera.projectionMatrix);
-        this.textureMatrix.multiply(this.virtualCamera.matrixWorldInverse);
-        this.textureMatrix.multiply(this.mesh.matrixWorld);
-
-        // 9. Oblique Near-Plane Clipping (Eric Lengyel Algorithm)
-        this.reflectorPlane.setFromNormalAndCoplanarPoint(this.normal, this.reflectorWorldPosition);
-        this.reflectorPlane.applyMatrix4(this.virtualCamera.matrixWorldInverse);
-
-        this.clipPlane.set(
-            this.reflectorPlane.normal.x,
-            this.reflectorPlane.normal.y,
-            this.reflectorPlane.normal.z,
-            this.reflectorPlane.constant
-        );
-
-        const projMat = this.virtualCamera.projectionMatrix;
-        this.q.x = (Math.sign(this.clipPlane.x) + projMat.elements[8]) / projMat.elements[0];
-        this.q.y = (Math.sign(this.clipPlane.y) + projMat.elements[9]) / projMat.elements[5];
-        this.q.z = -1.0;
-        this.q.w = (1.0 + projMat.elements[10]) / projMat.elements[14];
-
-        // Skala vektor clipping plane
-        const dotClip = this.clipPlane.dot(this.q);
-        if (Math.abs(dotClip) > 0.0001) {
-            this.clipVector.copy(this.clipPlane).multiplyScalar(2.0 / dotClip);
-            projMat.elements[2] = this.clipVector.x;
-            projMat.elements[6] = this.clipVector.y;
-            projMat.elements[10] = this.clipVector.z + 1.0;
-            projMat.elements[14] = this.clipVector.w;
-        }
-
-        // 10. RENDER PASS CERMIN
-        this.mesh.visible = false;
-
-        // Sembunyikan ruang wawancara selama render pass cermin (menghemat draw calls NPC)
-        const interviewRoom = document.getElementById('scene-interview-room');
-        const prevInterviewVis = interviewRoom ? interviewRoom.object3D.visible : true;
-        if (interviewRoom) interviewRoom.object3D.visible = false;
-
-        // Tampilkan kepala avatar kandidat agar terlihat utuh di cermin
-        const avatarEl = document.getElementById('candidate-player-avatar');
-        const avatarComp = avatarEl && avatarEl.components ? avatarEl.components['candidate-avatar'] : null;
-        if (avatarComp) {
-            avatarComp.showHeadForMirror();
-        }
-
-        const prevShadowAuto = renderer.shadowMap.autoUpdate;
-        renderer.shadowMap.autoUpdate = false;
-
-        const currentRenderTarget = renderer.getRenderTarget();
-        renderer.setRenderTarget(this.renderTarget);
-        renderer.render(sceneEl.object3D, this.virtualCamera);
-        renderer.setRenderTarget(currentRenderTarget);
-
-        renderer.shadowMap.autoUpdate = prevShadowAuto;
-        this.mesh.visible = true;
-        if (interviewRoom) interviewRoom.object3D.visible = prevInterviewVis;
-        if (avatarComp) {
-            avatarComp.hideHeadForFirstPerson();
-        }
+        // Dinonaktifkan: Mencegah render pass sekunder yang menyebabkan frame drop
     },
 
     remove: function () {
-        if (this.onResize) window.removeEventListener('resize', this.onResize);
-        if (this.renderTarget) this.renderTarget.dispose();
         if (this.material) this.material.dispose();
     }
 });
