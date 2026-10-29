@@ -111,16 +111,23 @@
                 const renderer = scene.renderer;
                 if (!renderer) return;
 
-                // 1. Simpan Pixel Ratio asli dan optimasi ke 1.25 di VR mode agar stabil di 60 FPS
+                // 1. Simpan Pixel Ratio asli dan gunakan rasio resolusi tajam agar tidak blur di VR smartphone
                 if (this._origPixelRatio === null) {
                     this._origPixelRatio = renderer.getPixelRatio();
                 }
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+                const nativeDpr = window.devicePixelRatio || 1;
+                // Gunakan rasio tajam (hingga 2.25) agar teks dan objek 3D tidak pecah/blur di VR lensa
+                const vrDpr = Math.min(Math.max(nativeDpr, 1.5), 2.25);
+                renderer.setPixelRatio(vrDpr);
+
+                if (typeof scene.resize === 'function') {
+                    scene.resize();
+                    setTimeout(() => { if (typeof scene.resize === 'function') scene.resize(); }, 300);
+                }
 
                 // 2. Inisialisasi THREE.StereoCamera bawaan A-Frame
                 if (!this._stereoCam) {
                     this._stereoCam = new AFRAME.THREE.StereoCamera();
-                    this._stereoCam.aspect = 0.5;
                     this._stereoCam.eyeSep = 0.064; // Interpupillary distance standar ~64mm
                 }
 
@@ -158,7 +165,17 @@
                         const height = size.y;
                         const halfW = Math.floor(width / 2);
 
-                        // Perbarui kamera stereo berdasarkan orientasi & posisi kamera aktif
+                        // Pastikan aspek rasio kamera utama sinkron dengan dimensi layar penuh
+                        if (c && height > 0) {
+                            const screenAspect = width / height;
+                            if (Math.abs(c.aspect - screenAspect) > 0.01) {
+                                c.aspect = screenAspect;
+                                c.updateProjectionMatrix();
+                            }
+                        }
+
+                        // Dalam Three.js StereoCamera, 'aspect' adalah faktor pembagi horizontal layar (0.5 untuk Side-by-Side).
+                        // Three.js mengalikan camera.aspect * 0.5 = (width/height) * 0.5 = halfW/height (proporsi 1:1 asli)
                         self._stereoCam.aspect = 0.5;
                         self._stereoCam.update(c);
 
@@ -217,6 +234,9 @@
             const scene = document.querySelector('a-scene');
             if (scene && scene.renderer && this._origPixelRatio !== null) {
                 scene.renderer.setPixelRatio(this._origPixelRatio);
+                if (typeof scene.resize === 'function') {
+                    scene.resize();
+                }
             }
         },
 

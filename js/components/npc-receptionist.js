@@ -184,6 +184,10 @@
             }
         },
 
+        navigateMenuSelection: function (dir) {
+            this.navigateMenu(dir);
+        },
+
         confirmSelectedMenu: function () {
             if (!this.isMenuOpen) return;
             const topic = this.menuTopics[this.selectedOptionIndex];
@@ -1102,6 +1106,8 @@
             }
         }
     });
+
+    window.ReceptionistNPC = window.MensetsuReceptionist;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => window.MensetsuReceptionist.init());

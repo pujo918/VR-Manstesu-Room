@@ -8,26 +8,29 @@
     const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                            (window.matchMedia && window.matchMedia('(max-width: 768px)').matches && 'ontouchstart' in window);
 
-    // Inisialisasi State Global Mensetsu
-    window.MensetsuState = {
-        studentName: localStorage.getItem('mensetsu_student_name') || '',
-        sessionId: localStorage.getItem('mensetsu_session_id') || generateSessionId(),
-        deviceMode: isMobileDevice ? 'mobile' : 'pc', // 'pc' | 'mobile' | 'vr'
-        isStarted: false,
-        startTime: null,
-        knockCount: 0,
-        ojigiCount: 0
-    };
-
     function generateSessionId() {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         let res = 'MENSET-';
         for (let i = 0; i < 6; i++) {
             res += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        localStorage.setItem('mensetsu_session_id', res);
         return res;
     }
+
+    // Inisialisasi State Global Mensetsu - selalu buat sesi baru yang bersih untuk setiap kunjungan / refresh
+    window.MensetsuState = {
+        studentName: localStorage.getItem('mensetsu_student_name') || '',
+        sessionId: generateSessionId(),
+        deviceMode: isMobileDevice ? 'mobile' : 'pc', // 'pc' | 'mobile' | 'vr'
+        isStarted: false,
+        startTime: null,
+        knockCount: 0,
+        ojigiCount: 0,
+        hasWatchedVideo: false,
+        isCalledForInterview: false,
+        receptionCheckedIn: false,
+        micGranted: localStorage.getItem('mensetsu_mic_permitted') === 'true'
+    };
 
     const DEVICE_METADATA = {
         pc: {
@@ -194,13 +197,14 @@
                     <!-- ==================================================== -->
                     <div id="gate-step-device" class="gate-step-panel gate-step-hidden">
                         <div class="gate-header">
-                            <div class="step-nav-row">
+                            <div class="step-nav-row" id="gate-device-nav-row" style="display:none;">
                                 <button type="button" class="btn-gate-back" id="btn-back-to-mic" title="Periksa ulang mikrofon">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m7 7-7-7 7-7"/></svg>
                                     <span>Cek Mikrofon</span>
                                 </button>
                                 <div class="gate-badge">Pilihan Perangkat • 端末選択</div>
                             </div>
+                            <div class="gate-badge" id="gate-device-badge-standalone">日本大学院・奨学金面接シミュレーション</div>
                             <h1 class="gate-title">Menggunakan device apa?</h1>
                             <p class="gate-subtitle">Silakan pilih perangkat yang Anda gunakan untuk memulai simulasi wawancara.</p>
                         </div>
@@ -351,8 +355,15 @@
             // 0. Tombol Lanjutkan dari Layar Loading jika pengguna ingin langsung klik
             const loaderReadyBtn = document.getElementById('btn-loader-ready');
             if (loaderReadyBtn) {
-                loaderReadyBtn.addEventListener('click', () => {
-                    this.goToStepMic();
+                loaderReadyBtn.addEventListener('click', async () => {
+                    const isPermitted = await this.checkIfMicAlreadyPermitted();
+                    if (isPermitted) {
+                        if (!window.MensetsuState) window.MensetsuState = {};
+                        window.MensetsuState.micGranted = true;
+                        this.goToStepDevice();
+                    } else {
+                        this.goToStepMic();
+                    }
                 });
             }
 
@@ -541,11 +552,20 @@
                                             btnReady.classList.add('is-active');
                                         }
 
-                                        // Transisi otomatis halus ke Step 1 (Izin Mikrofon Upfront) setelah jeda elegan 950ms
-                                        setTimeout(() => {
+                                        // Transisi otomatis halus ke Step Pemilihan Perangkat / Izin Mikrofon (Hanya untuk pengguna baru)
+                                        setTimeout(async () => {
                                             const stepLoading = document.getElementById('gate-step-loading');
                                             if (stepLoading && stepLoading.classList.contains('gate-step-visible')) {
-                                                this.goToStepMic();
+                                                const isPermitted = await this.checkIfMicAlreadyPermitted();
+                                                if (isPermitted) {
+                                                    // Sudah pernah mengizinkan di browser ini -> langsung buka Step Device!
+                                                    if (!window.MensetsuState) window.MensetsuState = {};
+                                                    window.MensetsuState.micGranted = true;
+                                                    this.goToStepDevice();
+                                                } else {
+                                                    // Pengguna baru pertama kali -> minta izin mikrofon upfront
+                                                    this.goToStepMic();
+                                                }
                                             }
                                         }, 950);
                                     }
@@ -562,10 +582,17 @@
                         gpuWarmupDone = true;
                         currentTargetProgress = 100;
                         setProgress(100, 'Sistem Siap! Performa 60 FPS Optimal', 'Semua aset siap.');
-                        setTimeout(() => {
+                        setTimeout(async () => {
                             const stepLoading = document.getElementById('gate-step-loading');
                             if (stepLoading && stepLoading.classList.contains('gate-step-visible')) {
-                                this.goToStepMic();
+                                const isPermitted = await this.checkIfMicAlreadyPermitted();
+                                if (isPermitted) {
+                                    if (!window.MensetsuState) window.MensetsuState = {};
+                                    window.MensetsuState.micGranted = true;
+                                    this.goToStepDevice();
+                                } else {
+                                    this.goToStepMic();
+                                }
                             }
                         }, 950);
                     }, 850);
@@ -611,7 +638,24 @@
             }, 90);
         },
 
-        // Navigasi ke Step 1 (Izin Mikrofon Upfront)
+        // Cek apakah browser ini sudah pernah mengizinkan mikrofon (Hanya minta SEKALI per browser)
+        checkIfMicAlreadyPermitted: async function () {
+            if (localStorage.getItem('mensetsu_mic_permitted') === 'true') {
+                return true;
+            }
+            if (navigator.permissions && navigator.permissions.query) {
+                try {
+                    const res = await navigator.permissions.query({ name: 'microphone' });
+                    if (res && res.state === 'granted') {
+                        localStorage.setItem('mensetsu_mic_permitted', 'true');
+                        return true;
+                    }
+                } catch (e) {}
+            }
+            return false;
+        },
+
+        // Navigasi ke Step 1 (Izin Mikrofon Upfront - Hanya untuk pengguna baru di browser ini)
         goToStepMic: function () {
             if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
 
@@ -668,6 +712,7 @@
             }
 
             if (status === 'granted') {
+                localStorage.setItem('mensetsu_mic_permitted', 'true');
                 if (iconWrap) {
                     iconWrap.classList.add('is-granted');
                     iconWrap.classList.remove('is-denied');
@@ -711,6 +756,7 @@
             const descEl = document.getElementById('gate-mic-status-desc');
 
             if (window.MensetsuState && window.MensetsuState.micGranted) {
+                localStorage.setItem('mensetsu_mic_permitted', 'true');
                 this.goToStepDevice();
                 return;
             }
@@ -730,6 +776,9 @@
                     if (!window.MensetsuState) window.MensetsuState = {};
                     window.MensetsuState.micGranted = true;
                 }
+
+                // Catat di localStorage bahwa browser ini SUDAH mengizinkan mikrofon (cukup sekali!)
+                localStorage.setItem('mensetsu_mic_permitted', 'true');
 
                 if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
 
@@ -779,6 +828,20 @@
             const stepMic = document.getElementById('gate-step-mic');
             const step1 = document.getElementById('gate-step-device');
             const step2 = document.getElementById('gate-step-name');
+
+            // Sesuaikan tombol kembali ke mic: hanya muncul jika pengguna baru saja membuka step mic
+            const navRow = document.getElementById('gate-device-nav-row');
+            const badgeAlone = document.getElementById('gate-device-badge-standalone');
+            const wasOnMic = stepMic && stepMic.classList.contains('gate-step-visible');
+            if (navRow && badgeAlone) {
+                if (wasOnMic) {
+                    navRow.style.display = 'flex';
+                    badgeAlone.style.display = 'none';
+                } else {
+                    navRow.style.display = 'none';
+                    badgeAlone.style.display = 'inline-flex';
+                }
+            }
 
             if (stepLoad) {
                 stepLoad.classList.remove('gate-step-visible');
@@ -878,6 +941,48 @@
             window.MensetsuState.startTime = new Date();
             localStorage.setItem('mensetsu_student_name', name);
 
+            // Selalu reset seluruh alur wawancara, audio, dan penilaian etika ke kondisi awal bersih
+            if (window.MensetsuInterview && typeof window.MensetsuInterview.reset === 'function') {
+                window.MensetsuInterview.reset();
+            }
+            if (window.MannerEvaluation && typeof window.MannerEvaluation.reset === 'function') {
+                window.MannerEvaluation.reset();
+            }
+            if (window.MensetsuRecorder && typeof window.MensetsuRecorder.reset === 'function') {
+                window.MensetsuRecorder.reset();
+            }
+
+            // Kembalikan posisi kamera pemain ke ruang tunggu depan pintu
+            const playerCam = document.getElementById('player-camera');
+            if (playerCam && playerCam.object3D) {
+                playerCam.object3D.position.set(0, 1.6, 14.2);
+                playerCam.setAttribute('position', '0 1.6 14.2');
+                const playerComp = playerCam.components['player-collision-and-proximity'];
+                if (playerComp && playerComp.lastValidPos) {
+                    playerComp.lastValidPos.x = 0;
+                    playerComp.lastValidPos.z = 14.2;
+                }
+            }
+
+            // Pastikan pintu ruang wawancara tertutup rapat di awal sesi
+            window.isDoorOpen = false;
+            window.isSitting = false;
+            window.currentSeat = null;
+            const doorPivot = document.getElementById('door-pivot');
+            if (doorPivot) {
+                doorPivot.setAttribute('rotation', '0 0 0');
+            }
+            const doorText = document.getElementById('status-door');
+            if (doorText) doorText.innerHTML = '<b style="color:#dc2626">Tertutup</b>';
+            const sitText = document.getElementById('status-posture');
+            if (sitText) sitText.innerHTML = '<b style="color:#cbd5e1">Berdiri (立位)</b>';
+
+            // Reset indikator lampu pintu & status panggilan ke merah (belum dipanggil)
+            window.MensetsuState.hasWatchedVideo = false;
+            window.MensetsuState.isCalledForInterview = false;
+            window.MensetsuState.receptionCheckedIn = false;
+            window.dispatchEvent(new CustomEvent('mensetsu-door-lamp-reset'));
+
             if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
 
             // Tampilkan tombol Layar Penuh dan Chip Nama di pojok kanan atas saat bermain
@@ -889,8 +994,6 @@
             if (nav) {
                 nav.style.display = 'flex';
             }
-
-
 
             // Hilangkan Gate Screen dengan animasi halus
             const gate = document.getElementById('gate-screen');

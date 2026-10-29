@@ -89,6 +89,43 @@
         bubbleChunkTimers: [],
         _bubbleTickerStarted: false,
 
+        reset: function () {
+            console.log('Mereset alur wawancara MensetsuInterview ke awal (WAITING_ENTRY)...');
+            this.currentStep = 'WAITING_ENTRY';
+            this.isNpcSpeaking = false;
+            this.activeSpeakerId = null;
+            this.activeDialogKey = null;
+            this.isCandidateAnswering = false;
+            this.isWaitingForCandidateAnswer = false;
+            this.currentAnswerCallback = null;
+            this.currentQuestionKey = null;
+            this.lastQuestionEndTime = 0;
+
+            // Hentikan pemutaran audio pertanyaan NPC jika sedang berjalan
+            if (this.currentAudio) {
+                try {
+                    this.currentAudio.pause();
+                    this.currentAudio.currentTime = 0;
+                } catch (e) {}
+                this.currentAudio = null;
+            }
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+
+            // Sembunyikan Balon Kata Komik 3D
+            this.hideSubtitleBubble();
+
+            // Sembunyikan HUD dialog transkrip
+            const overlay = document.getElementById('npc-dialogue-overlay');
+            if (overlay) overlay.classList.remove('active');
+
+            // Hentikan dan reset perekaman suara kandidat
+            if (window.MensetsuRecorder && typeof window.MensetsuRecorder.reset === 'function') {
+                window.MensetsuRecorder.reset();
+            }
+        },
+
         init: function () {
             console.log('Sistem 3 NPC Pewawancara & 3D Speech Bubble Diaktifkan.');
             this.createSubtitleOverlay();
@@ -587,6 +624,18 @@
 
                 const pos = camera.getAttribute('position');
                 const isSitting = window.isSitting;
+
+                // 0. Evaluasi Reset: Jika kandidat kembali ke ruang tunggu (pos.z > 5.5) sebelum sesi wawancara selesai,
+                // reset otomatis alur pertanyaan wawancara dan penilaian etika ke awal (WAITING_ENTRY).
+                // Sehingga ketika kandidat masuk lagi, pewawancara menanyakan dari awal tanpa melanjutkan sesi terputus.
+                if (pos.z > 5.5 && this.currentStep !== 'WAITING_ENTRY' && this.currentStep !== 'FINISHED') {
+                    console.log('Kandidat kembali ke ruang tunggu sebelum wawancara tuntas. Mereset wawancara ke awal.');
+                    this.reset();
+                    if (window.MannerEvaluation && typeof window.MannerEvaluation.reset === 'function') {
+                        window.MannerEvaluation.reset();
+                    }
+                    return;
+                }
 
                 // 1. Saat kandidat tiba di dekat meja/kursi wawancara (Z < 0.8) tapi belum duduk
                 if (this.currentStep === 'WAITING_ENTRY' && pos.z < 0.8 && pos.z > -2.0 && !isSitting) {

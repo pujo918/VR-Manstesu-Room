@@ -28,6 +28,23 @@
             question4: null,
             question5: null
         },
+        transcripts: {
+            question_intro: '',
+            question1: '',
+            question2: '',
+            question3: '',
+            question4: '',
+            question5: ''
+        },
+        speechMetrics: {
+            question_intro: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+            question1: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+            question2: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+            question3: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+            question4: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+            question5: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' }
+        },
+        recognition: null,
         currentQuestionKey: null,
         isRecording: false,
         recordStartTime: 0,
@@ -98,6 +115,43 @@
                 console.warn('Izin akses mikrofon gagal atau ditolak:', err);
                 throw err;
             }
+        },
+
+        reset: function () {
+            this.recordedAudios = {
+                question_intro: null,
+                question1: null,
+                question2: null,
+                question3: null,
+                question4: null,
+                question5: null
+            };
+            this.transcripts = {
+                question_intro: '',
+                question1: '',
+                question2: '',
+                question3: '',
+                question4: '',
+                question5: ''
+            };
+            this.speechMetrics = {
+                question_intro: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+                question1: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+                question2: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+                question3: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+                question4: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' },
+                question5: { durationSec: 0, hasVoice: false, charCount: 0, transcript: '' }
+            };
+            if (this.recognition) {
+                try { this.recognition.abort(); } catch (_) {}
+                this.recognition = null;
+            }
+            this.pcmChunks = [];
+            this.currentQuestionKey = null;
+            if (this.isRecording) {
+                this.stopRecording();
+            }
+            console.log('Voice Recorder telah di-reset ke kondisi awal.');
         },
 
         init: function () {
@@ -204,6 +258,58 @@
                     this.recordStartTime = Date.now();
                     this.showRecorderHUD(true);
                     this.startTimer();
+
+                    // Inisialisasi Web Speech API (ja-JP) untuk mendeteksi bahasa Jepang & transkripsi
+                    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    if (SpeechRec) {
+                        try {
+                            if (this.recognition) {
+                                try { this.recognition.abort(); } catch (_) {}
+                                this.recognition = null;
+                            }
+                            this.recognition = new SpeechRec();
+                            this.recognition.lang = 'ja-JP';
+                            this.recognition.continuous = true;
+                            this.recognition.interimResults = true;
+                            this.recognition.maxAlternatives = 1;
+
+                            const activeQKey = this.currentQuestionKey;
+                            let finalAccum = '';
+
+                            this.recognition.onresult = (ev) => {
+                                let interim = '';
+                                for (let i = ev.resultIndex; i < ev.results.length; ++i) {
+                                    const res = ev.results[i];
+                                    if (res.isFinal) {
+                                        finalAccum += res[0].transcript + ' ';
+                                    } else {
+                                        interim += res[0].transcript;
+                                    }
+                                }
+                                const currentText = (finalAccum + interim).trim();
+                                this.transcripts[activeQKey] = currentText;
+                                if (this.speechMetrics[activeQKey]) {
+                                    this.speechMetrics[activeQKey].transcript = currentText;
+                                    this.speechMetrics[activeQKey].charCount = currentText.length;
+                                }
+                            };
+
+                            this.recognition.onerror = (err) => {
+                                console.warn('[STT ja-JP Info]:', err.error);
+                            };
+
+                            this.recognition.onend = () => {
+                                if (this.isRecording && this.recognition) {
+                                    try { this.recognition.start(); } catch (_) {}
+                                }
+                            };
+
+                            this.recognition.start();
+                        } catch (sttErr) {
+                            console.warn('[STT ja-JP Start Error]:', sttErr);
+                        }
+                    }
+
                     window.dispatchEvent(new CustomEvent('mensetsu-rec-started', { detail: { questionKey: this.currentQuestionKey } }));
                 })
                 .catch((err) => {
@@ -215,6 +321,58 @@
                     this.recordStartTime = Date.now();
                     this.showRecorderHUD(true);
                     this.startTimer();
+
+                    // Inisialisasi Web Speech API (ja-JP) untuk mendeteksi bahasa Jepang & transkripsi
+                    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    if (SpeechRec) {
+                        try {
+                            if (this.recognition) {
+                                try { this.recognition.abort(); } catch (_) {}
+                                this.recognition = null;
+                            }
+                            this.recognition = new SpeechRec();
+                            this.recognition.lang = 'ja-JP';
+                            this.recognition.continuous = true;
+                            this.recognition.interimResults = true;
+                            this.recognition.maxAlternatives = 1;
+
+                            const activeQKey = this.currentQuestionKey;
+                            let finalAccum = '';
+
+                            this.recognition.onresult = (ev) => {
+                                let interim = '';
+                                for (let i = ev.resultIndex; i < ev.results.length; ++i) {
+                                    const res = ev.results[i];
+                                    if (res.isFinal) {
+                                        finalAccum += res[0].transcript + ' ';
+                                    } else {
+                                        interim += res[0].transcript;
+                                    }
+                                }
+                                const currentText = (finalAccum + interim).trim();
+                                this.transcripts[activeQKey] = currentText;
+                                if (this.speechMetrics[activeQKey]) {
+                                    this.speechMetrics[activeQKey].transcript = currentText;
+                                    this.speechMetrics[activeQKey].charCount = currentText.length;
+                                }
+                            };
+
+                            this.recognition.onerror = (err) => {
+                                console.warn('[STT ja-JP Info]:', err.error);
+                            };
+
+                            this.recognition.onend = () => {
+                                if (this.isRecording && this.recognition) {
+                                    try { this.recognition.start(); } catch (_) {}
+                                }
+                            };
+
+                            this.recognition.start();
+                        } catch (sttErr) {
+                            console.warn('[STT ja-JP Start Error]:', sttErr);
+                        }
+                    }
+
                     window.dispatchEvent(new CustomEvent('mensetsu-rec-started', { detail: { questionKey: this.currentQuestionKey } }));
                 });
         },
@@ -255,6 +413,24 @@
             const wavBase64 = this.encodePCMToWavBase64(this.pcmChunks, this.inputSampleRate, 16000);
             this.recordedAudios[targetKey] = wavBase64;
             this.pcmChunks = [];
+
+            // Rekam metrik durasi & transkripsi jawaban untuk evaluasi otomatis
+            const durSec = Math.max(0, Math.round((Date.now() - this.recordStartTime) / 1000));
+            const transcript = (this.transcripts[targetKey] || '').trim();
+            if (!this.speechMetrics[targetKey]) {
+                this.speechMetrics[targetKey] = {};
+            }
+            this.speechMetrics[targetKey].durationSec = durSec;
+            this.speechMetrics[targetKey].hasVoice = (wavBase64 && wavBase64.length > 800);
+            this.speechMetrics[targetKey].charCount = transcript.length;
+            this.speechMetrics[targetKey].transcript = transcript;
+
+            // Hentikan pengenal suara ja-JP
+            if (this.recognition) {
+                const rec = this.recognition;
+                this.recognition = null;
+                try { rec.stop(); } catch (_) {}
+            }
 
             const sizeKb = Math.round((wavBase64.length * 3 / 4) / 1024);
             console.log(`Rekaman WAV ${targetKey} berhasil disimpan (${sizeKb} KB).`);
@@ -409,16 +585,45 @@
             });
         },
 
-        // Kirim Payload Lengkap ke Google Apps Script
+        // Kirim Payload Lengkap ke Google Apps Script (Drive & Spreadsheet)
         sendDataToGoogleCloud: function () {
+            // Picu evaluasi bahasa & kelengkapan jawaban berbasis respon audio
+            if (window.MannerEvaluation && typeof window.MannerEvaluation.evaluateSpeechAndContent === 'function') {
+                window.MannerEvaluation.evaluateSpeechAndContent();
+            }
+            const mannerEval = window.MannerEvaluation && typeof window.MannerEvaluation.getSummaryPayload === 'function' 
+                ? window.MannerEvaluation.getSummaryPayload() 
+                : null;
+
             const payload = {
                 timestamp: new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }),
                 sessionId: window.MensetsuState ? window.MensetsuState.sessionId : 'MENSET-UNKNOWN',
                 studentName: window.MensetsuState ? window.MensetsuState.studentName : 'Kandidat',
                 deviceMode: window.MensetsuState ? window.MensetsuState.deviceMode : 'pc',
                 hasWatchedVideo: (window.MensetsuState && window.MensetsuState.hasWatchedVideo) ? 'Sudah Ditonton' : 'Belum Ditonton',
-                totalMannerScore: window.MannerEvaluation ? window.MannerEvaluation.getTotalScore() : 0,
-                mannerDetails: window.MannerEvaluation ? window.MannerEvaluation.getSummaryPayload().conciseNote : '-',
+
+                // SKOR 100 POIN LENGKAP & EVALUASI SUB-KATEGORI:
+                totalScore: mannerEval ? mannerEval.totalScore : (window.MannerEvaluation ? window.MannerEvaluation.getTotalScore() : 0),
+                mannerScore: mannerEval ? mannerEval.totalMannerScore : 0,
+                languageScore: mannerEval ? mannerEval.totalLanguageScore : 0,
+                contentScore: mannerEval ? mannerEval.totalContentScore : 0,
+                gradeTitle: mannerEval ? mannerEval.gradeTitle : 'Evaluasi',
+
+                // Kompatibilitas kolom lama Spreadsheet:
+                totalMannerScore: mannerEval ? mannerEval.totalScore : 0,
+                mannerDetails: mannerEval ? mannerEval.conciseNote : '-',
+                languageDetails: mannerEval ? mannerEval.languageNote : '-',
+                contentDetails: mannerEval ? mannerEval.contentNote : '-',
+
+                // TRANSKRIP TEKS BAHASA JEPANG PER PERTANYAAN:
+                transcriptIntro: this.transcripts.question_intro || '-',
+                transcriptQ1: this.transcripts.question1 || '-',
+                transcriptQ2: this.transcripts.question2 || '-',
+                transcriptQ3: this.transcripts.question3 || '-',
+                transcriptQ4: this.transcripts.question4 || '-',
+                transcriptQ5: this.transcripts.question5 || '-',
+
+                // REKAMAN SUARA WAV BASE64:
                 audioIntro: this.recordedAudios.question_intro || '',
                 audioQ1: this.recordedAudios.question1 || '',
                 audioQ2: this.recordedAudios.question2 || '',

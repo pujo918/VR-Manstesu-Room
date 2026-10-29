@@ -1083,8 +1083,8 @@ a-scene,
    ========================================================================== */
 #virtual-joystick-zone {
     position: fixed;
-    bottom: 24px;
-    left: 24px;
+    bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    left: calc(44px + env(safe-area-inset-left, 0px));
     z-index: 9999;
     user-select: none;
     -webkit-user-select: none;
@@ -1146,8 +1146,8 @@ a-scene,
    ========================================================================== */
 #mobile-action-buttons {
     position: fixed;
-    bottom: 24px;
-    right: 20px;
+    bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    right: calc(44px + env(safe-area-inset-right, 0px));
     z-index: 9999;
     user-select: none;
     -webkit-user-select: none;
@@ -1537,8 +1537,8 @@ a-scene,
     }
 
     #virtual-joystick-zone {
-        bottom: 16px;
-        left: 16px;
+        bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+        left: calc(36px + env(safe-area-inset-left, 0px));
     }
 
     #joystick-base {
@@ -1552,8 +1552,8 @@ a-scene,
     }
 
     #mobile-action-buttons {
-        bottom: 14px;
-        right: 12px;
+        bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+        right: calc(36px + env(safe-area-inset-right, 0px));
     }
 
     .xbox-pad-plate {
@@ -1792,8 +1792,8 @@ a-scene,
 
     /* 4. In-Game HUD & Mobile Controls di Landscape */
     #virtual-joystick-zone {
-        bottom: 10px !important;
-        left: 12px !important;
+        bottom: calc(32px + env(safe-area-inset-bottom, 0px)) !important;
+        left: calc(64px + env(safe-area-inset-left, 0px)) !important;
         gap: 2px !important;
     }
 
@@ -1812,8 +1812,8 @@ a-scene,
     }
 
     #mobile-action-buttons {
-        bottom: 8px !important;
-        right: 10px !important;
+        bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
+        right: calc(64px + env(safe-area-inset-right, 0px)) !important;
     }
 
     .xbox-pad-plate {
@@ -2079,6 +2079,97 @@ a-scene,
 .jp-sub {
     font-size: 10px;
     color: var(--text-muted);
+}
+
+.category-row-header td {
+    background: rgba(30, 58, 102, 0.45) !important;
+    color: #93c5fd !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    letter-spacing: 0.5px;
+    padding: 7px 10px !important;
+    border-top: 2px solid var(--navy-focus) !important;
+    border-bottom: 1px solid var(--border-slate) !important;
+}
+
+.score-pills-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.score-pill-sub {
+    background: var(--surface-charcoal);
+    border: 1px solid var(--border-slate);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.score-pill-sub strong {
+    color: #93c5fd;
+}
+
+.transcript-toggle-btn {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-slate);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.transcript-toggle-btn:hover {
+    background: var(--surface-charcoal);
+    border-color: var(--navy-focus);
+    color: var(--text-washi);
+}
+
+.transcript-list {
+    background: var(--surface-charcoal);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 11px;
+    margin-bottom: 14px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.transcript-item {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--border-subtle);
+}
+
+.transcript-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.transcript-label {
+    font-weight: 700;
+    color: #93c5fd;
+    font-size: 10.5px;
+    margin-bottom: 2px;
+}
+
+.transcript-text {
+    color: var(--text-washi);
+    font-family: inherit;
+    line-height: 1.4;
+    word-break: break-word;
 }
 
 .sensei-notice-box {
