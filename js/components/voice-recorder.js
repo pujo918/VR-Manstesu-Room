@@ -32,6 +32,73 @@
         isRecording: false,
         recordStartTime: 0,
         timerInterval: null,
+        isMicPermissionGranted: false,
+
+        checkPermissionStatus: async function () {
+            if (this.isMicPermissionGranted) return 'granted';
+            if (navigator.permissions && navigator.permissions.query) {
+                try {
+                    const status = await navigator.permissions.query({ name: 'microphone' });
+                    if (status && status.state === 'granted') {
+                        this.isMicPermissionGranted = true;
+                        if (!window.MensetsuState) window.MensetsuState = {};
+                        window.MensetsuState.micGranted = true;
+                    }
+                    return status ? status.state : 'prompt';
+                } catch (e) {
+                    return 'prompt';
+                }
+            }
+            return 'prompt';
+        },
+
+        requestPermission: async function () {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                const err = new Error('Browser tidak mendukung getUserMedia');
+                console.warn(err);
+                throw err;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                this.isMicPermissionGranted = true;
+                if (!window.MensetsuState) window.MensetsuState = {};
+                window.MensetsuState.micGranted = true;
+
+                // Bangunkan AudioContext sejenak agar audio engine web mobile terbuka
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) {
+                    try {
+                        const tempCtx = new AudioCtx();
+                        if (tempCtx.state === 'suspended') {
+                            await tempCtx.resume();
+                        }
+                        setTimeout(() => {
+                            if (tempCtx.state !== 'closed') tempCtx.close().catch(() => {});
+                        }, 120);
+                    } catch (e) {}
+                }
+
+                // Matikan track stream sementara agar indikator perekaman merah tidak menyala
+                // di tab browser sampai pengguna benar-benar menjawab di ruang wawancara
+                stream.getTracks().forEach(track => track.stop());
+
+                return true;
+            } catch (err) {
+                this.isMicPermissionGranted = false;
+                if (!window.MensetsuState) window.MensetsuState = {};
+                window.MensetsuState.micGranted = false;
+                console.warn('Izin akses mikrofon gagal atau ditolak:', err);
+                throw err;
+            }
+        },
 
         init: function () {
             console.log('Sistem Perekam Suara WAV & Integrasi Cloud Siap.');

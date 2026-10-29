@@ -134,15 +134,73 @@
                 </div>
 
                 <!-- ==================================================== -->
-                <!-- MODAL KARTU: ONBOARDING LANGKAH 1 & 2                -->
+                <!-- MODAL KARTU: ONBOARDING LANGKAH 1, 2 & 3             -->
                 <!-- ==================================================== -->
                 <div class="gate-card gate-step-hidden" id="gate-onboarding-card">
                     <!-- ==================================================== -->
-                    <!-- LANGKAH 1: PERTANYAAN PILIH DEVICE (3 GAMBAR CLICKABLE)-->
+                    <!-- LANGKAH 1: PERIZINAN MIKROFON WAWANCARA (UPFRONT)   -->
                     <!-- ==================================================== -->
-                    <div id="gate-step-device" class="gate-step-panel gate-step-visible">
+                    <div id="gate-step-mic" class="gate-step-panel gate-step-visible">
                         <div class="gate-header">
-                            <div class="gate-badge">日本大学院・奨学金面接シミュレーション</div>
+                            <div class="gate-badge">音声認識・マイク権限確認</div>
+                            <h1 class="gate-title">Izin Akses Mikrofon</h1>
+                            <p class="gate-subtitle">Simulasi wawancara menggunakan perekaman suara untuk menjawab pertanyaan dosen/pewawancara. Aktifkan izin mikrofon sekarang sebelum memilih perangkat & memasang kacamata VR.</p>
+                        </div>
+
+                        <div class="gate-body">
+                            <div class="mic-permission-box" id="gate-mic-box">
+                                <div class="mic-permission-icon-wrap" id="gate-mic-icon-wrap">
+                                    <div class="mic-pulse-ring"></div>
+                                    <div class="mic-pulse-ring-2"></div>
+                                    <div class="mic-icon-circle">
+                                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                            <line x1="12" y1="19" x2="12" y2="23"/>
+                                            <line x1="8" y1="23" x2="16" y2="23"/>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <div class="mic-permission-info">
+                                    <h3 class="mic-status-title" id="gate-mic-status-title">Status: Menunggu Izin Browser</h3>
+                                    <p class="mic-status-desc" id="gate-mic-status-desc">Klik tombol di bawah untuk memberikan izin akses mikrofon agar tidak ada dialog browser yang menghalangi pandangan saat bermain di mode VR 360.</p>
+                                </div>
+                            </div>
+
+                            <div id="gate-mic-error-msg" class="validation-msg" style="display:none;"></div>
+
+                            <div style="text-align: center;">
+                                <div class="engine-ready-badge">
+                                    <span class="engine-dot-pulse"></span>
+                                    <span>WAV 16kHz PCM Audio Stream • Google Drive Cloud Ready</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gate-footer">
+                            <button type="button" class="btn-start-simulation" id="gate-btn-request-mic">
+                                <span>Aktifkan & Izinkan Mikrofon</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+                            </button>
+                            <button type="button" class="btn-gate-skip" id="gate-btn-skip-mic">
+                                Lewati sementara (Lanjut Pilih Perangkat)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ==================================================== -->
+                    <!-- LANGKAH 2: PERTANYAAN PILIH DEVICE (3 GAMBAR CLICKABLE)-->
+                    <!-- ==================================================== -->
+                    <div id="gate-step-device" class="gate-step-panel gate-step-hidden">
+                        <div class="gate-header">
+                            <div class="step-nav-row">
+                                <button type="button" class="btn-gate-back" id="btn-back-to-mic" title="Periksa ulang mikrofon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m7 7-7-7 7-7"/></svg>
+                                    <span>Cek Mikrofon</span>
+                                </button>
+                                <div class="gate-badge">Pilihan Perangkat • 端末選択</div>
+                            </div>
                             <h1 class="gate-title">Menggunakan device apa?</h1>
                             <p class="gate-subtitle">Silakan pilih perangkat yang Anda gunakan untuk memulai simulasi wawancara.</p>
                         </div>
@@ -196,7 +254,7 @@
                     </div>
 
                     <!-- ==================================================== -->
-                    <!-- LANGKAH 2: INPUT NAMA LENGKAP MAHASISWA / KANDIDAT   -->
+                    <!-- LANGKAH 3: INPUT NAMA LENGKAP MAHASISWA / KANDIDAT   -->
                     <!-- ==================================================== -->
                     <div id="gate-step-name" class="gate-step-panel gate-step-hidden">
                         <div class="gate-header">
@@ -218,6 +276,16 @@
                                 <div class="pill-value">
                                     <img id="gate-selected-device-img" src="assets/device-pc.png" class="pill-thumb" alt="device">
                                     <strong id="gate-selected-device-name">Komputer / Laptop</strong>
+                                </div>
+                            </div>
+
+                            <!-- Indikator Status Mikrofon -->
+                            <div class="selected-device-pill" style="margin-top: -4px;">
+                                <span class="pill-label">Status Mikrofon:</span>
+                                <div class="pill-value" id="gate-name-mic-pill">
+                                    <span style="color:#4ade80; display:flex; align-items:center; gap:6px;">
+                                        <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#4ade80;"></span> Terhubung & Siap
+                                    </span>
                                 </div>
                             </div>
 
@@ -284,7 +352,29 @@
             const loaderReadyBtn = document.getElementById('btn-loader-ready');
             if (loaderReadyBtn) {
                 loaderReadyBtn.addEventListener('click', () => {
+                    this.goToStepMic();
+                });
+            }
+
+            // 0.5. Tombol Aksi Izin Mikrofon (Step 1)
+            const btnReqMic = document.getElementById('gate-btn-request-mic');
+            if (btnReqMic) {
+                btnReqMic.addEventListener('click', () => {
+                    this.handleRequestMic();
+                });
+            }
+
+            const btnSkipMic = document.getElementById('gate-btn-skip-mic');
+            if (btnSkipMic) {
+                btnSkipMic.addEventListener('click', () => {
                     this.goToStepDevice();
+                });
+            }
+
+            const btnBackToMic = document.getElementById('btn-back-to-mic');
+            if (btnBackToMic) {
+                btnBackToMic.addEventListener('click', () => {
+                    this.goToStepMic();
                 });
             }
 
@@ -293,6 +383,10 @@
             cards.forEach(card => {
                 const triggerAction = () => {
                     const chosen = card.getAttribute('data-device') || 'pc';
+                    // Jika mic belum aktif, minta izin secara otomatis memanfaatkan interaksi klik ini
+                    if (window.MensetsuRecorder && !window.MensetsuState.micGranted && typeof window.MensetsuRecorder.requestPermission === 'function') {
+                        window.MensetsuRecorder.requestPermission().catch(() => {});
+                    }
                     this.goToStepName(chosen);
                 };
 
@@ -447,11 +541,11 @@
                                             btnReady.classList.add('is-active');
                                         }
 
-                                        // Transisi otomatis halus ke Step 1 (Pilih Perangkat) setelah jeda elegan 950ms
+                                        // Transisi otomatis halus ke Step 1 (Izin Mikrofon Upfront) setelah jeda elegan 950ms
                                         setTimeout(() => {
                                             const stepLoading = document.getElementById('gate-step-loading');
                                             if (stepLoading && stepLoading.classList.contains('gate-step-visible')) {
-                                                this.goToStepDevice();
+                                                this.goToStepMic();
                                             }
                                         }, 950);
                                     }
@@ -471,7 +565,7 @@
                         setTimeout(() => {
                             const stepLoading = document.getElementById('gate-step-loading');
                             if (stepLoading && stepLoading.classList.contains('gate-step-visible')) {
-                                this.goToStepDevice();
+                                this.goToStepMic();
                             }
                         }, 950);
                     }, 850);
@@ -517,19 +611,13 @@
             }, 90);
         },
 
-        // Navigasi ke Step 2 (Input Nama)
-        goToStepName: function (deviceMode) {
-            window.MensetsuState.deviceMode = deviceMode;
+        // Navigasi ke Step 1 (Izin Mikrofon Upfront)
+        goToStepMic: function () {
             if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
-
-            const info = DEVICE_METADATA[deviceMode] || DEVICE_METADATA.pc;
-            const imgEl = document.getElementById('gate-selected-device-img');
-            const nameEl = document.getElementById('gate-selected-device-name');
-            if (imgEl) imgEl.src = info.icon;
-            if (nameEl) nameEl.textContent = info.name;
 
             const stepLoad = document.getElementById('gate-step-loading');
             const onbCard = document.getElementById('gate-onboarding-card');
+            const stepMic = document.getElementById('gate-step-mic');
             const step1 = document.getElementById('gate-step-device');
             const step2 = document.getElementById('gate-step-name');
 
@@ -546,22 +634,149 @@
                 step1.classList.add('gate-step-hidden');
             }
             if (step2) {
-                step2.classList.remove('gate-step-hidden');
-                step2.classList.add('gate-step-visible');
+                step2.classList.remove('gate-step-visible');
+                step2.classList.add('gate-step-hidden');
+            }
+            if (stepMic) {
+                stepMic.classList.remove('gate-step-hidden');
+                stepMic.classList.add('gate-step-visible');
+            }
 
-                const nameInput = document.getElementById('gate-input-name');
-                if (nameInput) {
-                    setTimeout(() => nameInput.focus(), 150);
+            this.updateMicPermissionUI();
+        },
+
+        // Perbarui Visual Status Izin Mikrofon (Cek State Browser)
+        updateMicPermissionUI: async function () {
+            const iconWrap = document.getElementById('gate-mic-icon-wrap');
+            const titleEl = document.getElementById('gate-mic-status-title');
+            const descEl = document.getElementById('gate-mic-status-desc');
+            const btnReq = document.getElementById('gate-btn-request-mic');
+            const errBox = document.getElementById('gate-mic-error-msg');
+
+            let status = 'prompt';
+            if (window.MensetsuRecorder && typeof window.MensetsuRecorder.checkPermissionStatus === 'function') {
+                status = await window.MensetsuRecorder.checkPermissionStatus();
+            } else if (navigator.permissions && navigator.permissions.query) {
+                try {
+                    const res = await navigator.permissions.query({ name: 'microphone' });
+                    status = res ? res.state : 'prompt';
+                } catch (e) {}
+            }
+
+            if (window.MensetsuState && window.MensetsuState.micGranted) {
+                status = 'granted';
+            }
+
+            if (status === 'granted') {
+                if (iconWrap) {
+                    iconWrap.classList.add('is-granted');
+                    iconWrap.classList.remove('is-denied');
+                }
+                if (titleEl) titleEl.textContent = 'Status: Mikrofon Aktif & Terverifikasi!';
+                if (descEl) descEl.textContent = 'Izin browser telah aktif. Tidak akan ada popup dialog yang mengganggu pandangan saat bermain di mode VR 360.';
+                if (errBox) errBox.style.display = 'none';
+                if (btnReq) {
+                    btnReq.innerHTML = `<span>Lanjut ke Pemilihan Perangkat</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>`;
+                    btnReq.style.background = 'linear-gradient(135deg, #15803d 0%, #166534 100%)';
+                    btnReq.style.borderColor = '#22c55e';
+                }
+            } else if (status === 'denied') {
+                if (iconWrap) {
+                    iconWrap.classList.remove('is-granted');
+                    iconWrap.classList.add('is-denied');
+                }
+                if (titleEl) titleEl.textContent = 'Status: Izin Mikrofon Diblokir Browser';
+                if (descEl) descEl.textContent = 'Browser Anda memblokir mikrofon. Klik ikon gembok / perizinan di address bar browser, ubah Microphone menjadi "Izinkan (Allow)", lalu coba lagi.';
+                if (btnReq) {
+                    btnReq.innerHTML = `<span>Coba Periksa Izin Lagi</span>`;
+                }
+            } else {
+                if (iconWrap) iconWrap.classList.remove('is-granted', 'is-denied');
+                if (titleEl) titleEl.textContent = 'Status: Menunggu Izin Browser';
+                if (descEl) descEl.textContent = 'Klik tombol di bawah untuk memberikan izin akses mikrofon agar tidak ada dialog browser yang menghalangi pandangan saat bermain di mode VR 360.';
+                if (btnReq) {
+                    btnReq.innerHTML = `<span>Aktifkan & Izinkan Mikrofon</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>`;
+                    btnReq.style.background = '';
+                    btnReq.style.borderColor = '';
                 }
             }
         },
 
-        // Navigasi ke Step 1 (Pilih Device)
+        // Handler Meminta Izin Mikrofon Upfront
+        handleRequestMic: async function () {
+            const btnReq = document.getElementById('gate-btn-request-mic');
+            const errBox = document.getElementById('gate-mic-error-msg');
+            const iconWrap = document.getElementById('gate-mic-icon-wrap');
+            const titleEl = document.getElementById('gate-mic-status-title');
+            const descEl = document.getElementById('gate-mic-status-desc');
+
+            if (window.MensetsuState && window.MensetsuState.micGranted) {
+                this.goToStepDevice();
+                return;
+            }
+
+            if (btnReq) {
+                btnReq.disabled = true;
+                btnReq.innerHTML = `<span>Meminta Izin Browser...</span>`;
+            }
+            if (errBox) errBox.style.display = 'none';
+
+            try {
+                if (window.MensetsuRecorder && typeof window.MensetsuRecorder.requestPermission === 'function') {
+                    await window.MensetsuRecorder.requestPermission();
+                } else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(t => t.stop());
+                    if (!window.MensetsuState) window.MensetsuState = {};
+                    window.MensetsuState.micGranted = true;
+                }
+
+                if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+
+                if (iconWrap) {
+                    iconWrap.classList.add('is-granted');
+                    iconWrap.classList.remove('is-denied');
+                }
+                if (titleEl) titleEl.textContent = 'Status: Izin Berhasil Diaktifkan!';
+                if (descEl) descEl.textContent = 'Mikrofon terhubung dan terverifikasi. Membuka pilihan perangkat...';
+
+                if (btnReq) {
+                    btnReq.innerHTML = `<span>Izin Diterima! Menuju Perangkat...</span>`;
+                    btnReq.style.background = 'linear-gradient(135deg, #15803d 0%, #166534 100%)';
+                    btnReq.style.borderColor = '#22c55e';
+                }
+
+                setTimeout(() => {
+                    this.goToStepDevice();
+                    if (btnReq) btnReq.disabled = false;
+                }, 600);
+
+            } catch (err) {
+                console.warn('Izin mic ditolak/gagal:', err);
+                if (btnReq) {
+                    btnReq.disabled = false;
+                    btnReq.innerHTML = `<span>Coba Izinkan Lagi</span>`;
+                }
+                if (iconWrap) {
+                    iconWrap.classList.remove('is-granted');
+                    iconWrap.classList.add('is-denied');
+                }
+                if (titleEl) titleEl.textContent = 'Akses Mikrofon Belum Diizinkan';
+                if (descEl) descEl.textContent = 'Pastikan Anda menekan "Izinkan" pada kotak dialog browser, atau periksa ikon gembok di bilah alamat browser.';
+                if (errBox) {
+                    errBox.textContent = 'Akses mikrofon ditolak oleh browser. Silakan klik ikon gembok pada URL address bar lalu izinkan Microphone.';
+                    errBox.style.display = 'block';
+                }
+            }
+        },
+
+        // Navigasi ke Step 2 (Pilih Device)
         goToStepDevice: function () {
             if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
 
             const stepLoad = document.getElementById('gate-step-loading');
             const onbCard = document.getElementById('gate-onboarding-card');
+            const stepMic = document.getElementById('gate-step-mic');
             const step1 = document.getElementById('gate-step-device');
             const step2 = document.getElementById('gate-step-name');
 
@@ -573,6 +788,10 @@
                 onbCard.classList.remove('gate-step-hidden');
                 onbCard.classList.add('gate-step-visible');
             }
+            if (stepMic) {
+                stepMic.classList.remove('gate-step-visible');
+                stepMic.classList.add('gate-step-hidden');
+            }
             if (step2) {
                 step2.classList.remove('gate-step-visible');
                 step2.classList.add('gate-step-hidden');
@@ -580,6 +799,59 @@
             if (step1) {
                 step1.classList.remove('gate-step-hidden');
                 step1.classList.add('gate-step-visible');
+            }
+        },
+
+        // Navigasi ke Step 3 (Input Nama)
+        goToStepName: function (deviceMode) {
+            window.MensetsuState.deviceMode = deviceMode;
+            if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+
+            const info = DEVICE_METADATA[deviceMode] || DEVICE_METADATA.pc;
+            const imgEl = document.getElementById('gate-selected-device-img');
+            const nameEl = document.getElementById('gate-selected-device-name');
+            if (imgEl) imgEl.src = info.icon;
+            if (nameEl) nameEl.textContent = info.name;
+
+            const micPill = document.getElementById('gate-name-mic-pill');
+            if (micPill) {
+                if (window.MensetsuState && window.MensetsuState.micGranted) {
+                    micPill.innerHTML = `<span style="color:#4ade80; display:flex; align-items:center; gap:6px;"><span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#4ade80;"></span> Terhubung & Siap</span>`;
+                } else {
+                    micPill.innerHTML = `<span style="color:#fbbf24; display:flex; align-items:center; gap:6px;"><span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#fbbf24;"></span> Belum Diizinkan</span>`;
+                }
+            }
+
+            const stepLoad = document.getElementById('gate-step-loading');
+            const onbCard = document.getElementById('gate-onboarding-card');
+            const stepMic = document.getElementById('gate-step-mic');
+            const step1 = document.getElementById('gate-step-device');
+            const step2 = document.getElementById('gate-step-name');
+
+            if (stepLoad) {
+                stepLoad.classList.remove('gate-step-visible');
+                stepLoad.classList.add('gate-step-hidden');
+            }
+            if (onbCard) {
+                onbCard.classList.remove('gate-step-hidden');
+                onbCard.classList.add('gate-step-visible');
+            }
+            if (stepMic) {
+                stepMic.classList.remove('gate-step-visible');
+                stepMic.classList.add('gate-step-hidden');
+            }
+            if (step1) {
+                step1.classList.remove('gate-step-visible');
+                step1.classList.add('gate-step-hidden');
+            }
+            if (step2) {
+                step2.classList.remove('gate-step-hidden');
+                step2.classList.add('gate-step-visible');
+
+                const nameInput = document.getElementById('gate-input-name');
+                if (nameInput) {
+                    setTimeout(() => nameInput.focus(), 150);
+                }
             }
         },
 
