@@ -34,8 +34,8 @@ function doPost(e) {
       "Status Video",
       "Nilai Etika Otomatis (0-30)",
       "Rincian Etika",
-      "Nilai Bahasa & Kelancaran (0-35)",
-      "Nilai Struktur Quartet II (0-35)",
+      "Nilai Bahasa Otomatis (0-35)",
+      "Nilai Struktur Otomatis (0-35)",
       "Total Skor (0-100)",
       "Link Folder Drive Mahasiswa",
       "Audio Intro (Perkenalan Diri / Jikoshoukai)",
@@ -43,14 +43,23 @@ function doPost(e) {
       "Audio Q2 (Alasan Memilih Kampus)",
       "Audio Q3 (Sumber Informasi Kampus)",
       "Audio Q4 (Kelebihan Diri / Chousho)",
-      "Audio Q5 (Kekurangan & Solusi / Tansho)"
+      "Audio Q5 (Kekurangan & Solusi / Tansho)",
+      "Grade / Status Kelulusan",
+      "Transkrip Intro (ja-JP)",
+      "Transkrip Q1 (ja-JP)",
+      "Transkrip Q2 (ja-JP)",
+      "Transkrip Q3 (ja-JP)",
+      "Transkrip Q4 (ja-JP)",
+      "Transkrip Q5 (ja-JP)",
+      "Rincian Evaluasi Bahasa",
+      "Rincian Evaluasi Struktur"
     ];
 
-    // Jika sheet belum ada, buat baru; jika sudah ada, pastikan header ter-update lengkap 17 kolom
+    // Jika sheet belum ada, buat baru; jika sudah ada, pastikan header ter-update lengkap
     if (!sheet) {
       sheet = ss.insertSheet("Nilai_Wawancara");
       sheet.appendRow(headers);
-    } else if (sheet.getLastColumn() < headers.length) {
+    } else {
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     }
     sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#0284c7").setFontColor("#ffffff");
@@ -102,7 +111,13 @@ function doPost(e) {
 
     // 4. Masukkan Baris Nilai Baru ke Google Spreadsheet
     var nextRow = sheet.getLastRow() + 1;
+    // Formula otomatis Total Skor (Kolom F + Kolom H + Kolom I):
     var formulaTotal = "=F" + nextRow + "+H" + nextRow + "+I" + nextRow;
+
+    // Nilai Kategori dari Sistem (Otomatis terisi, namun Sensei dapat mengganti secara manual):
+    var mannerVal = Number(data.mannerScore !== undefined ? data.mannerScore : (data.totalMannerScore || 0));
+    var languageVal = Number(data.languageScore !== undefined ? data.languageScore : 0);
+    var contentVal = Number(data.contentScore !== undefined ? data.contentScore : 0);
 
     sheet.appendRow([
       data.timestamp || new Date(),
@@ -110,18 +125,27 @@ function doPost(e) {
       data.studentName || "Kandidat",
       data.deviceMode || "PC",
       data.hasWatchedVideo || "Belum Ditonton",
-      data.totalMannerScore || 0,
-      data.mannerDetails || "-",
-      "", // Kolom H: Nilai Bahasa oleh Sensei (0-35)
-      "", // Kolom I: Nilai Struktur Quartet II oleh Sensei (0-35)
-      formulaTotal, // Kolom J: Total skor otomatis saat Sensei mengisi kolom H dan I
-      folderUrl,
-      audioUrlIntro,
-      audioUrl1,
-      audioUrl2,
-      audioUrl3,
-      audioUrl4,
-      audioUrl5
+      mannerVal,                                        // Kolom F: Nilai Etika (0-30)
+      data.mannerDetails || "-",                        // Kolom G: Rincian Etika
+      languageVal,                                      // Kolom H: Nilai Bahasa (0-35) - Auto terisi & Bisa diedit manual!
+      contentVal,                                       // Kolom I: Nilai Struktur (0-35) - Auto terisi & Bisa diedit manual!
+      formulaTotal,                                     // Kolom J: Total Skor (=F+H+I) otomatis update saat F, H, I diedit!
+      folderUrl,                                        // Kolom K: Link Folder Drive
+      audioUrlIntro,                                    // Kolom L: Audio Intro
+      audioUrl1,                                        // Kolom M: Audio Q1
+      audioUrl2,                                        // Kolom N: Audio Q2
+      audioUrl3,                                        // Kolom O: Audio Q3
+      audioUrl4,                                        // Kolom P: Audio Q4
+      audioUrl5,                                        // Kolom Q: Audio Q5
+      data.gradeTitle || "-",                           // Kolom R: Grade / Status
+      data.transcriptIntro || "-",                      // Kolom S: Transkrip Intro
+      data.transcriptQ1 || "-",                         // Kolom T: Transkrip Q1
+      data.transcriptQ2 || "-",                         // Kolom U: Transkrip Q2
+      data.transcriptQ3 || "-",                         // Kolom V: Transkrip Q3
+      data.transcriptQ4 || "-",                         // Kolom W: Transkrip Q4
+      data.transcriptQ5 || "-",                         // Kolom X: Transkrip Q5
+      data.languageDetails || "-",                      // Kolom Y: Rincian Bahasa
+      data.contentDetails || "-"                        // Kolom Z: Rincian Struktur
     ]);
 
     return ContentService.createTextOutput(JSON.stringify({

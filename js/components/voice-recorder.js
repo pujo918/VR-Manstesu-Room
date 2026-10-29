@@ -604,13 +604,13 @@
 
                 // SKOR 100 POIN LENGKAP & EVALUASI SUB-KATEGORI:
                 totalScore: mannerEval ? mannerEval.totalScore : (window.MannerEvaluation ? window.MannerEvaluation.getTotalScore() : 0),
-                mannerScore: mannerEval ? mannerEval.totalMannerScore : 0,
-                languageScore: mannerEval ? mannerEval.totalLanguageScore : 0,
-                contentScore: mannerEval ? mannerEval.totalContentScore : 0,
+                mannerScore: mannerEval ? mannerEval.totalMannerScore : (window.MannerEvaluation ? window.MannerEvaluation.getMannerTotalScore() : 0),
+                languageScore: mannerEval ? mannerEval.totalLanguageScore : (window.MannerEvaluation ? window.MannerEvaluation.getLanguageTotalScore() : 0),
+                contentScore: mannerEval ? mannerEval.totalContentScore : (window.MannerEvaluation ? window.MannerEvaluation.getContentTotalScore() : 0),
                 gradeTitle: mannerEval ? mannerEval.gradeTitle : 'Evaluasi',
 
-                // Kompatibilitas kolom lama Spreadsheet:
-                totalMannerScore: mannerEval ? mannerEval.totalScore : 0,
+                // Nilai Etika Kategori I (Maks 30 Poin, bukan 100):
+                totalMannerScore: mannerEval ? mannerEval.totalMannerScore : (window.MannerEvaluation ? window.MannerEvaluation.getMannerTotalScore() : 0),
                 mannerDetails: mannerEval ? mannerEval.conciseNote : '-',
                 languageDetails: mannerEval ? mannerEval.languageNote : '-',
                 contentDetails: mannerEval ? mannerEval.contentNote : '-',
