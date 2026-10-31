@@ -3042,6 +3042,859 @@ body.vr-stereo-mode .reception-rpg-btn {
     }
 }
 
+/* ==========================================================================
+   SISTEM PANDUAN KONTROL INTERAKTIF (ARCHITECTURAL JAPANESE HUD DESIGN)
+   ========================================================================== */
+
+/* Tombol Panduan di Top Nav Bar (Seragam dengan Sistem Korporat Charcoal) */
+.nav-btn.btn-tutorial {
+    background: var(--surface-charcoal);
+    border: 1px solid var(--border-slate);
+    color: var(--text-washi);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.nav-btn.btn-tutorial:hover {
+    background: var(--surface-elevated);
+    border-color: #c5a059;
+    color: #ffffff;
+}
+
+.nav-btn.btn-tutorial .tut-icon {
+    display: inline-flex;
+    align-items: center;
+    color: #c5a059;
+}
+
+/* --------------------------------------------------------------------------
+   1. VIEWFINDER SPOTLIGHT & COACH CARD OVERLAY (PC & MOBILE)
+   -------------------------------------------------------------------------- */
+#mensetsu-tutorial-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10020;
+    pointer-events: auto;
+    opacity: 1;
+    animation: tutFadeIn 0.2s ease-out;
+    font-family: var(--font-family);
+}
+
+@keyframes tutFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Indikator Zona Geser Kamera (Langkah 2 Mobile) */
+#tutorial-swipe-zone-indicator {
+    position: fixed;
+    top: 46%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+    width: min(260px, 52vw);
+    height: min(116px, 26vh);
+    border: 1px dashed rgba(245, 244, 239, 0.45);
+    border-radius: 6px;
+    background: rgba(22, 27, 34, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10019;
+}
+
+.swipe-hand-anim {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-washi);
+}
+
+.swipe-svg-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #c5a059;
+    animation: swipeTrackOscillate 2s infinite ease-in-out;
+}
+
+.swipe-zone-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+}
+
+@keyframes swipeTrackOscillate {
+    0%, 100% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+}
+
+/* Bingkai Viewfinder Spotlight (Siku Presisi Tanpa Efek Neon Berlebihan) */
+#tutorial-spotlight-ring {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    box-shadow: 0 0 0 9999px rgba(10, 13, 18, 0.82);
+    border: 1px solid rgba(245, 244, 239, 0.32);
+    pointer-events: none;
+    z-index: 10021;
+    transition:
+        top 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        left 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        border-radius 0.28s ease;
+}
+
+/* Siku Sudut Viewfinder (Corner Reticle Brackets) */
+.spot-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: #c5a059;
+    border-style: solid;
+    pointer-events: none;
+}
+
+.spot-corner.corner-tl {
+    top: -2px;
+    left: -2px;
+    border-width: 2px 0 0 2px;
+}
+
+.spot-corner.corner-tr {
+    top: -2px;
+    right: -2px;
+    border-width: 2px 2px 0 0;
+}
+
+.spot-corner.corner-bl {
+    bottom: -2px;
+    left: -2px;
+    border-width: 0 0 2px 2px;
+}
+
+.spot-corner.corner-br {
+    bottom: -2px;
+    right: -2px;
+    border-width: 0 2px 2px 0;
+}
+
+/* Highlight Presisi pada Tombol yang Sedang Ditunjuk */
+.tut-highlighted-btn {
+    outline: 2px solid #c5a059 !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.25) !important;
+}
+
+/* Panel Coach Mark (Architectural Charcoal & Washi) */
+#tutorial-coach-card {
+    position: fixed;
+    width: min(390px, calc(100vw - 24px));
+    background: #181d24;
+    border: 1px solid #3b4552;
+    border-radius: 8px;
+    padding: 16px 18px 14px 18px;
+    color: var(--text-washi);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.78);
+    box-sizing: border-box;
+    z-index: 10022;
+    overflow: hidden;
+    transition: top 0.26s cubic-bezier(0.22, 1, 0.36, 1), left 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tut-card-top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #c5a059 0%, #3b4552 100%);
+}
+
+.tut-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #262f3a;
+}
+
+.tut-meta-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tut-step-num {
+    display: inline-block;
+    padding: 2px 6px;
+    background: #232b35;
+    border: 1px solid #3b4552;
+    border-radius: 4px;
+    color: #c5a059;
+    font-family: monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.tut-step-category {
+    color: var(--text-muted);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.tut-btn-skip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: transparent;
+    border: 1px solid #333d4b;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tut-btn-skip:hover {
+    color: var(--text-washi);
+    border-color: #64748b;
+    background: #232b35;
+}
+
+.tut-title-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 6px;
+}
+
+.tut-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    background: #222933;
+    border: 1px solid #333d4b;
+    color: #c5a059;
+    flex-shrink: 0;
+}
+
+.tut-card-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-washi);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+.tut-card-desc {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+}
+
+.tut-card-desc strong {
+    color: var(--text-washi);
+    font-weight: 700;
+}
+
+.tut-card-desc em {
+    color: var(--text-muted);
+    font-style: normal;
+}
+
+/* Daftar Fungsi Tombol di dalam Coach Card */
+.tut-btn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.tut-btn-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #1f2630;
+    border: 1px solid #2e3846;
+    border-radius: 6px;
+    padding: 7px 10px;
+}
+
+.tut-btn-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.tut-btn-copy strong {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-washi);
+    line-height: 1.25;
+}
+
+.tut-btn-copy span {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    line-height: 1.35;
+}
+
+/* Keycap Hardware Presisi */
+.tut-key-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 26px;
+    padding: 0 7px;
+    border-radius: 5px;
+    background: #141920;
+    border: 1px solid #475569;
+    border-bottom-width: 2.5px;
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-washi);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.tut-key-pill.pill-y { border-color: #d97706; color: #fbbf24; }
+.tut-key-pill.pill-x { border-color: #2563eb; color: #60a5fa; }
+.tut-key-pill.pill-b { border-color: #dc2626; color: #f87171; }
+.tut-key-pill.pill-a { border-color: #16a34a; color: #4ade80; }
+.tut-key-pill.pill-neutral { border-color: #64748b; color: #e2e8f0; }
+
+.tut-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #262f3a;
+}
+
+/* Segmented Linear Progress Bar */
+.tut-dots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tut-dot {
+    width: 14px;
+    height: 4px;
+    border-radius: 2px;
+    background: #2b3543;
+    transition: all 0.2s ease;
+}
+
+.tut-dot.active {
+    width: 24px;
+    background: #c5a059;
+}
+
+.tut-dot.done {
+    background: #64748b;
+}
+
+.tut-nav-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tut-btn-prev,
+.tut-btn-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 6px 11px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tut-btn-prev {
+    background: #222933;
+    border: 1px solid #3b4552;
+    color: var(--text-secondary);
+}
+
+.tut-btn-prev:hover {
+    background: #2c3542;
+    color: #ffffff;
+}
+
+.tut-btn-next {
+    background: #1e3a8a;
+    border: 1px solid #3b82f6;
+    color: #ffffff;
+}
+
+.tut-btn-next:hover {
+    background: #1d4ed8;
+}
+
+.tut-btn-next.is-finish {
+    background: #15803d;
+    border-color: #22c55e;
+}
+
+.tut-btn-next.is-finish:hover {
+    background: #16a34a;
+}
+
+/* --------------------------------------------------------------------------
+   2. DOCK REFERENSI KEYBOARD & MOUSE (KHUSUS TUTORIAL PC)
+   -------------------------------------------------------------------------- */
+#pc-tutorial-hud-dock {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10020;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #161b22;
+    border: 1px solid #3b4552;
+    border-radius: 8px;
+    padding: 10px 18px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+    pointer-events: none;
+}
+
+.pc-dock-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #1f2630;
+    border: 1px solid #2e3846;
+}
+
+.pc-keys-pyramid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.pc-keys-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pc-dock-right-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pc-key-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.pc-key-unit small {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.pc-key-cap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 26px;
+    padding: 0 6px;
+    background: #141920;
+    border: 1px solid #475569;
+    border-bottom-width: 2.5px;
+    border-radius: 4px;
+    color: var(--text-washi);
+    font-family: monospace;
+    font-size: 11.5px;
+    font-weight: 800;
+}
+
+.pc-key-cap.key-y { border-color: #d97706; color: #fbbf24; }
+.pc-key-cap.key-x { border-color: #2563eb; color: #60a5fa; }
+.pc-key-cap.key-a { border-color: #16a34a; color: #4ade80; }
+.pc-key-cap.key-b { border-color: #dc2626; color: #f87171; }
+
+.pc-mouse-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-washi);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 4px 6px;
+}
+
+.pc-mouse-icon svg {
+    color: #c5a059;
+}
+
+.pc-dock-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+/* --------------------------------------------------------------------------
+   3. DUAL-EYE STEREOSCOPIC WARM-UP CHECKLIST (KHUSUS HEADSET VR)
+   -------------------------------------------------------------------------- */
+#mensetsu-vr-tutorial-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10020;
+    pointer-events: none;
+    opacity: 1;
+    animation: tutFadeIn 0.2s ease-out;
+    font-family: var(--font-family);
+}
+
+.vr-mode-badge {
+    left: 12px !important;
+    transform: none !important;
+}
+
+.vr-tut-pane {
+    position: fixed;
+    top: 52%;
+    transform: translate(-50%, -50%);
+    width: min(44vw, 340px);
+    pointer-events: auto;
+}
+
+.vr-tut-pane-left {
+    left: 25%;
+}
+
+.vr-tut-pane-right {
+    left: 75%;
+}
+
+body:not(.vr-stereo-mode) .vr-tut-pane-left {
+    left: 50%;
+    width: min(90vw, 400px);
+}
+
+body:not(.vr-stereo-mode) .vr-tut-pane-right {
+    display: none;
+}
+
+.vr-tut-card {
+    position: relative;
+    background: #181d24;
+    border: 1px solid #3b4552;
+    border-radius: 8px;
+    padding: 12px 13px 10px 13px;
+    color: var(--text-washi);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.vr-tut-top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #c5a059 0%, #3b4552 100%);
+}
+
+.vr-tut-header {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #262f3a;
+}
+
+.vr-tut-title-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vr-tut-icon {
+    display: inline-flex;
+    align-items: center;
+    color: #c5a059;
+}
+
+.vr-tut-badge {
+    color: var(--text-washi);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.vr-tut-sub {
+    font-size: 9.5px;
+    color: var(--text-secondary);
+}
+
+.vr-tut-sub strong {
+    color: #c5a059;
+    font-family: monospace;
+}
+
+.vr-tut-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.vr-check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #1f2630;
+    border: 1px solid #2e3846;
+    border-radius: 5px;
+    padding: 5px 8px;
+    transition: all 0.2s ease;
+}
+
+.vr-check-item.is-done {
+    background: rgba(21, 128, 61, 0.14);
+    border-color: #15803d;
+}
+
+.vr-chk-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.vr-check-item.is-done .vr-chk-box {
+    color: #4ade80;
+}
+
+.vr-chk-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.vr-chk-text strong {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-washi);
+    line-height: 1.25;
+}
+
+.vr-check-item.is-done .vr-chk-text strong {
+    color: #86efac;
+}
+
+.vr-chk-text small {
+    font-size: 9.5px;
+    color: var(--text-secondary);
+    line-height: 1.25;
+}
+
+.vr-tut-footer {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid #262f3a;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.vr-tut-progress-label {
+    font-size: 9.5px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.vr-tut-btn-done {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #232b35;
+    border: 1px solid #3b4552;
+    border-radius: 5px;
+    color: var(--text-washi);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.vr-tut-btn-done:hover {
+    background: #2f3844;
+    border-color: #c5a059;
+}
+
+/* --------------------------------------------------------------------------
+   4. RESPONSIF MOBILE LANDSCAPE (TINGGI <= 520px)
+   -------------------------------------------------------------------------- */
+@media (max-height: 520px) {
+    #tutorial-coach-card {
+        width: min(336px, calc(100vw - 20px));
+        padding: 11px 13px 10px 13px;
+        border-radius: 7px;
+    }
+
+    .tut-card-header {
+        margin-bottom: 6px;
+        padding-bottom: 5px;
+    }
+
+    .tut-step-num {
+        font-size: 10px;
+        padding: 1px 5px;
+    }
+
+    .tut-step-category {
+        font-size: 9.5px;
+    }
+
+    .tut-btn-skip {
+        font-size: 9.5px;
+        padding: 2px 6px;
+    }
+
+    .tut-title-row {
+        gap: 7px;
+        margin-bottom: 4px;
+    }
+
+    .tut-title-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .tut-card-title {
+        font-size: 13px;
+    }
+
+    .tut-card-desc {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .tut-btn-list {
+        gap: 4px;
+        margin-top: 5px;
+    }
+
+    .tut-btn-item {
+        padding: 4px 7px;
+        gap: 7px;
+    }
+
+    .tut-btn-copy strong {
+        font-size: 10.5px;
+    }
+
+    .tut-btn-copy span {
+        font-size: 10px;
+        line-height: 1.25;
+    }
+
+    .tut-key-pill {
+        min-width: 22px;
+        height: 20px;
+        font-size: 10px;
+        padding: 0 5px;
+    }
+
+    .tut-card-footer {
+        margin-top: 8px;
+        padding-top: 6px;
+    }
+
+    .tut-btn-prev,
+    .tut-btn-next {
+        padding: 4px 9px;
+        font-size: 10px;
+    }
+
+    #pc-tutorial-hud-dock {
+        bottom: 8px;
+        padding: 6px 12px;
+        gap: 10px;
+    }
+
+    .vr-tut-pane {
+        top: 53%;
+        width: min(46vw, 310px);
+    }
+
+    .vr-tut-card {
+        padding: 8px 9px;
+    }
+
+    .vr-tut-checklist {
+        gap: 3px;
+    }
+
+    .vr-check-item {
+        padding: 3px 6px;
+    }
+
+    .vr-chk-text strong {
+        font-size: 9.5px;
+    }
+
+    .vr-chk-text small {
+        font-size: 8.5px;
+    }
+}
+
+
 
 
 

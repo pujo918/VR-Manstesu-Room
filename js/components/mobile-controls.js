@@ -6,6 +6,9 @@
 (function () {
     // Handler Khusus Tombol Xbox B (Mic / Bicara Jawaban)
     window.handleMobileMicButton = function () {
+        if (window.MensetsuTutorial && typeof window.MensetsuTutorial.notifyVRActionTriggered === 'function') {
+            if (window.MensetsuTutorial.notifyVRActionTriggered('mic')) return;
+        }
         const interview = window.MensetsuInterview;
 
         // 1. Sedang merekam suara -> selesaikan rekaman dan teruskan alur wawancara
@@ -208,7 +211,7 @@
                     this._vrClickAttached = true;
                     window.addEventListener('click', (e) => {
                         if (this.activeMode !== 'vr') return;
-                        if (e.target && e.target.closest('#top-nav-controls, #gate-screen, #reception-menu-overlay')) {
+                        if (e.target && e.target.closest('#top-nav-controls, #gate-screen, #reception-menu-overlay, #mensetsu-vr-tutorial-overlay, #mensetsu-tutorial-overlay')) {
                             return;
                         }
                         if (typeof window.triggerAction === 'function') {
@@ -640,7 +643,7 @@
 
                     // Pastikan tidak menyentuh tombol gamepad atau navigasi atas
                     const el = document.elementFromPoint(t.clientX, t.clientY);
-                    if (el && el.closest('#virtual-joystick-zone, #mobile-action-buttons, #top-nav-controls, #gate-screen, .interactive-modal')) {
+                    if (el && el.closest('#virtual-joystick-zone, #mobile-action-buttons, #top-nav-controls, #gate-screen, .interactive-modal, #mensetsu-tutorial-overlay, #mensetsu-vr-tutorial-overlay')) {
                         continue;
                     }
 
@@ -912,7 +915,13 @@
             });
 
             // Handler Navigasi Menu Pertanyaan Resepsionis via Tombol Shoulder L1 (Atas) & L2 (Bawah)
+            // Jika Panduan VR sedang aktif, Trigger Samping (L1/L2/R1/R2) berfungsi untuk Langsung Tutup / Lewati Panduan VR
             const handleL1 = () => {
+                if (window.MensetsuTutorial && window.MensetsuTutorial.isActive && window.MensetsuTutorial.currentMode === 'vr') {
+                    if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+                    window.MensetsuTutorial.stop();
+                    return;
+                }
                 if (window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen) {
                     window.MensetsuReceptionist.navigateMenu(-1);
                 } else if (typeof window.triggerAction === 'function') {
@@ -921,6 +930,11 @@
             };
 
             const handleL2 = () => {
+                if (window.MensetsuTutorial && window.MensetsuTutorial.isActive && window.MensetsuTutorial.currentMode === 'vr') {
+                    if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+                    window.MensetsuTutorial.stop();
+                    return;
+                }
                 if (window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen) {
                     window.MensetsuReceptionist.navigateMenu(1);
                 } else if (typeof window.triggerOjigi === 'function') {
@@ -928,17 +942,31 @@
                 }
             };
 
-            // Tombol 4 (L1 / Shoulder Atas): Scroll Pilihan Menu ke Atas
+            // Tombol 4 (L1 / Shoulder Atas): Scroll Pilihan Menu ke Atas / Tutup Panduan VR
             checkButton(4, handleL1);
 
-            // Tombol 5 (R1 / Shoulder Kanan Atas): Scroll Pilihan Menu ke Bawah / Ojigi
+            // Tombol 5 (R1 / Shoulder Kanan Atas): Scroll Pilihan Menu ke Bawah / Tutup Panduan VR
             checkButton(5, handleL2);
 
-            // Tombol 6 (L2 / Trigger Bawah): Scroll Pilihan Menu ke Bawah
+            // Tombol 6 (L2 / Trigger Bawah): Scroll Pilihan Menu ke Bawah / Tutup Panduan VR
             checkButton(6, handleL2);
 
-            // Tombol 7 (R2 / Trigger Bawah Kanan): Scroll Pilihan Menu ke Bawah
+            // Tombol 7 (R2 / Trigger Bawah Kanan): Scroll Pilihan Menu ke Bawah / Tutup Panduan VR
             checkButton(7, handleL2);
+
+            // Tombol 8 & 9 (Select / Start pada Remote VR): Tutup Panduan VR
+            checkButton(8, () => {
+                if (window.MensetsuTutorial && window.MensetsuTutorial.isActive && window.MensetsuTutorial.currentMode === 'vr') {
+                    if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+                    window.MensetsuTutorial.stop();
+                }
+            });
+            checkButton(9, () => {
+                if (window.MensetsuTutorial && window.MensetsuTutorial.isActive && window.MensetsuTutorial.currentMode === 'vr') {
+                    if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+                    window.MensetsuTutorial.stop();
+                }
+            });
         }
     };
 

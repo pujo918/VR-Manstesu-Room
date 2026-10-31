@@ -327,6 +327,12 @@ window.showActionToast = function (message) {
 
 // 1. Ketuk Pintu (Hanya bisa dilakukan saat berdiri di dekat pintu ruang wawancara)
 window.triggerKnock = function () {
+    if (window.MensetsuTutorial && typeof window.MensetsuTutorial.notifyVRActionTriggered === 'function') {
+        if (window.MensetsuTutorial.notifyVRActionTriggered('knock')) {
+            return;
+        }
+    }
+
     const camera = document.getElementById('player-camera');
     const pos = camera && camera.object3D ? camera.object3D.position : (camera ? camera.getAttribute('position') : null);
 
@@ -458,6 +464,12 @@ window.triggerOjigi = function () {
 
 // 3. Pemicu Aksi Interaktif Umum (Aksi Tombol Y / F)
 window.triggerAction = function () {
+    if (window.MensetsuTutorial && typeof window.MensetsuTutorial.notifyVRActionTriggered === 'function') {
+        if (window.MensetsuTutorial.notifyVRActionTriggered('action')) {
+            return;
+        }
+    }
+
     if (window.MensetsuReceptionist && window.MensetsuReceptionist.isMenuOpen) {
         window.MensetsuReceptionist.confirmSelectedMenu();
         return;
@@ -548,11 +560,6 @@ window.addEventListener('keydown', function (e) {
     else if (key === 'o') {
         e.preventDefault();
         window.triggerOjigi();
-    }
-    // Tombol C untuk Duduk / Berdiri
-    else if (key === 'c') {
-        e.preventDefault();
-        window.toggleSit();
     }
     // Jika sedang duduk dan menekan tombol WASD / Spasi, langsung berdiri secara intuitif
     else if (window.isSitting && (key === 'w' || key === 'a' || key === 's' || key === 'd' || key === ' ')) {

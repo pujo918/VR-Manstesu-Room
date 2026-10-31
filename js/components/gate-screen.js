@@ -37,7 +37,7 @@
             name: 'Komputer / Laptop',
             icon: 'assets/device-pc.png',
             desc: 'Keyboard WASD & Mouse',
-            actionDesc: '<strong>W, A, S, D</strong> = Jalan, <strong>F</strong> = Interaksi, <strong>K</strong> = Ketuk, <strong>O</strong> = Ojigi, <strong>C</strong> = Duduk.'
+            actionDesc: '<strong>W, A, S, D</strong> = Jalan, <strong>F</strong> = Interaksi / Duduk, <strong>K</strong> = Ketuk, <strong>O</strong> = Ojigi, <strong>B</strong> = Mic.'
         },
         mobile: {
             name: 'Smartphone / HP',
@@ -78,6 +78,12 @@
                     <span id="top-user-name">Kandidat</span>
                     <span class="session-badge" id="top-session-badge"></span>
                 </div>
+                <button class="nav-btn btn-tutorial" id="btn-open-tutorial" title="Panduan Kontrol & Tutorial">
+                    <span class="tut-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </span>
+                    <span class="tut-text">Panduan</span>
+                </button>
                 <button class="nav-btn btn-fullscreen" id="btn-toggle-fullscreen" title="Layar penuh (Full Screen)">
                     <span class="fs-icon">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
@@ -90,6 +96,16 @@
             document.getElementById('btn-toggle-fullscreen').addEventListener('click', () => {
                 this.toggleFullscreen();
             });
+
+            const btnTut = document.getElementById('btn-open-tutorial');
+            if (btnTut) {
+                btnTut.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (window.MensetsuTutorial && typeof window.MensetsuTutorial.start === 'function') {
+                        window.MensetsuTutorial.start(window.MensetsuState.deviceMode, true);
+                    }
+                });
+            }
         },
 
         // Modal Onboarding Bertahap: Step 0 (Cinematic Preloader & GPU Warmup) -> Step 1 (Pilih Device) -> Step 2 (Input Nama)
@@ -1023,6 +1039,13 @@
                     try { this.toggleFullscreen(); } catch (_) {}
                 }
             }
+
+            // Jalankan Tutorial Interaktif otomatis (hanya 1x per browser via localStorage)
+            setTimeout(() => {
+                if (window.MensetsuTutorial && typeof window.MensetsuTutorial.maybeStartAuto === 'function') {
+                    window.MensetsuTutorial.maybeStartAuto(window.MensetsuState.deviceMode);
+                }
+            }, 420);
 
             console.log(`Mahasiswa "${name}" (${window.MensetsuState.sessionId}) memulai simulasi dalam mode: ${window.MensetsuState.deviceMode}`);
         },
